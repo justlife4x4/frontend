@@ -1,0 +1,484 @@
+{
+  "accessLevels": [
+    {
+      "id": "1",
+      "Name": "System Admin",
+      "Description": "Only Lodging",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    },
+    {
+      "id": "2",
+      "Name": "Hotel Room Service",
+      "Description": "Only Lodging",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    },
+    {
+      "id": "3",
+      "Name": "Hotel Kitchen",
+      "Description": "Only Lodging",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    },
+    {
+      "id": "32b4d4e4-4ec1-4eda-8455-2dcf28d1bb6b",
+      "Name": "Hotel Housekeeping",
+      "Description": "Only Lodging",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    }
+  ],
+  "employees": [
+    {
+      "HotelId": "1",
+      "AccessLevelId": "1",
+      "id": "1",
+      "Name": "Pradip Adhikari",
+      "Address": "18 A, B.T. Road, Khardah, Lichubagan, 24 Pgs(N), Kolkata 700116, India",
+      "Mobile": "9830152752",
+      "Email": "pradip.adhikary@gmail.com",
+      "Password": "",
+      "OTP": "",
+      "Session": "",
+      "Token": "",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "AccessLevelId": "1",
+      "id": "21eaf7eb-8da3-4572-9301-eac1a384e4db",
+      "Name": "Ankur Banerjee",
+      "Address": "14, Thana Road, Kolkata 700118, W.B, India",
+      "Mobile": "9830092329",
+      "Email": "ankur.banerjee@gmail.com",
+      "Password": "",
+      "OTP": "",
+      "Session": "",
+      "Token": "",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    }
+  ],
+  "plans": [
+    {
+      "HotelId": "1",
+      "id": "1",
+      "Name": "EP (European Plan)",
+      "Description": "Only Lodging",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "2",
+      "Name": "CP (Continental Plan)",
+      "Description": "Breakfast Only",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "3",
+      "Name": "MAP (Mod. American Plan)",
+      "Description": "Breakfast and a major meal(either Lunch or dinner)",
+      "IsEnable": true
+    },
+    {
+      "id": "32b4d4e4-4ec1-4eda-8455-2dcf28d1bb6b",
+      "Name": "AP (Americal plan)",
+      "Description": "Breakfast included",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    }
+  ],
+  "roomCategories": [
+    {
+      "HotelId": "1",
+      "id": "1",
+      "Name": "Delux (2nd Floor)",
+      "Tariff": 1600,
+      "MaxDiscount": 100,
+      "ExtraBedTariff": 150,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "9/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "2",
+      "Name": "Delux (Top Floor)",
+      "Tariff": 1600,
+      "MaxDiscount": 100,
+      "ExtraBedTariff": 150,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "9/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "3",
+      "Name": "Cottage (A Block)",
+      "Tariff": 3000,
+      "MaxDiscount": 500,
+      "ExtraBedTariff": 550,
+      "ExtraPersonTariff": 600,
+      "UpdatedDate": "9/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "4",
+      "Name": "Non A/C (Top Floor)",
+      "Tariff": 2500,
+      "MaxDiscount": 200,
+      "ExtraBedTariff": 150,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "01/01/1971",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "5",
+      "Name": "Super Delux (2nd Floor)",
+      "Tariff": 2000,
+      "MaxDiscount": 100,
+      "ExtraBedTariff": 100,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "7/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "6",
+      "Name": "Super Delux (4th Floor)",
+      "Tariff": 2500,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 0,
+      "ExtraPersonTariff": 10,
+      "UpdatedDate": "28/10/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "9",
+      "Name": "Super Delux (1st Floor)",
+      "Tariff": 3000,
+      "MaxDiscount": 700,
+      "ExtraBedTariff": 150,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "7/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "10",
+      "Name": "Super Delux (5th Floor)",
+      "Tariff": 4000,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 10,
+      "ExtraPersonTariff": 0,
+      "UpdatedDate": "28/10/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "12",
+      "Name": "Non A/C (1st Floor)",
+      "Tariff": 4500,
+      "MaxDiscount": 1000,
+      "ExtraBedTariff": 500,
+      "ExtraPersonTariff": 500,
+      "UpdatedDate": "01/01/1971",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "13",
+      "Name": "Double Bed",
+      "Tariff": 4500,
+      "MaxDiscount": 1000,
+      "ExtraBedTariff": 500,
+      "ExtraPersonTariff": 500,
+      "UpdatedDate": "01/01/1971",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "14",
+      "Name": "Single Bed",
+      "Tariff": 4500,
+      "MaxDiscount": 1000,
+      "ExtraBedTariff": 500,
+      "ExtraPersonTariff": 500,
+      "UpdatedDate": "7/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "15",
+      "Name": "Dormitory (10 Beds)",
+      "Tariff": 4500,
+      "MaxDiscount": 1000,
+      "ExtraBedTariff": 500,
+      "ExtraPersonTariff": 500,
+      "UpdatedDate": "01/01/1971",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "16",
+      "Name": "Dormitory (6 Beds)",
+      "Tariff": 4500,
+      "MaxDiscount": 1000,
+      "ExtraBedTariff": 500,
+      "ExtraPersonTariff": 500,
+      "UpdatedDate": "01/01/1971",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "17",
+      "Name": "Dormitory (4 Beds)",
+      "Tariff": 4500,
+      "MaxDiscount": 1000,
+      "ExtraBedTariff": 500,
+      "ExtraPersonTariff": 500,
+      "UpdatedDate": "01/01/1971",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "18",
+      "Name": "Driver Room",
+      "Tariff": 4500,
+      "MaxDiscount": 1000,
+      "ExtraBedTariff": 500,
+      "ExtraPersonTariff": 500,
+      "UpdatedDate": "01/01/1971",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "19",
+      "Name": "Driver Room (Single)",
+      "Tariff": 2500,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 10,
+      "ExtraPersonTariff": 0,
+      "UpdatedDate": "28/10/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "20",
+      "Name": "Non A/c (Ground Floof)",
+      "Tariff": 0,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 0,
+      "ExtraPersonTariff": 0,
+      "UpdatedDate": "27/10/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "cf71cb66-c884-4833-8ad4-cb3a096d8b7d",
+      "Name": "Suit (Ground Floof)",
+      "Tariff": 5000,
+      "MaxDiscount": 100,
+      "ExtraBedTariff": 1000,
+      "ExtraPersonTariff": 1500,
+      "UpdatedDate": "7/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "661bbe1b-fc5d-45cc-aeaa-e15c3618e8d1",
+      "Name": "Suit (1st Floof)",
+      "Tariff": 6000,
+      "MaxDiscount": 1999,
+      "ExtraBedTariff": 2000,
+      "ExtraPersonTariff": 3000,
+      "UpdatedDate": "7/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "id": "0bf0e802-6e15-4354-b8b5-b78052dcf536",
+      "Name": "Suit (2nd Floof)",
+      "Tariff": 8000,
+      "MaxDiscount": 2000,
+      "ExtraBedTariff": 1000,
+      "ExtraPersonTariff": 1000,
+      "UpdatedDate": "7/11/2022",
+      "IsEnable": true
+    }
+  ],
+  "rooms": [
+    {
+      "HotelId": "1",
+      "AccessLevelId": "1",
+      "id": "1",
+      "Name": "Pradip Adhikari",
+      "Address": "18 A, B.T. Road, Khardah, Lichubagan, 24 Pgs(N), Kolkata 700116, India",
+      "Mobile": 9830152750,
+      "Email": "pradip.adhikary@gmail.com",
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "2",
+      "id": "2",
+      "No": "201",
+      "Tariff": 1600,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 150,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "29/10/2022",
+      "IsEnable": true,
+      "IsOccopied": true
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "3",
+      "id": "3",
+      "No": "301",
+      "Tariff": 3000,
+      "MaxDiscount": 500,
+      "ExtraBedTariff": 550,
+      "ExtraPersonTariff": 600,
+      "UpdatedDate": "27/10/2022",
+      "IsEnable": true,
+      "IsOccopied": true
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "4",
+      "id": "4",
+      "No": "401",
+      "Tariff": 2500,
+      "MaxDiscount": 200,
+      "ExtraBedTariff": 150,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "01/01/1971",
+      "IsEnable": true,
+      "IsOccopied": false
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "4",
+      "id": "5",
+      "No": "402",
+      "Tariff": 2000,
+      "MaxDiscount": 100,
+      "ExtraBedTariff": 100,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "7/11/2022",
+      "IsEnable": true,
+      "IsOccopied": true
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "4",
+      "id": "6",
+      "No": "403",
+      "Tariff": 2500,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 0,
+      "ExtraPersonTariff": 10,
+      "UpdatedDate": "28/10/2022",
+      "IsEnable": true,
+      "IsOccopied": true
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "4",
+      "id": "9",
+      "No": "404",
+      "Tariff": 3000,
+      "MaxDiscount": 700,
+      "ExtraBedTariff": 150,
+      "ExtraPersonTariff": 100,
+      "UpdatedDate": "7/11/2022",
+      "IsEnable": true,
+      "IsOccopied": false
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "4",
+      "id": "10",
+      "No": "406",
+      "Tariff": 4000,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 10,
+      "ExtraPersonTariff": 0,
+      "UpdatedDate": "28/10/2022",
+      "IsEnable": true,
+      "IsOccopied": true
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "4",
+      "id": "14",
+      "No": "409",
+      "Tariff": 4500,
+      "MaxDiscount": 1000,
+      "ExtraBedTariff": 500,
+      "ExtraPersonTariff": 500,
+      "UpdatedDate": "9/11/2022",
+      "IsEnable": true,
+      "IsOccopied": false
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "17",
+      "id": "84d87253-e27e-4c12-8078-752cde304c1e",
+      "No": "410",
+      "Tariff": 2500,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 0,
+      "ExtraPersonTariff": 0,
+      "UpdatedDate": "9/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "16",
+      "id": "c6dfe259-723f-424a-97fb-2caad11886fc",
+      "No": "610",
+      "Tariff": 500,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 0,
+      "ExtraPersonTariff": 0,
+      "UpdatedDate": "9/11/2022",
+      "IsEnable": true
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "15",
+      "id": "3ef536a2-6ca7-41f3-ba81-b2ec03c5fc77",
+      "No": "1010",
+      "Tariff": 1000,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 0,
+      "ExtraPersonTariff": 0,
+      "UpdatedDate": "9/11/2022",
+      "IsEnable": true,
+      "IsOccopied": false
+    },
+    {
+      "HotelId": "1",
+      "CategoryId": "18",
+      "id": "db9cf363-92fe-4c92-9f8f-57338441075d",
+      "No": "201",
+      "Tariff": 200,
+      "MaxDiscount": 0,
+      "ExtraBedTariff": 0,
+      "ExtraPersonTariff": 0,
+      "UpdatedDate": "10/11/2022",
+      "IsEnable": true,
+      "IsOccopied": false
+    }
+  ]
+}
