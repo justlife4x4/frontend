@@ -30,7 +30,7 @@ export const changePasswordSchema = Yup.object({
 });
 
 export const accessLevelSchema = Yup.object({
-    keyInputName: Yup.string().required("Name can't be empty!").min(6, "Invalid name!"),
+    keyInputName: Yup.string().required("Name can't be empty!").min(3, "Invalid name!"),
     keyInputDescription: Yup.string().required("Description can't be empty!").min(10, "Invalid description!")
 });
 

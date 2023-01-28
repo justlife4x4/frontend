@@ -1,11 +1,12 @@
 import { React, createContext, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import {toast} from 'react-toastify';
 import jwt_decode from 'jwt-decode';
 
 import { ContextProvider } from './contexts/ContextProvider';
 import Container from './components/Container';
 import ContainerSidebar from './components/ContainerSidebar';
-
+import useFetchWithAuth from './components/useFetchWithAuth';
 
 const HotelId = createContext();
 
@@ -14,6 +15,9 @@ function App() {
   const [pEmployeeId, setPEmployeeId] = useState(null);
   const [pEmployeeName, setPEmployeeName] = useState(null);
   const [pEmployeeRoles, setPEmployeeRoles] = useState(null);
+  const {data, loading, error, doFetch} = useFetchWithAuth({
+    url: `/employees/${hotelId}/${pEmployeeId}`
+  });
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
@@ -21,9 +25,27 @@ function App() {
 
       setPEmployeeId(employeeInfo.UserInfo.userid);
       setPEmployeeName(employeeInfo.UserInfo.username);
-      setPEmployeeRoles(employeeInfo.UserInfo.roles);
+
+      doFetch();
     }
   }, [pEmployeeId]);
+
+  useEffect(() => {
+    error && toast.error(error);
+
+    // !loading && data && console.log(data.accessLevels);
+    let roles = '';
+    !loading && data && data.accessLevels.map(role => {
+      if (roles.length === 0){
+        roles = role.name; 
+      } else {
+        roles = roles + "," + role.name; 
+      }
+    });
+    setPEmployeeRoles(roles);
+
+    // !loading && setPEmployeeRoles(employeeInfo.UserInfo.roles);
+  }, [data, error, loading]);
 
   return (
     <HotelId.Provider value={hotelId}>
