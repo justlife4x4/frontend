@@ -1,21 +1,23 @@
-import { React, useContext, useEffect, useState } from 'react';
-import { Breadcrumb, Container } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
+import {React, useEffect, useState, useRef} from 'react';
+import {Breadcrumb} from 'react-bootstrap';
+import {ToastContainer, toast} from 'react-toastify';
 
-import { HotelId } from '../App';
-import { useStateContext } from '../contexts/ContextProvider';
-import RoomCategorySearch from '../components/roomCategory/RoomCategorySearch';
-import RoomCategoryAdd from '../components/roomCategory/RoomCategoryAdd';
-import RoomCategoryCard from '../components/roomCategory/RoomCategoryCard';
+import {useStateContext} from '../contexts/ContextProvider';
+import BookingAgentSearch from '../components/bookingAgent/BookingAgentSearch';
+import BookingAgentAdd from '../components/bookingAgent/BookingAgentAdd';
+import BookingAgentCard from '../components/bookingAgent/BookingAgentCard';
 import Paging from '../components/Paging';
 import useFetchWithAuth from '../components/useFetchWithAuth';
 
-import 'react-toastify/dist/ReactToastify.css';
+const CloseButton = ({closeToast}) => (
+    <i className="material-icons"
+      onClick={closeToast}>
+    </i>
+);
 
-
-const RoomCategories = () => {
-    const hotelId = useContext(HotelId);
+const BookingAgents = () => {
     const contextValues = useStateContext();
+    const searchRef = useRef(null);
 
     const [search, setSearch] = useState('');
     const [selectedPage, setSelectedPage] = useState(1);
@@ -25,9 +27,8 @@ const RoomCategories = () => {
     const itemPerPage = contextValues.itemPerPage;
     const indexOfLastItem = selectedPage * itemPerPage;
     const indexOfFirstItem = indexOfLastItem - itemPerPage;
-
-    const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/roomCategories/${hotelId}`,
+    const {data, loading, error, doFetch} = useFetchWithAuth({
+        url: `/bookingAgents`,
         params: {
             search: search
         }
@@ -35,13 +36,13 @@ const RoomCategories = () => {
 
     useEffect(() => {
         doFetch();
-        setChanged(false);
     }, [changed, search]);
 
     useEffect(() => {
         setChanged(false);
-        error && toast.error(error)
-    }, [data, error, loading]);
+        error && toast.error(error.message);
+        !loading && searchRef.current.setFocus();
+    }, [data, loading, error]);
 
     const handleSearch = (search) => {
         setSearch(search);
@@ -59,8 +60,12 @@ const RoomCategories = () => {
    };
 
     const handleDeleted = () => {
-        toast.success('Room category deleted');
+        toast.success('Data successfully deleted');
         setChanged(true);
+    };
+
+    const handleClosed = () => {
+        searchRef.current.setFocus();
     };
 
     const handelPaging = (pageNumber) => {
@@ -78,26 +83,33 @@ const RoomCategories = () => {
 
             if ((rowData.length === itemPerRow) || (data.length === colIdx)) {
                 const r = rowIdx;
+                const c = colIdx;
                 const d = rowData;
 
                 rowIdx++;
                 rowData = [];
 
-                return createRow(d, r) ;
+                return createRow(d, r, c);
             } else { 
                 return null 
             }
         })
     }
 
-    const createRow = (data, rowIdx) => {
-        const rowKey=`row_${rowIdx}`;
+    const createRow = (data, rowIdx, colIdx) => {
+        const rowKey = `row_${rowIdx}`;
+        let idx = colIdx - data.length;
 
         return (
             <div className="row m-0 p-0" key={rowKey}>
                 {
                     data.map((item) => {
-                        return createCol(item);
+                        const c = idx;
+                        const d = item;
+
+                        idx++;
+
+                        return createCol(d, c);
                     })
                 }
             </div>);
@@ -107,17 +119,16 @@ const RoomCategories = () => {
         const colKey = `col_${data._id}`;
 
         return (
-            <div className="col-xl-4 col-md-4 m-0" key={colKey}>
-                <RoomCategoryCard
-                    pId={data._id} 
-                    pName={data.name}
-                    pTariff={parseFloat(data.tariff, 10).toFixed(2)}
-                    pDiscount={parseFloat(data.maxDiscount, 10).toFixed(2)}
-                    pBed={parseFloat(data.extraBedTariff, 10).toFixed(2)}
-                    pPerson={parseFloat(data.extraPersonTariff, 10).toFixed(2)}
-                    onEdited={handleEdited}
-                    onDeleted={handleDeleted} />
-            </div>);
+                <div className="col-xl-4 col-md-4 m-0" key={colKey}>
+                    <BookingAgentCard
+                        pId={data._id} 
+                        pName={data.name}
+                        pDescription={data.description}
+                        onEdited={handleEdited}
+                        onDeleted={handleDeleted}
+                        onClosed={handleClosed} />
+                </div>
+            );
     }
 
     return ( 
@@ -126,41 +137,42 @@ const RoomCategories = () => {
             <Breadcrumb className="mt-5">
                 <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
                 <Breadcrumb.Item href="/">Master</Breadcrumb.Item>
-                <Breadcrumb.Item active>Room category</Breadcrumb.Item>
+                <Breadcrumb.Item active>Booking agent</Breadcrumb.Item>
             </Breadcrumb>
             {/* End :: Bread crumb */}
 
+            {/* Start :: display data */}
             <div className="row">
                 <div className="col-12">
                     <div className="card">
 
                         {/* Start :: Header & operational panel */}
-                        <div className="card-header">
-                            <Container>
-                                <div className="row">    
-                                    <div className="col-xs-12 col-md-4">
-                                        <h3>Room category</h3>        
-                                    </div>
-                                    <div className="col-xs-12 col-md-8">
-                                        <div className="input-group justify-content-end mt-2">
-                                            <RoomCategorySearch 
-                                                onSearchChange={handleSearch} />
+                        <div className="card-header mx-3">
+                            <div className="row">    
+                                <div className="col-xs-12 col-md-4">
+                                    <h3>Booking agents</h3>        
+                                </div>
+                                <div className="col-xs-12 col-md-8">
+                                    <div className="input-group justify-content-end mt-2">
+                                        <BookingAgentSearch
+                                            onSearchChange={handleSearch}
+                                            ref={searchRef}/>
 
-                                            <RoomCategoryAdd 
-                                                onAdded={handleAdded} />
-                                        </div>
+                                        <BookingAgentAdd 
+                                            onAdded={handleAdded}
+                                            onClosed={handleClosed}/>
                                     </div>
                                 </div>
-                                <div className="row">    
-                                    <div className="col-12 text-right mt-4 text-muted">
-                                        {/* Start :: Display data count */}
-                                            {!loading && 
-                                                data && 
-                                                    `display count : ${selectedPage * itemPerPage > data.length ? data.length : selectedPage * itemPerPage} of ${data.length}`}
-                                        {/* End :: Display data count */}
-                                    </div>
+                            </div>
+                            <div className="row">    
+                                <div className="col-12 text-right mt-4 text-muted">
+                                    {/* Start :: Display data count */}
+                                    {!loading && 
+                                        data && 
+                                            `display count : ${selectedPage * itemPerPage > data.length ? data.length : selectedPage * itemPerPage} of ${data.length}`}
+                                    {/* End :: Display data count */}
                                 </div>
-                            </Container>
+                            </div>
                         </div>
                         {/* End :: Header & operational panel */}
 
@@ -178,7 +190,7 @@ const RoomCategories = () => {
                         {/* End :: Display data */}
                         
                         {/* Start :: Pagination */}
-                        <div className="row px-2 mx-4 d-flex justify-content-end">
+                        <div className="card-header d-flex justify-content-end mx-3">
                             {!loading && 
                                     data && 
                                         <Paging
@@ -188,26 +200,26 @@ const RoomCategories = () => {
                                             onPaging={handelPaging} />}
                         </div>
                         {/* End :: Pagination */}
+
                     </div>
                 </div>
             </div>
+            {/* End :: display data */}
 
             {/* Start :: display message */}
             <ToastContainer
                 position="bottom-right"
                 theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
+                autoClose={2000}
+                hideProgressBar={true}
+                newestOnTop={true}
                 rtl={false}
-                closeOnClick
+                closeButton={CloseButton}
                 pauseOnFocusLoss
-                draggable
-                pauseOnHover />
+                pauseOnHover/>
             {/* End :: display message */}
-
-        </>
+        </>                
     );
 }
  
-export default RoomCategories;
+export default BookingAgents;

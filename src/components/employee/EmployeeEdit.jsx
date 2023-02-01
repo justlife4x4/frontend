@@ -1,25 +1,42 @@
-import { React, useContext, useEffect, useState } from 'react';
-import { Modal, NavLink } from 'react-bootstrap';
-import { useFormik } from 'formik';
-import { ToastContainer, toast } from 'react-toastify';
-import { X, Edit3 } from 'react-feather';
+import {React, useContext, useEffect, useRef, useState} from 'react';
+import {Modal, NavLink} from 'react-bootstrap';
+import {useFormik} from 'formik';
+import {toast} from 'react-toastify';
+import {X, Edit3} from 'react-feather';
 
-import { HotelId } from '../../App';
-import { employeeSchema } from '../../schemas';
+import {HotelId} from '../../App';
+import {employeeSchema} from '../../schemas';
 import AccessLevelSelect from '../AccessLevelSelect';
 import useFetchWithAuth from '../useFetchWithAuth';
 
-import 'react-toastify/dist/ReactToastify.css';
-
-
 // Start:: form
-const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onSubmited, onClose }) => {
+const EmployeeForm = ({pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onSubmited, onClosed}) => {
     const hotelId = useContext(HotelId);
+    const inputRef = useRef();
+    const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doUpdate } = useFetchWithAuth({
         url: `/employees/${hotelId}/${pId}`
     });
 
-    const { values, errors, handleBlur, handleChange, touched, setFieldValue, handleSubmit } = useFormik({
+    useEffect(() => {
+        !loading && inputRef.current.focus();
+        
+        document.addEventListener('keydown', (event) => {
+          if (event.keyCode === 27) {
+            onClosed();
+          }
+        });
+
+        return () => {
+          document.removeEventListener('keydown', onClosed);
+        };
+      }, []);
+
+    useEffect(() => {
+        !loading && inputRef.current.focus();
+    }, [loading]);
+
+    const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
             keyInputAccessLevels: pAccessLevels,
             keyInputName: pName,
@@ -28,9 +45,14 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
             keyInputEmail: pEmail
         },
         validationSchema: employeeSchema,
-        onSubmit: async (values, action) => {
+        onSubmit: async (values) => {
+            let assessLevelList = [];
+		    values.keyInputAccessLevels.map((item) => {
+			    assessLevelList.push({ id: item.value, name: item.label });
+		    });
+
             const payload = {   
-                                'accessLevels': values.keyInputAccessLevels,
+                                'accessLevels': assessLevelList,
                                 'name': values.keyInputName.toUpperCase(), 
                                 'address': values.keyInputAddress.toUpperCase(), 
                                 'mobile': values.keyInputMobile.toString(), 
@@ -40,7 +62,7 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
             await doUpdate(payload);
         
             if (error === null) {
-                action.resetForm();
+                resetForm();
                 onSubmited();
             } else {
                 toast.error(error);
@@ -48,12 +70,19 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
         }
     });
 
+    const handleClose = () => {
+        setValidateOnChange(false);
+        resetForm(); 
+        onClosed();
+    }
+
     return (
         <form>
             <Modal.Body>
                 <div className="row mb-2">
                     <div className="col-12">
-                        <label className="form-label" htmlFor="keyInputAccessLevels">Access level</label>
+                        <label className="form-label" 
+                            htmlFor="keyInputAccessLevels">Access level</label>
 
                         <AccessLevelSelect
                             name={'keyInputAccessLevels'}
@@ -70,14 +99,19 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
 
                 <div className="row mb-2">
                     <div className="col-12">
-                        <label className="form-label" htmlFor="keyInputName">Name</label>
+                        <label className="form-label" 
+                            htmlFor="keyInputName">Name</label>
+
                         <input 
                             type="text" 
                             id="keyInputName"
-                            placeholder="Name" 
                             className="form-control"
+                            placeholder="Name" 
+                            autoComplete="off"
+                            maxLength={100}
                             disabled={true}
-                            value={values.keyInputName} />
+                            value={values.keyInputName} 
+                            onChange={handleChange}/>
 
                         {errors.keyInputName && 
                             touched.keyInputName ? 
@@ -88,16 +122,19 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
 
                 <div className="row mb-2">
                     <div className="col-12">
-                        <label className="form-label" htmlFor="keyInputAddress">Address</label>
+                        <label className="form-label" 
+                            htmlFor="keyInputAddress">Address</label>
+
                         <textarea 
                             id="keyInputAddress"
                             placeholder="Address"
                             className="form-control"
                             rows={"5"}
+                            maxLength={"256"}
                             disabled={loading || error !== null}
+                            ref={inputRef}
                             value={values.keyInputAddress} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange}/>
 
                     {errors.keyInputAddress && 
                         touched.keyInputAddress ? 
@@ -108,16 +145,19 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
 
                 <div className="row mb-2">
                     <div className="col-xs-12 col-md-6">
-                        <label className="form-label" htmlFor="keyInputBed">Mobile no.</label>
+                        <label className="form-label" 
+                            htmlFor="keyInputBed">Mobile no.</label>
+
                         <input 
                             type="number"
                             id="keyInputMobile"
-                            placeholder="Mobile no." 
                             className="form-control"
+                            placeholder="Mobile no." 
+                            autoComplete="off"
+                            maxLength={256}
                             disabled={loading || error !== null}
                             value={values.keyInputMobile} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
                         {errors.keyInputMobile && 
                             touched.keyInputMobile ? 
@@ -126,16 +166,18 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
                     </div>
 
                     <div className="col-xs-12 col-md-6">
-                        <label className="form-label" htmlFor="keyInputEmail">Email</label>
+                        <label className="form-label" 
+                            htmlFor="keyInputEmail">Email</label>
+
                         <input 
                             type="text"
                             id="keyInputEmail"
-                            placeholder="Email" 
                             className="form-control"
+                            placeholder="Email" 
+                            maxLength={100}
                             disabled={loading || error !== null}
                             value={values.keyInputEmail} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
                         {errors.keyInputEmail && 
                             touched.keyInputEmail ? 
@@ -147,17 +189,18 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
 
             <Modal.Footer>
                 <button
+                    type="button"
                     className="btn btn-danger"
                     disabled={loading}
-                    onClick={(e) => {onClose(e)}} >
+                    onClick={handleClose}>
                     Close
                 </button>
                 
                 <button 
-                    className="btn btn-success"
                     type="button"
+                    className="btn btn-success"
                     disabled={loading} 
-                    onClick={handleSubmit} >
+                    onClick={handleSubmit}>
 
                     {!loading && "Confirm"}
                     {loading && 
@@ -173,7 +216,7 @@ const EmployeeForm = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
 // End:: form
 
 // Start:: Component
-const EmployeeEdit = ({ pId, onEdited }) => {
+const EmployeeEdit = ({pId, onEdited, onClosed}) => {
     const hotelId = useContext(HotelId);
     const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doFetch } = useFetchWithAuth({
@@ -181,12 +224,12 @@ const EmployeeEdit = ({ pId, onEdited }) => {
     });
 
     useEffect(() => {
-        doFetch();
-    }, [pId]);
+        showModal && doFetch();
+    }, [pId, showModal]);
 
     useEffect(() => {
         error && toast.error(error);
-    }, [data, error, loading, pId, showModal]);
+    }, [data, error, loading]);
 
     const handleShowModal = () => {
         setShowModal(true);
@@ -194,11 +237,12 @@ const EmployeeEdit = ({ pId, onEdited }) => {
 
     const handleCloseModal = () => {
         setShowModal(false);
+        onClosed();
     };
 
     const handleSave = () => {
-        onEdited();
         setShowModal(false);
+        onEdited();
     }
 
     return (
@@ -206,25 +250,25 @@ const EmployeeEdit = ({ pId, onEdited }) => {
             {/* Start:: Edit buttom */}
             <span 
                 className="pr-5" 
-                onClick={(e) => {handleShowModal()}}>
+                onClick={handleShowModal}>
                 <Edit3 className="feather-16 mr-3"/>Edit
             </span>
             {/* End:: Edit buttom */}
 
             {/* Start:: Edit modal */}
-            <Modal 
-                show={showModal}>
+            {data &&
+                <Modal 
+                    show={showModal}>
 
-                <Modal.Header>
-                    <Modal.Title>Edit employee</Modal.Title>
-                    <NavLink 
-                        className="nav-icon" href="#" 
-                        onClick={(e) => {handleCloseModal()}}>
-                        <i className="align-middle"><X/></i>
-                    </NavLink>
-                </Modal.Header>
+                    <Modal.Header>
+                        <Modal.Title>Edit employee</Modal.Title>
+                        <NavLink 
+                            className="nav-icon" href="#" 
+                            onClick={handleCloseModal}>
+                            <i className="align-middle"><X/></i>
+                        </NavLink>
+                    </Modal.Header>
 
-                {data && 
                     <EmployeeForm 
                         pId={pId}    
                         pAccessLevels={data.accessLevels}
@@ -233,23 +277,10 @@ const EmployeeEdit = ({ pId, onEdited }) => {
                         pMobile={data.mobile}
                         pEmail={data.email}
                         onSubmited={handleSave} 
-                        onClose={handleCloseModal} />
-                }
-            </Modal>
+                        onClosed={handleCloseModal} />
+                    
+                </Modal>}
             {/* End:: Edit modal */}
-
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                rtl={false}
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover />
-
         </div>  
     );
 }

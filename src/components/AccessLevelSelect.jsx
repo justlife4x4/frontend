@@ -1,5 +1,5 @@
 import { React, useEffect, useState, useRef } from 'react';
-import Multiselect from 'multiselect-react-dropdown';
+import Select from 'react-select';
 
 import useFetchWithAuth from './useFetchWithAuth';
 
@@ -10,45 +10,44 @@ const AccessLevelSelect = ({ onChange, name, value, disabled = false }) => {
     const { data, loading, error, doFetch } = useFetchWithAuth({
         url: `/accessLevels`
     });
+	let defaultList = [];
 
 	useEffect(() => {
         doFetch();
+
+		value && value.map((item) => {
+			defaultList.push({ value: item.id, label: item.name });
+		});
     }, []);
 
     useEffect(() => {
-		var list = [];
+		let list = [];
 		data && data.map((item) => {
-			list.push({ id: item._id, name: item.name });
+			list.push({ value: item._id, label: item.name });
 		});
 		setAccesslevelList(list);
-		// !loading && inputRef.current.focus();
+		!loading && inputRef.current.focus();
     }, [data, loading, error]);
 
 	useEffect(() => {
         onChange(selectedList);
     }, [selectedList]);
 
-	const onSelect = (selectedList, selectedItem) => {
-		setSelectedList(selectedList);
-	};
-	
-	const onRemove = (selectedList, removedItem) => {
+
+	const onSelect = (selectedList) => {
 		setSelectedList(selectedList);
 	};
 
 	return (
 		<>
-			{data &&
-				<Multiselect
-					name={name}
-					disabled={loading && disabled} 
-					options={accesslevelList}
-					selectedValues={value}
-					ref={inputRef}
-					onSelect={onSelect}
-					onRemove={onRemove}
-					showCheckbox="true"
-					displayValue="name"/>}
+			<Select 
+				name={name}
+				disabled={loading && disabled} 
+				ref={inputRef}
+				options={accesslevelList} 
+				defaultValue={defaultList}
+				onChange={onSelect}
+				isMulti />
 		</>				
     );
 }

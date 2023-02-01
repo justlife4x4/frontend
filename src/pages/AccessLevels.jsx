@@ -13,7 +13,7 @@ const CloseButton = ({closeToast}) => (
     <i className="material-icons"
       onClick={closeToast}>
     </i>
-  );
+);
 
 const AccessLevels = () => {
     const contextValues = useStateContext();
@@ -27,29 +27,12 @@ const AccessLevels = () => {
     const itemPerPage = contextValues.itemPerPage;
     const indexOfLastItem = selectedPage * itemPerPage;
     const indexOfFirstItem = indexOfLastItem - itemPerPage;
-
     const {data, loading, error, doFetch} = useFetchWithAuth({
         url: `/accessLevels`,
         params: {
             search: search
         }
     });
-
-    // useEffect(() => {
-    //     console.log(contextValues.showMenu);
-
-    //     if (contextValues.showMenu) {
-    //         itemPerRow = contextValues.itemPerR;
-    //         itemPerPage = contextValues.itemPerPage;
-    //     } else {
-    //         itemPerRow = contextValues.itemPerRowWithoutMenu;
-    //         itemPerPage = contextValues.itemPerPageWithoutMenu;
-    //     }
-
-    //     indexOfLastItem = selectedPage * itemPerPage;
-    //     indexOfFirstItem = indexOfLastItem - itemPerPage;
-
-    // }, [contextValues.showMenu]);
 
     useEffect(() => {
         doFetch();
@@ -100,36 +83,42 @@ const AccessLevels = () => {
 
             if ((rowData.length === itemPerRow) || (data.length === colIdx)) {
                 const r = rowIdx;
+                const c = colIdx;
                 const d = rowData;
 
                 rowIdx++;
                 rowData = [];
 
-                return createRow(d, r) ;
+                return createRow(d, r, c);
             } else { 
                 return null 
             }
         })
     }
 
-    const createRow = (data, rowIdx) => {
+    const createRow = (data, rowIdx, colIdx) => {
         const rowKey = `row_${rowIdx}`;
+        let idx = colIdx - data.length;
 
         return (
-            <>
-                <div className="row m-0 p-0" key={rowKey}>
-                    {data.map((item) => {
-                            return createCol(item);
-                        })}
-                </div>
-            </>);
+            <div className="row m-0 p-0" key={rowKey}>
+                {
+                    data.map((item) => {
+                        const c = idx;
+                        const d = item;
+
+                        idx++;
+
+                        return createCol(d, c);
+                    })
+                }
+            </div>);
     }
 
     const createCol = (data = undefined) => {
         const colKey = `col_${data._id}`;
 
         return (
-            <>
                 <div className="col-xl-4 col-md-4 m-0" key={colKey}>
                     <AccessLevelCard
                         pId={data._id} 
@@ -139,13 +128,13 @@ const AccessLevels = () => {
                         onDeleted={handleDeleted}
                         onClosed={handleClosed} />
                 </div>
-            </>);
+            );
     }
 
     return ( 
         <>
             {/* Seart :: Bread crumb */}
-            <Breadcrumb>
+            <Breadcrumb className="mt-5">
                 <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
                 <Breadcrumb.Item href="/">Master</Breadcrumb.Item>
                 <Breadcrumb.Item active>Access level</Breadcrumb.Item>

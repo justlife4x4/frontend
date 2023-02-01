@@ -1,16 +1,14 @@
-import { React, useContext, useEffect, useState } from 'react';
-import { Breadcrumb, Container } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
+import {React, useContext, useEffect, useState} from 'react';
+import {Breadcrumb, Container} from 'react-bootstrap';
+import {toast} from 'react-toastify';
 
-import { HotelId } from '../App';
-import { useStateContext } from '../contexts/ContextProvider';
+import {HotelId} from '../App';
+import {useStateContext} from '../contexts/ContextProvider';
 import PlanSearch from '../components/plan/PlanSearch';
 import PlanAdd from '../components/plan/PlanAdd';
 import PlanCard from '../components/plan/PlanCard';
 import Paging from '../components/Paging';
 import useFetchWithAuth from '../components/useFetchWithAuth';
-
-import 'react-toastify/dist/ReactToastify.css';
 
 
 const Plans = () => {
@@ -25,8 +23,7 @@ const Plans = () => {
     const itemPerPage = contextValues.itemPerPage;
     const indexOfLastItem = selectedPage * itemPerPage;
     const indexOfFirstItem = indexOfLastItem - itemPerPage;
-    
-    const { data, loading, error, doFetch } = useFetchWithAuth({
+        const { data, loading, error, doFetch } = useFetchWithAuth({
         url: `/plans/${hotelId}`,
         params: {
             search: search
@@ -127,7 +124,7 @@ const Plans = () => {
     return ( 
         <>    
             {/* Seart :: Bread crumb */}
-            <Breadcrumb>
+            <Breadcrumb className="mt-5">
                 <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
                 <Breadcrumb.Item href="/">Master</Breadcrumb.Item>
                 <Breadcrumb.Item active>Plan</Breadcrumb.Item>
@@ -194,20 +191,6 @@ const Plans = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Start :: display message */}
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                rtl={false}
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover />
-            {/* End :: display message */}
 
         </>
     );

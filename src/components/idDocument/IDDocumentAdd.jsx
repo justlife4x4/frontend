@@ -4,15 +4,15 @@ import {useFormik} from 'formik';
 import {toast} from 'react-toastify';
 import {X, Paperclip} from 'react-feather';
 
-import {accessLevelSchema} from '../../schemas';
+import {idDocumentSchema} from '../../schemas';
 import useFetchWithAuth from '../useFetchWithAuth';
 
 // Start:: form
-const AccessLevelForm = ({onSubmited, onClosed}) => {
+const IDDocumentForm = ({onSubmited, onClosed}) => {
     const inputRef = useRef();
     const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doInsert } = useFetchWithAuth({
-        url: `/accessLevels`
+        url: `/idDocuments`
     });
     
     useEffect(() => {
@@ -36,7 +36,7 @@ const AccessLevelForm = ({onSubmited, onClosed}) => {
             keyInputName: '',
             keyInputDescription: ''
         },
-        validationSchema: accessLevelSchema,
+        validationSchema: idDocumentSchema,
         validateOnChange,
         onSubmit: async (values, action) => {
             setValidateOnChange(true);
@@ -140,7 +140,7 @@ const AccessLevelForm = ({onSubmited, onClosed}) => {
 // End:: form
 
 // Start:: Component
-const AccessLevelAdd = ({onAdded, onClosed}) => {
+const IDDocumentAdd = ({onAdded, onClosed}) => {
     const [showModal, setShowModal] = useState(false);
 
     const handleShowModal = () => {
@@ -177,13 +177,13 @@ const AccessLevelAdd = ({onAdded, onClosed}) => {
                 show={showModal}>
 
                 <Modal.Header>
-                    <Modal.Title>Add access level</Modal.Title>
+                    <Modal.Title>Add id document</Modal.Title>
                     <NavLink className="nav-icon" href="#" onClick={handleCloseModal}>
                         <i className="align-middle"><X/></i>
                     </NavLink>
                 </Modal.Header>
 
-                <AccessLevelForm 
+                <IDDocumentForm 
                     onSubmited={handleSave} 
                     onClosed={handleCloseModal}/>
             </Modal>
@@ -193,4 +193,4 @@ const AccessLevelAdd = ({onAdded, onClosed}) => {
 }
 // End:: Component
 
-export default AccessLevelAdd;
+export default IDDocumentAdd;

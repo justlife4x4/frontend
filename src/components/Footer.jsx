@@ -8,16 +8,16 @@ const Footer = () => {
 			<div className="row text-muted">
 				<div className="col-6 text-left">
 					<ul className="list-inline">
-						<li className="list-inline-item">
+						<li className="list-inline-item mx-3">
 							<NavLink to="/support" className="text-muted">Support</NavLink>
 						</li>
-						<li className="list-inline-item">
+						<li className="list-inline-item mx-3">
 							<NavLink to="/help" className="text-muted">Help Center</NavLink>
 						</li>
-						<li className="list-inline-item">
+						<li className="list-inline-item mx-3">
 							<NavLink to="/privacy" className="text-muted">Privacy</NavLink>
 						</li>
-						<li className="list-inline-item">
+						<li className="list-inline-item mx-3">
 							<NavLink to="/terms" className="text-muted">Terms of Service</NavLink>
 						</li>
 					</ul>

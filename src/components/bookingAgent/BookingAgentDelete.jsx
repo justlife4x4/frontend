@@ -7,10 +7,10 @@ import useFetchWithAuth from '../useFetchWithAuth';
 
 
 // Start:: form
-const AccessLevelForm = ({pId, name, onSubmited, onClosed}) => {
+const BookingAgentForm = ({pId, name, onSubmited, onClosed}) => {
     const inputRef = useRef();
     const { loading, error, doDelete } = useFetchWithAuth({
-        url: `/accessLevels/${pId}`
+        url: `/bookingAgents/${pId}`
     });
     
     useEffect(() => {
@@ -76,10 +76,10 @@ const AccessLevelForm = ({pId, name, onSubmited, onClosed}) => {
 // End:: form
 
 // Start:: Component
-const AccessLevelDelete = ({pId, onDeleted, onClosed}) => {
+const BookingAgentDelete = ({pId, onDeleted, onClosed}) => {
     const [showModal, setShowModal] = useState(false)
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/accessLevels/${pId}`
+        url: `/bookingAgents/${pId}`
     });
 
     useEffect(() => {
@@ -121,7 +121,7 @@ const AccessLevelDelete = ({pId, onDeleted, onClosed}) => {
                     show={showModal}>
 
                     <Modal.Header>
-                        <Modal.Title>Delete access level</Modal.Title>
+                        <Modal.Title>Delete booking agent</Modal.Title>
                         <NavLink 
                             className="nav-icon" href="#" 
                             onClick={handleCloseModal}>
@@ -129,7 +129,7 @@ const AccessLevelDelete = ({pId, onDeleted, onClosed}) => {
                         </NavLink>
                     </Modal.Header>
                     
-                    <AccessLevelForm 
+                    <BookingAgentForm 
                         pId={pId} 
                         name={data.name}
                         onSubmited={handleSave} 
@@ -141,4 +141,4 @@ const AccessLevelDelete = ({pId, onDeleted, onClosed}) => {
 }
 // End:: Component
 
-export default AccessLevelDelete;
+export default BookingAgentDelete;

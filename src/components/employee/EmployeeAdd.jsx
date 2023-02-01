@@ -1,25 +1,36 @@
-import { React, useContext, useState } from 'react';
-import { useFormik } from 'formik';
-import { Modal, NavLink, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
-import { X, Paperclip } from 'react-feather';
+import {React, useContext, useEffect, useState} from 'react';
+import {Modal, NavLink, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {useFormik} from 'formik';
+import {toast} from 'react-toastify';
+import {X, Paperclip} from 'react-feather';
 
-import { HotelId } from '../../App';
-import { employeeSchema } from '../../schemas';
+import {HotelId} from '../../App';
+import {employeeSchema} from '../../schemas';
 import AccessLevelSelect from '../AccessLevelSelect';
 import useFetchWithAuth from '../useFetchWithAuth';
 
-import 'react-toastify/dist/ReactToastify.css';
 
 // Start:: form
-const EmployeeForm = ({ onSubmited, onClose }) => {
+const EmployeeForm = ({onSubmited, onClosed}) => {
     const hotelId = useContext(HotelId);
-    const [add, setAdd] = useState(true);
+    const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doInsert } = useFetchWithAuth({
         url: `/employees/${hotelId}`
     });
 
-    const { values, errors, handleBlur, handleChange, touched, setFieldValue, handleSubmit, resetForm } = useFormik({
+    useEffect(() => {
+        document.addEventListener('keydown', (event) => {
+          if (event.keyCode === 27) {
+            onClosed();
+          }
+        });
+    
+        return () => {
+          document.removeEventListener('keydown', onClosed);
+        };
+    }, []);
+
+    const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
             keyInputAccessLevels: '',
             keyInputName: '',
@@ -28,19 +39,25 @@ const EmployeeForm = ({ onSubmited, onClose }) => {
             keyInputEmail: ''
         },
         validationSchema: employeeSchema,
-        onSubmit: async (values, action) => {
+        validateOnChange,
+        onSubmit: async (values) => {
+            let assessLevelList = [];
+		    values.keyInputAccessLevels.map((item) => {
+			    assessLevelList.push({ id: item.value, name: item.label });
+		    });
+
             const payload = {   
-                            'accessLevels': values.keyInputAccessLevels, 
+                            'accessLevels': assessLevelList, 
                             'name': values.keyInputName.toUpperCase(), 
                             'address': values.keyInputAddress.toUpperCase(), 
                             'mobile': values.keyInputMobile.toString(), 
                             'email': values.keyInputEmail.toLowerCase() 
                         };
-                        
+
             await doInsert(payload);
         
             if (error === null) {
-                action.resetForm();
+                resetForm();
                 onSubmited();
             } else {
                 toast.error(error);
@@ -49,147 +66,141 @@ const EmployeeForm = ({ onSubmited, onClose }) => {
     });
 
     const handleClose = () => {
-        console.log("close");
+        setValidateOnChange(false);
         resetForm(); 
-        setAdd(false); 
-        onClose();
+        onClosed();
     }
 
     return (
-        <>
-            {add &&
-                <form onSubmit={handleSubmit}>
-                    <Modal.Body>
-                        <div className="row mb-3">
-                            <div className="col-12">
-                                <label className="form-label" 
-                                        htmlFor={"keyInputAccessLevels"}>Access level</label>
+        <form>
+            <Modal.Body>
+                <div className="row mb-3">
+                    <div className="col-12">
+                        <label className="form-label" 
+                                htmlFor={"keyInputAccessLevels"}>Role</label>
 
-                                <AccessLevelSelect 
-                                    name={"keyInputAccessLevels"}
-                                    onChange={(value) => {setFieldValue("keyInputAccessLevels", value)}} />
+                        <AccessLevelSelect 
+                            name={"keyInputAccessLevels"}
+                            onChange={(value) => {setFieldValue("keyInputAccessLevels", value)}}/>
 
-                                {errors.keyInputAccessLevelId && 
-                                    touched.keyInputAccessLevels ? 
-                                        (<small className="text-danger">{errors.keyInputAccessLevels}</small>) : 
-                                            null}
-                            </div>
-                        </div>
+                        {errors.keyInputAccessLevelId && 
+                            touched.keyInputAccessLevels ? 
+                                (<small className="text-danger">{errors.keyInputAccessLevels}</small>) : 
+                                    null}
+                    </div>
+                </div>
 
-                        <div className="row mb-3">
-                            <div className="col-12">
-                                <label className="form-label" 
-                                    htmlFor={"keyInputName"}>Name</label>
+                <div className="row mb-3">
+                    <div className="col-12">
+                        <label className="form-label" 
+                            htmlFor={"keyInputName"}>Name</label>
 
-                                <input 
-                                    type="text" 
-                                    name={"keyInputName"}
-                                    placeholder="Name"
-                                    className="form-control"
-                                    autoComplete="off"
-                                    maxLength={100}
-                                    disabled={loading} 
-                                    value={values.keyInputName} 
-                                    onChange={handleChange}
-                                    onBlur={handleBlur} />
+                        <input 
+                            type="text" 
+                            name="keyInputName"
+                            placeholder="Name"
+                            className="form-control"
+                            autoComplete="off"
+                            maxLength={100}
+                            disabled={loading} 
+                            value={values.keyInputName} 
+                            onChange={handleChange}/>
 
-                                {errors.keyInputName && 
-                                    touched.keyInputName ? 
-                                        (<small className="text-danger">{errors.keyInputName}</small>) : 
-                                            null}
-                            </div>
-                        </div>
+                        {errors.keyInputName && 
+                            touched.keyInputName ? 
+                                (<small className="text-danger">{errors.keyInputName}</small>) : 
+                                    null}
+                    </div>
+                </div>
 
-                        <div className="row mb-3">
-                            <div className="col-12">
-                                <label className="form-label" 
-                                        htmlFor={"keyInputAddress"}>Address</label>
-                                <textarea
-                                    name={"keyInputAddress"}
-                                    rows={"5"}
-                                    placeholder="Address"
-                                    className="form-control"
-                                    autoComplete="off"
-                                    maxLength={1000}
-                                    disabled={loading}
-                                    value={values.keyInputAddress} 
-                                    onChange={handleChange}
-                                    onBlur={handleBlur} />
-
-                                {errors.keyInputAddress && 
-                                    touched.keyInputAddress ? 
-                                        (<small className="text-danger">{errors.keyInputAddress}</small>) : 
-                                            null}
-                            </div>
-                        </div>
-
-                        <div className="row mb-3">
-                            <div className="col-xs-12 col-md-6">
-                                <label className="form-label" 
-                                    htmlFor={"keyInputMobile"}>Mobile no.</label>
-                                    
-                                <input
-                                    type="number"
-                                    name={"keyInputMobile"}
-                                    placeholder="Mobile no." 
-                                    className="form-control"
-                                    autoComplete="off"
-                                    maxLength={10}
-                                    disabled={loading}
-                                    value={values.keyInputMobile} 
-                                    onChange={handleChange}
-                                    onBlur={handleBlur} />
-
-                                { errors.keyInputMobile && 
-                                    touched.keyInputMobile ? 
-                                        (<small className="text-danger">{errors.keyInputMobile}</small>) : 
-                                            null }
-                            </div>
-
-                            <div className="col-xs-12 col-md-6">
-                                <label className="form-label" htmlFor={"keyInputEmail"}>Email</label>
-                                <input 
-                                    type="text"
-                                    placeholder="Email" 
-                                    className="form-control"
-                                    autoComplete="off"
-                                    name={"keyInputEmail"}
-                                    maxLength={100}
-                                    disabled={loading}
-                                    value={values.keyInputEmail} 
-                                    onChange={handleChange}
-                                    onBlur={handleBlur} />
-
-                                {errors.keyInputEmail && 
-                                    touched.keyInputEmail ? 
-                                        (<small className="text-danger">{errors.keyInputEmail}</small>) : 
-                                            null}    
-                            </div>
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button 
-                            className="btn btn-danger"
+                <div className="row mb-3">
+                    <div className="col-12">
+                        <label className="form-label" 
+                                htmlFor={"keyInputAddress"}>Address</label>
+                        <textarea
+                            name={"keyInputAddress"}
+                            rows={"5"}
+                            placeholder="Address"
+                            className="form-control"
+                            autoComplete="off"
+                            maxLength={1000}
                             disabled={loading}
-                            onClick={handleClose} >
-                            Close
-                        </button>
+                            value={values.keyInputAddress} 
+                            onChange={handleChange}/>
 
-                        <button 
-                            type="submit"
-                            className="btn btn-success"
-                            disabled={loading} >
+                        {errors.keyInputAddress && 
+                            touched.keyInputAddress ? 
+                                (<small className="text-danger">{errors.keyInputAddress}</small>) : 
+                                    null}
+                    </div>
+                </div>
 
-                            {!loading && "Confirm"}
-                            {loading && 
-                                <>
-                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Working
-                                </>}
-                        </button>
-                    </Modal.Footer>
-                </form>}
-        </>            
+                <div className="row mb-3">
+                    <div className="col-xs-12 col-md-6">
+                        <label className="form-label" 
+                            htmlFor={"keyInputMobile"}>Mobile no.</label>
+                            
+                        <input
+                            type="number"
+                            name="keyInputMobile"
+                            placeholder="Mobile no." 
+                            className="form-control"
+                            autoComplete="off"
+                            maxLength="10"
+                            disabled={loading}
+                            value={values.keyInputMobile} 
+                            onChange={handleChange}/>
+
+                        { errors.keyInputMobile && 
+                            touched.keyInputMobile ? 
+                                (<small className="text-danger">{errors.keyInputMobile}</small>) : 
+                                    null }
+                    </div>
+
+                    <div className="col-xs-12 col-md-6">
+                        <label className="form-label" htmlFor={"keyInputEmail"}>Email</label>
+                        <input 
+                            type="text"
+                            placeholder="Email" 
+                            className="form-control"
+                            autoComplete="off"
+                            name="keyInputEmail"
+                            maxLength={100}
+                            disabled={loading}
+                            value={values.keyInputEmail} 
+                            onChange={handleChange}/>
+
+                        {errors.keyInputEmail && 
+                            touched.keyInputEmail ? 
+                                (<small className="text-danger">{errors.keyInputEmail}</small>) : 
+                                    null}    
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <button 
+                    type="button"
+                    className="btn btn-danger"
+                    disabled={loading}
+                    onClick={handleClose} >
+                    Close
+                </button>
+
+                <button 
+                    type="button"
+                    className="btn btn-success"
+                    disabled={loading} 
+                    onClick={handleSubmit}>
+
+                    {!loading && "Confirm"}
+                    {loading && 
+                        <>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Working
+                        </>}
+                </button>
+            </Modal.Footer>
+        </form>
     );
 };
 // End:: form
@@ -207,7 +218,7 @@ const EmployeeAdd = ({ onAdded }) => {
     }
 
     const handleSave = () => {
-        onAdded();  
+        onAdded();
         setShowModal(false);
     }
 
@@ -217,9 +228,9 @@ const EmployeeAdd = ({ onAdded }) => {
             <OverlayTrigger
                 overlay={<Tooltip>new</Tooltip>}>
                 <button 
-                    className="btn btn-info hover:drop-shadow-xl ml-2" 
+                    className="btn btn-info ml-2" 
                     size="md" 
-                    onClick = {handleShowModal} >
+                    onClick={handleShowModal}>
                     <Paperclip className="feather-16"/>
                 </button>
             </OverlayTrigger>
@@ -227,7 +238,7 @@ const EmployeeAdd = ({ onAdded }) => {
 
             {/* Start:: Add modal */}
             <Modal 
-                show={showModal} >
+                show={showModal}>
 
                 <Modal.Header>
                     <Modal.Title>Add employee</Modal.Title>
@@ -241,18 +252,6 @@ const EmployeeAdd = ({ onAdded }) => {
                     onClose={handleCloseModal}/>
             </Modal>
             {/* End:: Add modal */}
-
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                rtl={false}
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover />
 
         </div>  
     );

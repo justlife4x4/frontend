@@ -15,7 +15,7 @@ export const ContextProvider = ({ children }) => {
   const [currentMode, setCurrentMode] = useState('Light');
   const [themeSettings, setThemeSettings] = useState(false);
   const [activeMenu, setActiveMenu] = useState(true);
-  const [showMenu, setShowMenu] = useState(true);
+  const [showMenu, setShowMenu] = useState(localStorage.getItem('menuStatus') !== null ? localStorage.getItem('menuStatus') : true);
   const [isClicked, setIsClicked] = useState(initialState);
   const [itemPerRow, setItemPerRow] = useState(3);
   const [itemPerPage, setItemPerPage] = useState(itemPerRow * 2);
@@ -32,9 +32,9 @@ export const ContextProvider = ({ children }) => {
     localStorage.setItem('themeMode', e.target.value);
   };
 
-  const setMenuStatus = (e) => {
-    setShowMenu(e.target.value);
-    localStorage.setItem('menuStatus', e.target.value);
+  const setMenuStatus = (status) => {
+    setShowMenu(status);
+    localStorage.setItem('menuStatus', status);
   };
 
   const handleClick = (clicked) => setIsClicked({...initialState, [clicked]: true});

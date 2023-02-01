@@ -1,12 +1,36 @@
-import { React } from 'react';
-import { Table, Card, Dropdown } from 'react-bootstrap';
+import {React, useEffect, useState, useRef, forwardRef, useImperativeHandle} from 'react';
+import {Table, Card, Dropdown} from 'react-bootstrap';
 
 import EmployeeEdit from './EmployeeEdit';
 import EmployeeDelete from './EmployeeDelete';
 
-import 'react-toastify/dist/ReactToastify.css';
+//const EmployeeCard = ({pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onEdited, onDeleted, onClosed, onActivated}) => {
+const EmployeeCard = forwardRef((props, ref) => {
+    const cardRef = useRef();
+    const [focus, setFocus] = useState(false);
+    const [active, setActive] = useState(false);
 
-const EmployeeCard = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onEdited, onDeleted }) => {
+    const setDeSelect = () => {
+        cardRef.current && cardRef.current.setActive(false);
+    };
+
+    useImperativeHandle(ref, () => {
+        return {
+            setDeSelect
+        }
+      }, []);
+
+
+    useEffect(() => {
+        setActive(props.pSelectionStatus);
+
+        // console.log(active);
+    }, [props.pSelectionStatus]);  
+
+    const handleClose = () => {
+        props.onClosed();
+    }
+
     const accessLevels = (accessLevelObject) => {
         var accessLevel = '';
 
@@ -22,69 +46,75 @@ const EmployeeCard = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, on
     }
 
     return (
-        <>
-            {pId && 
-                <Card className="border">
-                    <Card.Body className="pt-3 pl-1 pb-1 pr-1 m-0">
-                        <Card.Subtitle>
-                            <div className="row">
-                                <div className="col-md-10">
-                                    <h4 className="text-muted">
-                                        {pName}
-                                    </h4>
-                                </div>
-                                <div className="col-md-2 text-right">
-                                    <Dropdown autoClose="true">
-                                        <Dropdown.Toggle 
-                                            variant="light" 
-                                            size="sm"
-                                            align="end"
-                                            drop="down"/>
+        <Card className='border'
+            id={props.pId}
+            border={active ? 'info' : focus ? 'primary' : ''}  
+            style={{'cursor': 'pointer'}}
+            bg={'light'}
+            ref={cardRef}
+            onMouseEnter={() => setFocus(true)}
+            onMouseLeave={() => setFocus(false)} 
+            onClick={() => {setActive(!active) 
+                props.onActivated(props.pId, !active)}} >
 
-                                        <Dropdown.Menu style={{background: "#e5e5f0"}}>
-                                            <Dropdown.Item 
-                                                href="#" 
-                                                className="pl-2" >
-                                                <EmployeeEdit 
-                                                    pId={pId} 
-                                                    onEdited={onEdited} />
-                                            </Dropdown.Item>
+            <Card.Body className="pt-2 pl-1 pb-0 pr-1 m-0">
+                <Card.Subtitle>
+                    <div className="row">
+                        <div className="col-md-10">
+                            <h4>{props.pName}</h4>
+                        </div>
+                        <div className="col-md-2 text-right">
+                            <Dropdown autoClose="true">
+                                <Dropdown.Toggle 
+                                    variant="light" 
+                                    size="sm"
+                                    align="end"
+                                    drop="down"/>
 
-                                            <Dropdown.Item href="#" className="m-0 pl-2">
-                                                <EmployeeDelete 
-                                                    pId={pId} 
-                                                    onDeleted={onDeleted} />
-                                            </Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </div>
-                            </div>
-                        </Card.Subtitle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item 
+                                        href="#" 
+                                        className="pl-2">
+                                        <EmployeeEdit 
+                                            pId={props.pId} 
+                                            onEdited={props.onEdited} 
+                                            onClosed={handleClose}/>
+                                    </Dropdown.Item>
 
-                        <Table striped size="sm" className="text-muted mb-0 mt-2">
-                            <tbody>
-                                <tr>
-                                    <td><b>Access level</b></td>
-                                    <td className="text-right">{accessLevels(pAccessLevels)}</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Mobile no.</b></td>
-                                    <td className="text-right">{pMobile}</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Email</b></td>
-                                    <td className="text-right">{pEmail}</td>
-                                </tr>
-                                <tr>
-                                    <td className="text-center" colSpan={"2"}>{pAddress}</td>
-                                </tr>
-                            </tbody>                            
-                        </Table>
-                    </Card.Body>
-                </Card>
-            }
-        </>
-    );
-}
+                                    <Dropdown.Item href="#" className="m-0 pl-2">
+                                        <EmployeeDelete 
+                                            pId={props.pId} 
+                                            onDeleted={props.onDeleted} 
+                                            onClosed={handleClose} />
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </div>
+                    </div>
+                </Card.Subtitle>
+
+                <Table size="sm" className="mb-0 mt-2">
+                    <tbody>
+                        <tr>
+                            <td><b>Role</b></td>
+                            <td className="text-right">{accessLevels(props.pAccessLevels)}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Mobile no.</b></td>
+                            <td className="text-right">{props.pMobile}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Email</b></td>
+                            <td className="text-right">{props.pEmail}</td>
+                        </tr>
+                        <tr>
+                            <td colSpan={"2"}>{props.pAddress}</td>
+                        </tr>
+                    </tbody>                            
+                </Table>
+            </Card.Body>
+        </Card>
+    );  
+})
 
 export default EmployeeCard;

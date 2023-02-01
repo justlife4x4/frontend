@@ -1,45 +1,55 @@
-import { React, useEffect, useState, useContext } from 'react';
-import { Breadcrumb, Container } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
+import {React, useContext, useEffect, useState, useRef} from 'react';
+import {Breadcrumb} from 'react-bootstrap';
+import {ToastContainer, toast} from 'react-toastify';
 
-import { HotelId } from '../App';
-import { useStateContext } from '../contexts/ContextProvider';
+import {HotelId} from '../App';
+import {useStateContext} from '../contexts/ContextProvider';
 import EmployeeSearch from '../components/employee/EmployeeSearch';
 import EmployeeAdd from '../components/employee/EmployeeAdd';
 import EmployeeCard from '../components/employee/EmployeeCard';
 import Paging from '../components/Paging';
 import useFetchWithAuth from '../components/useFetchWithAuth';
 
-import 'react-toastify/dist/ReactToastify.css'; 
+const CloseButton = ({closeToast}) => (
+    <i className="material-icons"
+      onClick={closeToast}>
+    </i>
+  );
 
 const Employees = () => {
     const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
+    const searchRef = useRef(null);
     
     const [search, setSearch] = useState('');
     const [selectedPage, setSelectedPage] = useState(1);
     const [changed, setChanged] = useState(false);
 
+    const cardRef = useRef(null);
+    //let cardRef = [];
+    const [currentSelect, setCurrentSelect] = useState('');
+    // const [previousSelect, setPreviousSelect] = useState('');
+
     const itemPerRow = contextValues.itemPerRow;
     const itemPerPage = contextValues.itemPerPage;
     const indexOfLastItem = selectedPage * itemPerPage;
     const indexOfFirstItem = indexOfLastItem - itemPerPage;
-    const { data, loading, error, doFetch } = useFetchWithAuth({
+    const {data, loading, error, doFetch} = useFetchWithAuth({
         url: `/employees/${hotelId}`,
         params: {
             search: search
         }
     });
-
+    
     useEffect(() => {
         doFetch();
-        setChanged(false);
     }, [changed, search]);
 
     useEffect(() => {
         setChanged(false);
-        error && toast.error(error);
-    }, [data, error, loading]);
+        error && toast.error(error.message);
+        !loading && searchRef.current.setFocus();
+    }, [data, loading, error]);
 
     const handleSearch = (search) => {
         setSearch(search);
@@ -59,6 +69,23 @@ const Employees = () => {
     const handleDeleted = () => {
         toast.success('Data successfully deleted');
         setChanged(true);
+    };
+
+    const handelActivated = (key, status) => {
+        setCurrentSelect(key);
+
+        cardRef.current.setDeSelect();
+        // data.map((item) => {
+        //     if (item._id !== key) {
+        //         const card = document.getElementById(`${item._id}`);
+        //         card.pSelectionStatus = false;
+        //         // console.log(card);      
+        //     }
+        // })
+    }
+
+    const handleClosed = () => {
+        searchRef.current.setFocus();
     };
 
     const handelPaging = (pageNumber) => {
@@ -81,7 +108,7 @@ const Employees = () => {
                 rowIdx++;
                 rowData = [];
 
-                return createRow(d, r) ;
+                return createRow(d, r);
             } else { 
                 return null 
             }
@@ -107,6 +134,7 @@ const Employees = () => {
         return (
             <div className="col-xl-4 col-md-4 m-0" key={colKey}>
                 <EmployeeCard 
+                    ref={cardRef}
                     pAccessLevels={data.accessLevels}
                     pId={data._id} 
                     pName={data.name}
@@ -114,50 +142,54 @@ const Employees = () => {
                     pMobile={data.mobile}
                     pEmail={data.email}
                     onEdited={handleEdited}
-                    onDeleted={handleDeleted} />
+                    onDeleted={handleDeleted} 
+                    onClosed={handleClosed} 
+                    onActivated={handelActivated}/>
             </div>);
     }
 
     return ( 
         <>
             {/* Seart :: Bread crumb */}
-            <Breadcrumb>
+            <Breadcrumb className="mt-5">
                 <Breadcrumb.Item href = "/">Home</Breadcrumb.Item>
                 <Breadcrumb.Item href = "/">Master</Breadcrumb.Item>
                 <Breadcrumb.Item active>Employee</Breadcrumb.Item>
             </Breadcrumb>
             {/* End :: Bread crumb */}
 
+            {/* Start :: display data */}
             <div className="row">
                 <div className="col-12">
                     <div className="card">
+
                         {/* Start :: Header & operational panel */}
-                        <div className="card-header">
-                            <Container>
-                                <div className="row">    
-                                    <div className="col-xs-12 col-md-4">
-                                        <h3>Employees</h3>        
-                                    </div>
-                                    <div className="col-xs-12 col-md-8">
-                                        <div className="input-group justify-content-end mt-2">
-                                            <EmployeeSearch 
-                                                onSearchChange={handleSearch} />
-                                                
-                                            <EmployeeAdd 
-                                                onAdded={handleAdded} />
-                                        </div>
+                        <div className="card-header mx-3">
+                            <div className="row">    
+                                <div className="col-xs-12 col-md-4">
+                                    <h3>Employees</h3>        
+                                </div>
+                                <div className="col-xs-12 col-md-8">
+                                    <div className="input-group justify-content-end mt-2">
+                                        <EmployeeSearch 
+                                            onSearchChange={handleSearch}
+                                            ref={searchRef}/>
+                                            
+                                        <EmployeeAdd 
+                                            onAdded={handleAdded}
+                                            onClosed={handleClosed}/>
                                     </div>
                                 </div>
-                                <div className="row">    
-                                    <div className="col-12 text-right mt-4 text-muted">
-                                        {/* Start :: Display data count */}
-                                            {!loading && 
-                                                data && 
-                                                    `display count : ${selectedPage * itemPerPage > data.length ? data.length : selectedPage * itemPerPage} of ${data.length}`}
-                                        {/* End :: Display data count */}
-                                    </div>
+                            </div>
+                            <div className="row">    
+                                <div className="col-12 text-right mt-4 text-muted">
+                                    {/* Start :: Display data count */}
+                                        {!loading && 
+                                            data && 
+                                                `display count : ${selectedPage * itemPerPage > data.length ? data.length : selectedPage * itemPerPage} of ${data.length}`}
+                                    {/* End :: Display data count */}
                                 </div>
-                            </Container>
+                            </div>
                         </div>
                         {/* End :: Header & operational panel */}
 
@@ -175,7 +207,7 @@ const Employees = () => {
                         {/* End :: Display data */}
                         
                         {/* Start :: Pagination */}
-                        <div className="row px-2 mx-4 d-flex justify-content-end">
+                        <div className="card-header d-flex justify-content-end mx-3">
                             {!loading && 
                                     data && 
                                         <Paging
@@ -188,22 +220,23 @@ const Employees = () => {
                     </div>
                 </div>
             </div>
+            {/* End :: display data */}
 
             {/* Start :: display message */}
             <ToastContainer
                 position="bottom-right"
                 theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
+                autoClose={2000}
+                hideProgressBar={true}
+                newestOnTop={true}
                 rtl={false}
-                closeOnClick
+                closeButton={CloseButton}
                 pauseOnFocusLoss
-                draggable
-                pauseOnHover />
+                pauseOnHover/>
             {/* End :: display message */}
+
         </>
     );
 }
- 
+
 export default Employees;

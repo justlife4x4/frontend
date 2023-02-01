@@ -1,10 +1,10 @@
 import {React} from 'react';
 import {Table, Card, Dropdown} from 'react-bootstrap';
 
-import AccessLevelEdit from './AccessLevelEdit';
-import AccessLevelDelete from './AccessLevelDelete';
+import IDDocumentEdit from './IDDocumentEdit';
+import IDDocumentDelete from './IDDocumentDelete';
 
-const AccessLevelCard = ({pId, pName, pDescription, onEdited, onDeleted, onClosed}) => {
+const IDDocumentCard = ({pId, pName, pDescription, onEdited, onDeleted, onClosed}) => {
     
     const handleClose = () => {
         onClosed();
@@ -30,14 +30,14 @@ const AccessLevelCard = ({pId, pName, pDescription, onEdited, onDeleted, onClose
                                         <Dropdown.Item 
                                             href="#" 
                                             className="pl-2">
-                                            <AccessLevelEdit 
+                                            <IDDocumentEdit 
                                                 pId={pId} 
                                                 onEdited={onEdited} 
                                                 onClosed={handleClose} />
                                         </Dropdown.Item>
 
                                         <Dropdown.Item href="#" className="m-0 pl-2">
-                                            <AccessLevelDelete 
+                                            <IDDocumentDelete 
                                                 pId={pId} 
                                                 onDeleted={onDeleted} 
                                                 onClosed={handleClose} />
@@ -59,4 +59,4 @@ const AccessLevelCard = ({pId, pName, pDescription, onEdited, onDeleted, onClose
     );
 }
 
-export default AccessLevelCard;
+export default IDDocumentCard;

@@ -1,12 +1,12 @@
-/* card:custom {
-    background-color: green;
-    opacity: 0.3;
-  } */
+.icon {
+  height: 24px;
+  width: 24px;
+}
 
-/* .card-title:hover {
-    background-color: green;
-    opacity: 0.3;
-    font-size: 1.5rem;
-    color: white;
-    border-radius: 4px;
-} */
+.header-text {
+  color:#354052;
+}
+
+.active-card {
+  border: solid 1px red;
+}

@@ -1,15 +1,25 @@
-import { React } from 'react';
-import { useForm } from 'react-hook-form';
+import {React, useEffect, useRef, forwardRef, useImperativeHandle} from 'react';
 
-const RoomSearch = ({ onSearchChange }) => {
-    const {register, trigger} = useForm();
-    const keyInpSearch = 'inputSearch';
+const EmployeeSearch = forwardRef((props, ref) => {
+    const inputRef = useRef();
 
-    const handleChange = (e) => {
-        e.preventDefault();
-        const { name, value } = e.target;
-        onSearchChange(value);
-        trigger(name);
+    const setFocus = () => {
+        inputRef.current && inputRef.current.focus();
+    };
+
+    useImperativeHandle(ref, () => {
+        return {
+            setFocus
+        }
+      }, []);
+
+    useEffect(() => {
+        setFocus();
+      }, []);
+
+    const handleSearchChange = (e) => {
+        const {value} = e.target;
+        props.onSearchChange(value);
     };
 
     return (
@@ -20,18 +30,16 @@ const RoomSearch = ({ onSearchChange }) => {
 
                 <input 
                     type="search" 
-                    name={keyInpSearch}
-                    placeholder="search" 
                     className="form-control"
-                    maxLength={100}
-                    autoFocus
+                    placeholder="search" 
+                    maxLength={"100"}
                     autoComplete="off"
-                    onKeyUp={(e) => {handleChange(e)}} 
-                    {...register(keyInpSearch)} />
+                    ref={inputRef}
+                    onKeyUp={handleSearchChange} />
 
             </form>
         </div>
     );
-}
+})
  
-export default RoomSearch;
+export default EmployeeSearch;

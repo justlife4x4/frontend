@@ -1,18 +1,35 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import {React, useEffect, useState} from 'react';
+import {Paperclip, Edit3, Scissors, MoreVertical} from 'react-feather';
+import {useNavigate, NavLink} from 'react-router-dom';
+import {Nav} from 'react-bootstrap';
 
 import {useStateContext} from '../contexts/ContextProvider';
 import Profile from './auth/Profile';
 import ChangePassword from './auth/ChangePassword';
 import Logout from './auth/Logout';
 
+import '../assets/css/custom.css';
 
-const Navbar = ({pEmployeeId, pEmployeeName}) => {
+const Navbar = ({pEmployeeId, pEmployeeName, onClicked}) => {
     const contextValues = useStateContext();
+    const [menuState, setMenuState] = useState(contextValues.showMenu);
+    const [sideBarHeaderClass, setSideBarHeaderClass] = useState("sidebar");
+    const [sideBarHeaderTextClass, setSideBarHeaderTextClass] = useState("");
     const navigate = useNavigate();
 
+    useEffect(() => {
+        menuState && setSideBarHeaderClass("sidebar")
+        menuState && setSideBarHeaderTextClass("align-middle pt-4")
+
+        !menuState && setSideBarHeaderClass("sidebar bg-white") 
+        !menuState && setSideBarHeaderTextClass("align-middle pt-4 header-text")
+
+        contextValues.setMenuStatus(menuState);
+        onClicked(menuState);
+    }, [menuState]);
+
     const handleChick = () => {
-        contextValues.setShowMenu(!contextValues.showMenu);
+        setMenuState(!menuState);
     }
 
     const handleChangeProfileSuccess = () => {
@@ -30,39 +47,62 @@ const Navbar = ({pEmployeeId, pEmployeeName}) => {
     };
 
     return (
-        <>
-            <nav className="navbar navbar-expand navbar-light bg-white">
-                <a className="sidebar-toggle d-flex mr-2" href="#" onClick={handleChick}
-                    data-toggle="collapse" data-target="#sidebar" aria-expanded="true">
-                    <i className="hamburger align-self-center"></i>
-                </a>
+        <nav className="navbar navbar-expand navbar-light fixed-top bg-white" style={{"padding":"0px"}}>
+            <div className={sideBarHeaderClass} id="header-sidebar">
+                <NavLink className="sidebar-brand" to="/dashboard">
+                    <i className="align-middle mr-1">
+                        <span className="badge badge-light">
+                            <img className="icon" src='assets/img/brands/hotelapp.png' alt="hotelapp" />                  
+                        </span>
+                    </i>
+                    <span className={sideBarHeaderTextClass}>Hotel App</span>
+                </NavLink>
+            </div>
 
-                <div className="navbar-collapse collapse">
-                    <ul className="navbar-nav ml-auto">
-                        <li className="nav-item dropdown">
-                            <a className="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-toggle="dropdown">
-                                {/* <img src="assets\img\avatars\avatar.jpg" className="avatar img-fluid rounded-circle mr-1" alt="Chris Wood" />  */}
-                                <span className="text-dark fw-bold">{pEmployeeName}</span>
-                            </a>
-                            <div className="dropdown-menu dropdown-menu-right">
+            <a className="sidebar-toggle d-flex mx-2" href="#" onClick={handleChick}
+                data-toggle="collapse" data-target="#sidebar" aria-expanded="true">
+                <i className="hamburger align-self-center"></i>
+            </a>
 
-                                <Profile 
-                                    pEmployeeId={pEmployeeId}
-                                    onEdited={handleChangeProfileSuccess} />
+            <div className="navbar-collapse collapse">
 
-                                <ChangePassword 
-                                    pEmployeeId={pEmployeeId}
-                                    onChanged={handleChangePasswordSuccess}/>
+                {/* if selected then only show the menu */}
+                {/* <Nav>
+                    <Nav.Link href="#">
+                        <Paperclip className="feather-16 mr-1"/>New
+                    </Nav.Link>
+                    <Nav.Link href="#">
+                        <Edit3 className="feather-16 mr-1"/>Edit
+                    </Nav.Link>
+                    <Nav.Link href="#">
+                        <Scissors className="feather-16 mr-1"/>Delete
+                    </Nav.Link>
+                </Nav> */}
 
-                                <Logout
-                                    pEmployeeId={pEmployeeId}
-                                    onLogout={handleLogoutSuccess} />
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </nav>     
-        </>
+                <ul className="navbar-nav ml-auto">
+                    <li className="nav-item dropdown">
+                        <a className="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-toggle="dropdown">
+                            {/* <img src="assets\img\avatars\avatar.jpg" className="avatar img-fluid rounded-circle mr-1" alt="Chris Wood" />  */}
+                            <span className="text-dark fw-bold">{pEmployeeName}</span>
+                        </a>
+                        <div className="dropdown-menu dropdown-menu-right">
+
+                            <Profile 
+                                pEmployeeId={pEmployeeId}
+                                onEdited={handleChangeProfileSuccess} />
+
+                            <ChangePassword 
+                                pEmployeeId={pEmployeeId}
+                                onChanged={handleChangePasswordSuccess}/>
+
+                            <Logout
+                                pEmployeeId={pEmployeeId}
+                                onLogout={handleLogoutSuccess} />
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>     
     );
 }
 

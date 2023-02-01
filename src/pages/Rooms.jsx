@@ -122,7 +122,7 @@ const Rooms = () => {
     return ( 
         <>
             {/* Seart :: Bread crumb */}
-            <Breadcrumb>
+            <Breadcrumb className="mt-5">
                 <Breadcrumb.Item href = "/">Home</Breadcrumb.Item>
                 <Breadcrumb.Item href = "/">Master</Breadcrumb.Item>
                 <Breadcrumb.Item active>Room</Breadcrumb.Item>

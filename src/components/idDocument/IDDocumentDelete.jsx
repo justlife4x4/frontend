@@ -7,10 +7,10 @@ import useFetchWithAuth from '../useFetchWithAuth';
 
 
 // Start:: form
-const AccessLevelForm = ({pId, name, onSubmited, onClosed}) => {
+const IDDocumentForm = ({pId, name, onSubmited, onClosed}) => {
     const inputRef = useRef();
     const { loading, error, doDelete } = useFetchWithAuth({
-        url: `/accessLevels/${pId}`
+        url: `/idDocuments/${pId}`
     });
     
     useEffect(() => {
@@ -60,7 +60,7 @@ const AccessLevelForm = ({pId, name, onSubmited, onClosed}) => {
                     type="button"
                     className="btn btn-success"
                     disabled={loading || error}
-                    onClick={handleSave} >
+                    onClick={handleSave}>
 
                     {!loading && "Confirm"}
                     {loading && 
@@ -76,10 +76,10 @@ const AccessLevelForm = ({pId, name, onSubmited, onClosed}) => {
 // End:: form
 
 // Start:: Component
-const AccessLevelDelete = ({pId, onDeleted, onClosed}) => {
+const IDDocumentDelete = ({pId, onDeleted, onClosed}) => {
     const [showModal, setShowModal] = useState(false)
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/accessLevels/${pId}`
+        url: `/idDocuments/${pId}`
     });
 
     useEffect(() => {
@@ -121,7 +121,7 @@ const AccessLevelDelete = ({pId, onDeleted, onClosed}) => {
                     show={showModal}>
 
                     <Modal.Header>
-                        <Modal.Title>Delete access level</Modal.Title>
+                        <Modal.Title>Delete ID document</Modal.Title>
                         <NavLink 
                             className="nav-icon" href="#" 
                             onClick={handleCloseModal}>
@@ -129,7 +129,7 @@ const AccessLevelDelete = ({pId, onDeleted, onClosed}) => {
                         </NavLink>
                     </Modal.Header>
                     
-                    <AccessLevelForm 
+                    <IDDocumentForm 
                         pId={pId} 
                         name={data.name}
                         onSubmited={handleSave} 
@@ -141,4 +141,4 @@ const AccessLevelDelete = ({pId, onDeleted, onClosed}) => {
 }
 // End:: Component
 
-export default AccessLevelDelete;
+export default IDDocumentDelete;

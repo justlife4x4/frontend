@@ -1,15 +1,13 @@
-import { React, useContext, useEffect, useRef, useState } from 'react';
-import { Modal, NavLink } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
-import { X, Scissors } from 'react-feather';
+import {React, useContext, useEffect, useRef, useState} from 'react';
+import {Modal, NavLink} from 'react-bootstrap';
+import {toast} from 'react-toastify';
+import {X, Scissors} from 'react-feather';
 
-import { HotelId } from '../../App';
+import {HotelId} from '../../App';
 import useFetchWithAuth from '../useFetchWithAuth';
 
-import 'react-toastify/dist/ReactToastify.css';
-
 // Start:: form
-const EmployeeForm = ({ pId, pName, onSubmit, onClose }) => {
+const EmployeeForm = ({pId, pName, onSubmited, onClosed}) => {
     const hotelId = useContext(HotelId);
     const inputRef = useRef();
     const { loading, error, doDelete } = useFetchWithAuth({
@@ -17,14 +15,28 @@ const EmployeeForm = ({ pId, pName, onSubmit, onClose }) => {
     });
     
     useEffect(() => {
-        !loading && inputRef.current.focus() 
+        !loading && inputRef.current.focus();
+
+        document.addEventListener('keydown', (event) => {
+          if (event.keyCode === 27) {
+            onClosed();
+          }
+        });
+    
+        return () => {
+          document.removeEventListener('keydown', onClosed);
+        };
+      }, []);
+
+    useEffect(() => {
+        !loading && inputRef.current.focus();
     }, [loading, error]);
 
     const handleSave = async () => {
         await doDelete();
 
         if (error === null) {
-            onSubmit();
+            onSubmited();
         } else {
             toast.error(error);
         }
@@ -37,17 +49,19 @@ const EmployeeForm = ({ pId, pName, onSubmit, onClose }) => {
             </Modal.Body>
             <Modal.Footer>
                 <button 
+                    type="button"   
                     className="btn btn-danger"
                     disabled={loading}
                     ref={inputRef}
-                    onClick={(e) => {onClose()}}>
+                    onClick={onClosed} >
                     Close
                 </button>
 
                 <button 
+                    type="button"
                     className="btn btn-success"
                     disabled={loading || error}
-                    onClick={(e) => {handleSave()}}>
+                    onClick={handleSave} >
 
                     {!loading && "Confirm"}
                     {loading && 
@@ -63,33 +77,33 @@ const EmployeeForm = ({ pId, pName, onSubmit, onClose }) => {
 // End:: form
 
 // Start:: Component
-const EmployeeDelete = ({ pId, onDeleted }) => {
+const EmployeeDelete = ({pId, onDeleted, onClosed}) => {
     const hotelId = useContext(HotelId);
     const [showModal, setShowModal] = useState(false)
-
     const { data, loading, error, doFetch } = useFetchWithAuth({
         url: `/employees/${hotelId}/${pId}`
     });
 
     useEffect(() => {
-        doFetch();
-    }, [pId]);
+        showModal && doFetch();
+    }, [pId, showModal]);
 
     useEffect(() => {
         error && toast.error(error);
-    }, [data, error, loading, pId, showModal]);
+    }, [data, error, loading]);
 
     const handleShowModal = () => {
-        setShowModal(true)
+        setShowModal(true);
     }
 
     const handleCloseModal = () => {
-        setShowModal(false)
+        setShowModal(false);
+        onClosed();
     }
 
     const handleSave = () => {
-        onDeleted();  
         setShowModal(false);
+        onDeleted();  
     }
 
     return (
@@ -104,40 +118,26 @@ const EmployeeDelete = ({ pId, onDeleted }) => {
             {/* End:: Delete menu */}
 
             {/* Start:: Delete modal */}
-            <Modal 
-                size="sm"
-                show={showModal}>
+            {data &&
+                <Modal 
+                    size="sm"
+                    show={showModal}>
 
-                <Modal.Header>
-                    <Modal.Title>Delete employee</Modal.Title>
-                    <NavLink 
-                        className="nav-icon" href="#" 
-                        onClick={handleCloseModal}>
-                        <i className="align-middle"><X/></i>
-                    </NavLink>
-                </Modal.Header>
-
-                {data &&
+                    <Modal.Header>
+                        <Modal.Title>Delete employee</Modal.Title>
+                        <NavLink 
+                            className="nav-icon" href="#" 
+                            onClick={handleCloseModal}>
+                            <i className="align-middle"><X/></i>
+                        </NavLink>
+                    </Modal.Header>
                     <EmployeeForm 
                         pId={pId} 
                         pName={data.name}
-                        onSubmit={handleSave} 
-                        onClose={handleCloseModal} />
-                }
-            </Modal>
+                        onSubmited={handleSave} 
+                        onClosed={handleCloseModal} />
+            </Modal>}
             {/* End:: Delete modal */}
-
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                rtl={false}
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover />
 
         </div>  
     );

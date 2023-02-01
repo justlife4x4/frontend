@@ -4,15 +4,15 @@ import {useFormik} from 'formik';
 import {toast} from 'react-toastify';
 import {X, Edit3} from 'react-feather';
 
-import {accessLevelSchema} from '../../schemas';
+import {bookingAgentSchema} from '../../schemas';
 import useFetchWithAuth from '../useFetchWithAuth';
 
 // Start:: form
-const AccessLevelForm = ({pId, pName, pDescription, onSubmited, onClosed}) => {
+const BookingAgentForm = ({pId, pName, pDescription, onSubmited, onClosed}) => {
     const inputRef = useRef();
     const [validateOnChange, setValidateOnChange] = useState(false);
     const {loading, error, doUpdate} = useFetchWithAuth({
-        url: `/accessLevels/${pId}`
+        url: `/bookingAgents/${pId}`
     });
     
     useEffect(() => {
@@ -38,7 +38,7 @@ const AccessLevelForm = ({pId, pName, pDescription, onSubmited, onClosed}) => {
             keyInputName: pName,
             keyInputDescription: pDescription,
         },
-        validationSchema: accessLevelSchema,
+        validationSchema: bookingAgentSchema,
         onSubmit: async (values) => {
             setValidateOnChange(true);
             const payload = {   
@@ -140,10 +140,10 @@ const AccessLevelForm = ({pId, pName, pDescription, onSubmited, onClosed}) => {
 // End:: form
 
 // Start:: Component
-const AccessLevelEdit = ({pId, onEdited, onClosed}) => {
+const BookingAgentEdit = ({pId, onEdited, onClosed}) => {
     const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/accessLevels/${pId}`
+        url: `/bookingAgents/${pId}`
     });
 
     useEffect(() => {
@@ -184,7 +184,7 @@ const AccessLevelEdit = ({pId, onEdited, onClosed}) => {
                     show={showModal}>
 
                     <Modal.Header>
-                        <Modal.Title>Edit access level</Modal.Title>
+                        <Modal.Title>Edit booking agent</Modal.Title>
                         <NavLink 
                             className="nav-icon" href="#" 
                             onClick={handleCloseModal}>
@@ -192,7 +192,7 @@ const AccessLevelEdit = ({pId, onEdited, onClosed}) => {
                         </NavLink>
                     </Modal.Header>
                     
-                    <AccessLevelForm 
+                    <BookingAgentForm 
                         pId={pId}
                         pName={data.name}
                         pDescription={data.description}
@@ -205,4 +205,4 @@ const AccessLevelEdit = ({pId, onEdited, onClosed}) => {
 }
 // End:: Component
 
-export default AccessLevelEdit;
+export default BookingAgentEdit;

@@ -1,7 +1,7 @@
 import {React, useRef, useEffect, forwardRef, useImperativeHandle} from 'react';
 
 
-const AccessLevelSearch = forwardRef((props, ref) => {
+const BookingAgentSearch = forwardRef((props, ref) => {
     const inputRef = useRef();
 
     const setFocus = () => {
@@ -43,4 +43,4 @@ const AccessLevelSearch = forwardRef((props, ref) => {
     );
 })
  
-export default AccessLevelSearch;
+export default BookingAgentSearch;
