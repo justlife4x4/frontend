@@ -1,14 +1,10 @@
 import {React, useEffect, useState} from 'react';
-import {Paperclip, Edit3, Scissors, MoreVertical} from 'react-feather';
 import {useNavigate, NavLink} from 'react-router-dom';
-import {Nav} from 'react-bootstrap';
 
 import {useStateContext} from '../contexts/ContextProvider';
 import Profile from './auth/Profile';
 import ChangePassword from './auth/ChangePassword';
 import Logout from './auth/Logout';
-
-import '../assets/css/custom.css';
 
 const Navbar = ({pEmployeeId, pEmployeeName, onClicked}) => {
     const contextValues = useStateContext();
@@ -89,7 +85,7 @@ const Navbar = ({pEmployeeId, pEmployeeName, onClicked}) => {
 
                             <Profile 
                                 pEmployeeId={pEmployeeId}
-                                onEdited={handleChangeProfileSuccess} />
+                                onEdited={handleChangeProfileSuccess}/>
 
                             <ChangePassword 
                                 pEmployeeId={pEmployeeId}
@@ -97,7 +93,7 @@ const Navbar = ({pEmployeeId, pEmployeeName, onClicked}) => {
 
                             <Logout
                                 pEmployeeId={pEmployeeId}
-                                onLogout={handleLogoutSuccess} />
+                                onLogout={handleLogoutSuccess}/>
                         </div>
                     </li>
                 </ul>

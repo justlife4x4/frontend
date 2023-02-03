@@ -1,4 +1,4 @@
-import {React, useContext, useEffect, useRef, useState} from 'react';
+import {React, useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle} from 'react';
 import {Modal, NavLink} from 'react-bootstrap';
 import {toast} from 'react-toastify';
 import {X, Scissors} from 'react-feather';
@@ -77,16 +77,16 @@ const EmployeeForm = ({pId, pName, onSubmited, onClosed}) => {
 // End:: form
 
 // Start:: Component
-const EmployeeDelete = ({pId, onDeleted, onClosed}) => {
+const EmployeeDelete = forwardRef((props, ref) => {
     const hotelId = useContext(HotelId);
     const [showModal, setShowModal] = useState(false)
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/employees/${hotelId}/${pId}`
+        url: `/employees/${hotelId}/${props.pId}`
     });
 
     useEffect(() => {
         showModal && doFetch();
-    }, [pId, showModal]);
+    }, [props.pId, showModal]);
 
     useEffect(() => {
         error && toast.error(error);
@@ -98,25 +98,22 @@ const EmployeeDelete = ({pId, onDeleted, onClosed}) => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        onClosed();
+        props.onClosed();
     }
 
     const handleSave = () => {
         setShowModal(false);
-        onDeleted();  
+        props.onDeleted();  
     }
 
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+
     return (
-        <div className="text-left">
-
-            {/* Start:: Delete menu */}
-            <span 
-                className="pr-5" 
-                onClick={handleShowModal} >
-                <Scissors className="feather-16 mr-3"/>Delete
-            </span>
-            {/* End:: Delete menu */}
-
+        <>
             {/* Start:: Delete modal */}
             {data &&
                 <Modal 
@@ -132,16 +129,15 @@ const EmployeeDelete = ({pId, onDeleted, onClosed}) => {
                         </NavLink>
                     </Modal.Header>
                     <EmployeeForm 
-                        pId={pId} 
+                        pId={props.pId} 
                         pName={data.name}
                         onSubmited={handleSave} 
                         onClosed={handleCloseModal} />
             </Modal>}
             {/* End:: Delete modal */}
-
-        </div>  
+        </>
     );
-}
+})
 // End:: Component
 
 export default EmployeeDelete;

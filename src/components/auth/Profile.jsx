@@ -15,7 +15,7 @@ const CloseButton = ({closeToast}) => (
     <i className="material-icons"
       onClick={closeToast}>
     </i>
-  );
+);
 
 // Start:: form
 const ProfileForm = ({pAccessLevelId, pId, pName, pAddress, pMobile, pEmail, onSubmited, onClose}) => {
@@ -181,12 +181,12 @@ const ProfileForm = ({pAccessLevelId, pId, pName, pAddress, pMobile, pEmail, onS
 const Profile = ({pEmployeeId, onEdited}) => {
     const hotelId = useContext(HotelId);
     const [showModal, setShowModal] = useState(false);
-    const { data, loading, error, doFetch } = useFetchWithAuth({
+    const {data, loading, error, doFetch} = useFetchWithAuth({
         url: `/employees/${hotelId}/${pEmployeeId}`
     });
 
     useEffect(() => {
-        doFetch();
+        pEmployeeId && doFetch();
     }, [pEmployeeId]);
 
     useEffect(() => {

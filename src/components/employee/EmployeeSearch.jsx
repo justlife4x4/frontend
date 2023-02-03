@@ -11,11 +11,11 @@ const EmployeeSearch = forwardRef((props, ref) => {
         return {
             setFocus
         }
-      }, []);
+    });
 
     useEffect(() => {
         setFocus();
-      }, []);
+    }, []);
 
     const handleSearchChange = (e) => {
         const {value} = e.target;
@@ -36,7 +36,6 @@ const EmployeeSearch = forwardRef((props, ref) => {
                     autoComplete="off"
                     ref={inputRef}
                     onKeyUp={handleSearchChange} />
-
             </form>
         </div>
     );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, {createContext, useContext, useState} from 'react';
 
 const StateContext = createContext();
 
@@ -9,7 +9,7 @@ const initialState = {
   notification: false,
 };
 
-export const ContextProvider = ({ children }) => {
+export const ContextProvider = ({children}) => {
   const [screenSize, setScreenSize] = useState(undefined);
   const [currentColor, setCurrentColor] = useState('#03C9D7');
   const [currentMode, setCurrentMode] = useState('Light');
@@ -19,8 +19,6 @@ export const ContextProvider = ({ children }) => {
   const [isClicked, setIsClicked] = useState(initialState);
   const [itemPerRow, setItemPerRow] = useState(3);
   const [itemPerPage, setItemPerPage] = useState(itemPerRow * 2);
-  const [itemPerRowWithoutMenu, setItemPerRowWithoutMenu] = useState(4);
-  const [itemPerPageWithoutMenu, setItemPerPageWithoutMenu] = useState(itemPerRowWithoutMenu * 3);
 
   const setColor = (color) => {
     setCurrentColor(color);
@@ -41,12 +39,12 @@ export const ContextProvider = ({ children }) => {
 
   return (
     <StateContext.Provider value={{initialState, screenSize, setScreenSize, currentColor, setCurrentColor, 
-                                  currentMode, setCurrentMode, themeSettings, setThemeSettings, 
-                                  activeMenu, setActiveMenu, showMenu, setShowMenu,
-                                  isClicked, setIsClicked, itemPerRow, setItemPerRow, 
-                                  itemPerPage, setItemPerPage, itemPerRowWithoutMenu, setItemPerRowWithoutMenu, 
-                                  itemPerPageWithoutMenu, setItemPerPageWithoutMenu,
-                                  setColor, setMode, setMenuStatus, handleClick}} >
+      currentMode, setCurrentMode, themeSettings, setThemeSettings, 
+      activeMenu, setActiveMenu, showMenu, setShowMenu,
+      isClicked, setIsClicked, itemPerRow, setItemPerRow, 
+      itemPerPage, setItemPerPage, setColor, setMode, 
+      setMenuStatus, handleClick}} >
+
       {children}
     </StateContext.Provider>
   );

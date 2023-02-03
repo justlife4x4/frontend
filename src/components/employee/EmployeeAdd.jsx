@@ -1,8 +1,8 @@
-import {React, useContext, useEffect, useState} from 'react';
-import {Modal, NavLink, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {React, useContext, useEffect, useState, forwardRef, useImperativeHandle} from 'react';
+import {Modal, NavLink} from 'react-bootstrap';
 import {useFormik} from 'formik';
 import {toast} from 'react-toastify';
-import {X, Paperclip} from 'react-feather';
+import {X} from 'react-feather';
 
 import {HotelId} from '../../App';
 import {employeeSchema} from '../../schemas';
@@ -41,18 +41,13 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
         validationSchema: employeeSchema,
         validateOnChange,
         onSubmit: async (values) => {
-            let assessLevelList = [];
-		    values.keyInputAccessLevels.map((item) => {
-			    assessLevelList.push({ id: item.value, name: item.label });
-		    });
-
             const payload = {   
-                            'accessLevels': assessLevelList, 
-                            'name': values.keyInputName.toUpperCase(), 
-                            'address': values.keyInputAddress.toUpperCase(), 
-                            'mobile': values.keyInputMobile.toString(), 
-                            'email': values.keyInputEmail.toLowerCase() 
-                        };
+                'accessLevels': values.keyInputAccessLevels, 
+                'name': values.keyInputName.toUpperCase(), 
+                'address': values.keyInputAddress.toUpperCase(), 
+                'mobile': values.keyInputMobile.toString(), 
+                'email': values.keyInputEmail.toLowerCase() 
+            };
 
             await doInsert(payload);
         
@@ -206,7 +201,7 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
 // End:: form
 
 // Start:: Component
-const EmployeeAdd = ({ onAdded }) => {
+const EmployeeAdd = forwardRef((props, ref) => {
     const [showModal, setShowModal] = useState(false)
 
     const handleShowModal = () => {
@@ -218,24 +213,18 @@ const EmployeeAdd = ({ onAdded }) => {
     }
 
     const handleSave = () => {
-        onAdded();
+        props.onAdded();
         setShowModal(false);
     }
 
-    return (
-        <div className="text-left">
-            {/* Start:: Add buttom */}
-            <OverlayTrigger
-                overlay={<Tooltip>new</Tooltip>}>
-                <button 
-                    className="btn btn-info ml-2" 
-                    size="md" 
-                    onClick={handleShowModal}>
-                    <Paperclip className="feather-16"/>
-                </button>
-            </OverlayTrigger>
-            {/* End:: Add buttom */}
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
 
+    return (
+        <>
             {/* Start:: Add modal */}
             <Modal 
                 show={showModal}>
@@ -252,10 +241,9 @@ const EmployeeAdd = ({ onAdded }) => {
                     onClose={handleCloseModal}/>
             </Modal>
             {/* End:: Add modal */}
-
-        </div>  
+        </>            
     );
-}
+})
 // End:: Component
 
 export default EmployeeAdd;

@@ -7,13 +7,12 @@ import useFetchWithAuth from '../useFetchWithAuth';
 
 const Logout = ({pEmployeeId, onLogout}) => {
 	const hotelId = useContext(HotelId);
-
 	const { data, loading, error, doLogout } = useFetchWithAuth({
         url: `/logout/${hotelId}/${pEmployeeId}`
     });
 
 	useEffect(() => {
-		!error && data === "OK" && onLogout();
+		pEmployeeId && !error && data === "OK" && onLogout();
     }, [data]);
 
 	const handleLogout = async (e) => {

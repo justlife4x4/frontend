@@ -140,7 +140,7 @@ const Plans = () => {
                             <Container>
                                 <div className="row">    
                                     <div className="col-xs-12 col-md-4">
-                                        <h3>Plan</h3>        
+                                        <h3>Plans</h3>        
                                     </div>
                                     <div className="col-xs-12 col-md-8">
                                         <div className="input-group justify-content-end mt-2">

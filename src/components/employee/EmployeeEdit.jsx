@@ -1,8 +1,8 @@
-import {React, useContext, useEffect, useRef, useState} from 'react';
+import {React, useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle} from 'react';
 import {Modal, NavLink} from 'react-bootstrap';
 import {useFormik} from 'formik';
 import {toast} from 'react-toastify';
-import {X, Edit3} from 'react-feather';
+import {X} from 'react-feather';
 
 import {HotelId} from '../../App';
 import {employeeSchema} from '../../schemas';
@@ -32,9 +32,9 @@ const EmployeeForm = ({pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onS
         };
       }, []);
 
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-    }, [loading]);
+    // useEffect(() => {
+    //     !loading && inputRef.current.focus();
+    // }, [loading]);
 
     const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
@@ -46,19 +46,14 @@ const EmployeeForm = ({pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onS
         },
         validationSchema: employeeSchema,
         onSubmit: async (values) => {
-            let assessLevelList = [];
-		    values.keyInputAccessLevels.map((item) => {
-			    assessLevelList.push({ id: item.value, name: item.label });
-		    });
-
             const payload = {   
-                                'accessLevels': assessLevelList,
-                                'name': values.keyInputName.toUpperCase(), 
-                                'address': values.keyInputAddress.toUpperCase(), 
-                                'mobile': values.keyInputMobile.toString(), 
-                                'email': values.keyInputEmail.toLowerCase()
-                            };
-                            
+                'accessLevels': values.keyInputAccessLevels,
+                'name': values.keyInputName.toUpperCase(), 
+                'address': values.keyInputAddress.toUpperCase(), 
+                'mobile': values.keyInputMobile.toString(), 
+                'email': values.keyInputEmail.toLowerCase()
+            };
+
             await doUpdate(payload);
         
             if (error === null) {
@@ -216,20 +211,21 @@ const EmployeeForm = ({pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onS
 // End:: form
 
 // Start:: Component
-const EmployeeEdit = ({pId, onEdited, onClosed}) => {
+const EmployeeEdit = forwardRef((props, ref) => {    
     const hotelId = useContext(HotelId);
     const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/employees/${hotelId}/${pId}`
+        url: `/employees/${hotelId}/${props.pId}`
     });
 
     useEffect(() => {
         showModal && doFetch();
-    }, [pId, showModal]);
-
-    useEffect(() => {
         error && toast.error(error);
-    }, [data, error, loading]);
+    }, [props.pId, showModal]);
+
+    // useEffect(() => {
+    //     error && toast.error(error);
+    // }, [data, error, loading]);
 
     const handleShowModal = () => {
         setShowModal(true);
@@ -237,24 +233,22 @@ const EmployeeEdit = ({pId, onEdited, onClosed}) => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        onClosed();
+        props.onClosed();
     };
 
     const handleSave = () => {
         setShowModal(false);
-        onEdited();
+        props.onEdited();
     }
 
-    return (
-        <div className="text-left">
-            {/* Start:: Edit buttom */}
-            <span 
-                className="pr-5" 
-                onClick={handleShowModal}>
-                <Edit3 className="feather-16 mr-3"/>Edit
-            </span>
-            {/* End:: Edit buttom */}
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
 
+    return (
+        <>
             {/* Start:: Edit modal */}
             {data &&
                 <Modal 
@@ -270,7 +264,7 @@ const EmployeeEdit = ({pId, onEdited, onClosed}) => {
                     </Modal.Header>
 
                     <EmployeeForm 
-                        pId={pId}    
+                        pId={data._id}    
                         pAccessLevels={data.accessLevels}
                         pName={data.name}
                         pAddress={data.address}
@@ -281,9 +275,9 @@ const EmployeeEdit = ({pId, onEdited, onClosed}) => {
                     
                 </Modal>}
             {/* End:: Edit modal */}
-        </div>  
+        </>
     );
-}
+})
 // End:: Component
 
 export default EmployeeEdit;

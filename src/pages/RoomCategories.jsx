@@ -139,7 +139,7 @@ const RoomCategories = () => {
                             <Container>
                                 <div className="row">    
                                     <div className="col-xs-12 col-md-4">
-                                        <h3>Room category</h3>        
+                                        <h3>Room categories</h3>        
                                     </div>
                                     <div className="col-xs-12 col-md-8">
                                         <div className="input-group justify-content-end mt-2">

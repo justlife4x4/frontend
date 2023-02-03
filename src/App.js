@@ -26,14 +26,13 @@ function App() {
       setPEmployeeId(employeeInfo.UserInfo.userid);
       setPEmployeeName(employeeInfo.UserInfo.username);
 
-      doFetch();
+      pEmployeeId && doFetch();
     }
   }, [pEmployeeId]);
 
   useEffect(() => {
     error && toast.error(error);
 
-    // !loading && data && console.log(data.accessLevels);
     let roles = '';
     !loading && data && data.accessLevels.map(role => {
       if (roles.length === 0){
@@ -42,9 +41,8 @@ function App() {
         roles = roles + "," + role.name; 
       }
     });
-    setPEmployeeRoles(roles);
 
-    // !loading && setPEmployeeRoles(employeeInfo.UserInfo.roles);
+    setPEmployeeRoles(roles);
   }, [data, error, loading]);
 
   return (

@@ -1,6 +1,8 @@
 import {React, useContext, useEffect, useState, useRef} from 'react';
 import {Breadcrumb} from 'react-bootstrap';
+import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {ToastContainer, toast} from 'react-toastify';
+import {Paperclip} from 'react-feather';
 
 import {HotelId} from '../App';
 import {useStateContext} from '../contexts/ContextProvider';
@@ -14,26 +16,27 @@ const CloseButton = ({closeToast}) => (
     <i className="material-icons"
       onClick={closeToast}>
     </i>
-  );
+);
 
 const Employees = () => {
     const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
-    const searchRef = useRef(null);
-    
-    const [search, setSearch] = useState('');
-    const [selectedPage, setSelectedPage] = useState(1);
-    const [changed, setChanged] = useState(false);
-
-    const cardRef = useRef(null);
-    //let cardRef = [];
-    const [currentSelect, setCurrentSelect] = useState('');
-    // const [previousSelect, setPreviousSelect] = useState('');
 
     const itemPerRow = contextValues.itemPerRow;
     const itemPerPage = contextValues.itemPerPage;
+
+    const searchRef = useRef(null);
+    let cardRefs = useRef([]);
+    cardRefs.current = [itemPerRow];
+    
+    const [search, setSearch] = useState('');
+    const addRef = useRef(null);
+    const [changed, setChanged] = useState(false);
+    const [selectedPage, setSelectedPage] = useState(1);
+    
     const indexOfLastItem = selectedPage * itemPerPage;
     const indexOfFirstItem = indexOfLastItem - itemPerPage;
+
     const {data, loading, error, doFetch} = useFetchWithAuth({
         url: `/employees/${hotelId}`,
         params: {
@@ -43,17 +46,20 @@ const Employees = () => {
     
     useEffect(() => {
         doFetch();
-    }, [changed, search]);
 
-    useEffect(() => {
-        setChanged(false);
         error && toast.error(error.message);
         !loading && searchRef.current.setFocus();
-    }, [data, loading, error]);
+        changed && setChanged(!changed);
+        search && setSearch(!search);
+    }, [changed, search]);
 
     const handleSearch = (search) => {
         setSearch(search);
         setSelectedPage(1);
+    };
+
+    const handelOpenAdd = () => {
+        addRef.current.handleShowModal();
     };
 
     const handleAdded = () => {
@@ -71,17 +77,11 @@ const Employees = () => {
         setChanged(true);
     };
 
-    const handelActivated = (key, status) => {
-        setCurrentSelect(key);
-
-        cardRef.current.setDeSelect();
-        // data.map((item) => {
-        //     if (item._id !== key) {
-        //         const card = document.getElementById(`${item._id}`);
-        //         card.pSelectionStatus = false;
-        //         // console.log(card);      
-        //     }
-        // })
+    const handelActivated = (index) => {
+        cardRefs.current.map((item, idx) => {
+            if (index !== idx)
+                cardRefs.current[idx] && cardRefs.current[idx].setDeSelect();    
+        })
     }
 
     const handleClosed = () => {
@@ -89,6 +89,7 @@ const Employees = () => {
     };
 
     const handelPaging = (pageNumber) => {
+        cardRefs.current = [itemPerRow];
         setSelectedPage(pageNumber);
     };
 
@@ -121,20 +122,22 @@ const Employees = () => {
         return (
             <div className="row m-0 p-0" key={rowKey}>
                 {
-                    data.map((item) => {
-                        return createCol(item);
+                    data.map((item, idx) => {
+                        const itemIdx = (rowIdx * itemPerRow) + idx; 
+                        return createCol(item, itemIdx);
                     })
                 }
             </div>);
     }
 
-    const createCol = (data = undefined) => {
+    const createCol = (data = undefined, itemIdx) => {
         const colKey = `col_${data._id}`;
 
         return (
             <div className="col-xl-4 col-md-4 m-0" key={colKey}>
                 <EmployeeCard 
-                    ref={cardRef}
+                    ref={(el)=>cardRefs.current[itemIdx] = el}
+                    pIndex={itemIdx}
                     pAccessLevels={data.accessLevels}
                     pId={data._id} 
                     pName={data.name}
@@ -144,7 +147,7 @@ const Employees = () => {
                     onEdited={handleEdited}
                     onDeleted={handleDeleted} 
                     onClosed={handleClosed} 
-                    onActivated={handelActivated}/>
+                    onActivated={handelActivated}/>                
             </div>);
     }
 
@@ -162,7 +165,6 @@ const Employees = () => {
             <div className="row">
                 <div className="col-12">
                     <div className="card">
-
                         {/* Start :: Header & operational panel */}
                         <div className="card-header mx-3">
                             <div className="row">    
@@ -175,9 +177,19 @@ const Employees = () => {
                                             onSearchChange={handleSearch}
                                             ref={searchRef}/>
                                             
-                                        <EmployeeAdd 
+                                        <OverlayTrigger
+                                            overlay={<Tooltip>new</Tooltip>}>
+                                            <button 
+                                                className="btn btn-info ml-2" 
+                                                size="md" 
+                                                onClick={handelOpenAdd}>
+                                                <Paperclip className="feather-16"/>
+                                            </button>
+                                        </OverlayTrigger>
+
+                                        {/* <EmployeeAdd 
                                             onAdded={handleAdded}
-                                            onClosed={handleClosed}/>
+                                            onClosed={handleClosed}/> */}
                                     </div>
                                 </div>
                             </div>
@@ -221,6 +233,13 @@ const Employees = () => {
                 </div>
             </div>
             {/* End :: display data */}
+
+            {/* Start :: add employee component */}
+            <EmployeeAdd 
+                ref={addRef}   
+                onAdded={handleAdded}
+                onClosed={handleClosed}/>
+            {/* End :: add employee component */}
 
             {/* Start :: display message */}
             <ToastContainer
