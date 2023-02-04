@@ -1,4 +1,4 @@
-import {React, useContext, useEffect, useState, useRef} from 'react';
+import {React, useContext, useEffect, useState, useRef, forwardRef} from 'react';
 import {Breadcrumb} from 'react-bootstrap';
 import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {ToastContainer, toast} from 'react-toastify';
@@ -18,7 +18,7 @@ const CloseButton = ({closeToast}) => (
     </i>
 );
 
-const Employees = () => {
+const Employees = forwardRef((props, ref) => {
     const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
 
@@ -256,6 +256,6 @@ const Employees = () => {
 
         </>
     );
-}
+})
 
 export default Employees;
