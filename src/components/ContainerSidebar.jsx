@@ -14,10 +14,12 @@ import RoomCategories from '../pages/RoomCategories';
 import Rooms from '../pages/Rooms';
 import IDDocuments from '../pages/IDDocuments';
 import BookingAgents from '../pages/BookingAgents';
+
 import Support from '../pages/Support';
 import Help from '../pages/Help';
 import Privacy from '../pages/Privacy';
 import Terms from '../pages/Terms';
+import Error404 from '../pages/Error404';
 
 const ContainerSidebar = ({pEmployeeId, pEmployeeName, pEmployeeRoles}) => {
   const contextValues = useStateContext();
@@ -93,6 +95,7 @@ const ContainerSidebar = ({pEmployeeId, pEmployeeName, pEmployeeRoles}) => {
               <Route exact path="/help" element={<Help />} />
               <Route exact path="/privacy" element={<Privacy />} />
               <Route exact path="/terms" element={<Terms />} />
+              <Route path="*" element={<Error404 />} />
             </Routes>
           </div>
         </main>

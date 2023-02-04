@@ -2,17 +2,19 @@ import { React, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 import Login from '../pages/Login';
+import Error404 from '../pages/Error404';
 
 const Container = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-      navigate("/");
+      navigate("/login");
   }, []);
 
   return ( 
       <Routes>
-        <Route exact path="/" element={<Login />} />
+        <Route exact path="/login" element={<Login />} />
+        <Route element={<Error404 />} />
       </Routes>
   );
 }

@@ -2,9 +2,9 @@ import { React } from 'react';
 
 const Privacy = () =>{
     return ( 
-        <>
-            Provacy
-        </>
+        <div className="mt-5">
+            Privacy
+        </div>
      )
 }
 

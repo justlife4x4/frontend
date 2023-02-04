@@ -5,9 +5,9 @@ const Dashboard = () => {
     const hotelId = useContext(HotelId);
     
     return ( 
-        <>
-            Dashboard
-        </> 
+        <div className="mt-5">
+            Dashboard  Hotel Id : {hotelId}
+        </div> 
     );
 }
  

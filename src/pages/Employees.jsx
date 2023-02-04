@@ -45,13 +45,13 @@ const Employees = forwardRef((props, ref) => {
     });
     
     useEffect(() => {
-        doFetch();
+        hotelId && doFetch();
 
         error && toast.error(error.message);
         !loading && searchRef.current.setFocus();
         changed && setChanged(!changed);
         search && setSearch(!search);
-    }, [changed, search]);
+    }, [changed, search, hotelId, error, loading]);
 
     const handleSearch = (search) => {
         setSearch(search);
@@ -78,10 +78,11 @@ const Employees = forwardRef((props, ref) => {
     };
 
     const handelActivated = (index) => {
-        cardRefs.current.map((item, idx) => {
+        cardRefs.current.forEach((item, idx) => {
             if (index !== idx)
                 cardRefs.current[idx] && cardRefs.current[idx].setDeSelect();    
         })
+
     }
 
     const handleClosed = () => {
@@ -93,16 +94,16 @@ const Employees = forwardRef((props, ref) => {
         setSelectedPage(pageNumber);
     };
 
-    const displayData = (data = []) => {
+    const displayData = (pData = []) => {
         let rowIdx = 0;
         let colIdx = 0;
         let rowData = [];
 
-        return data.map((item) => {
+        return pData.map((item) => {
             rowData.push(item);
             colIdx++;
 
-            if ((rowData.length === itemPerRow) || (data.length === colIdx)) {
+            if ((rowData.length === itemPerRow) || (pData.length === colIdx)) {
                 const r = rowIdx;
                 const d = rowData;
 
@@ -116,13 +117,13 @@ const Employees = forwardRef((props, ref) => {
         })
     }
 
-    const createRow = (data, rowIdx) => {
+    const createRow = (pData, rowIdx) => {
         const rowKey=`row_${rowIdx}`;
 
         return (
             <div className="row m-0 p-0" key={rowKey}>
                 {
-                    data.map((item, idx) => {
+                    pData.map((item, idx) => {
                         const itemIdx = (rowIdx * itemPerRow) + idx; 
                         return createCol(item, itemIdx);
                     })
@@ -130,20 +131,20 @@ const Employees = forwardRef((props, ref) => {
             </div>);
     }
 
-    const createCol = (data = undefined, itemIdx) => {
-        const colKey = `col_${data._id}`;
+    const createCol = (pData = undefined, itemIdx) => {
+        const colKey = `col_${pData._id}`;
 
         return (
             <div className="col-xl-4 col-md-4 m-0" key={colKey}>
                 <EmployeeCard 
                     ref={(el)=>cardRefs.current[itemIdx] = el}
                     pIndex={itemIdx}
-                    pAccessLevels={data.accessLevels}
-                    pId={data._id} 
-                    pName={data.name}
-                    pAddress={data.address}
-                    pMobile={data.mobile}
-                    pEmail={data.email}
+                    pAccessLevels={pData.accessLevels}
+                    pId={pData._id} 
+                    pName={pData.name}
+                    pAddress={pData.address}
+                    pMobile={pData.mobile}
+                    pEmail={pData.email}
                     onEdited={handleEdited}
                     onDeleted={handleDeleted} 
                     onClosed={handleClosed} 
@@ -253,7 +254,6 @@ const Employees = forwardRef((props, ref) => {
                 pauseOnFocusLoss
                 pauseOnHover/>
             {/* End :: display message */}
-
         </>
     );
 })
