@@ -1,11 +1,11 @@
-import {React, useState} from 'react';
-import {Routes, Route, NavLink} from 'react-router-dom';
-import {Sliders} from 'react-feather';
+import { React, useState } from 'react';
+import { Routes, Route, NavLink } from 'react-router-dom';
+import { Sliders } from 'react-feather';
 
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from './NavbarLogin';
+import Footer from './FooterLogin';
 
-import {useStateContext} from '../contexts/ContextProvider';
+import { useStateContext } from '../contexts/ContextProvider';
 import Dashboard from '../pages/Dashboard';
 import AccessLevels from '../pages/AccessLevels';
 import Employees from '../pages/Employees';
@@ -21,7 +21,7 @@ import Privacy from '../pages/Privacy';
 import Terms from '../pages/Terms';
 import Error404 from '../pages/Error404';
 
-const ContainerSidebar = ({pEmployeeId, pEmployeeName, pEmployeeRoles}) => {
+const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
   const contextValues = useStateContext();
   const [menuState, setMenuState] = useState(contextValues.showMenu);
   const [selected, setSelected] = useState('');
@@ -36,7 +36,7 @@ const ContainerSidebar = ({pEmployeeId, pEmployeeName, pEmployeeRoles}) => {
 
   return ( 
     <>
-      {menuState && 
+      { menuState && 
         <nav id="sidebar" className="sidebar mt-5">
           <div className="sidebar-content">
             <ul className="sidebar-nav">
@@ -72,10 +72,10 @@ const ContainerSidebar = ({pEmployeeId, pEmployeeName, pEmployeeRoles}) => {
               </li>
             </ul>
           </div>
-        </nav>}
+        </nav> }
 
       <div className="main">
-        <Navbar 
+        <Navbar
           pEmployeeId={pEmployeeId}
           pEmployeeName={pEmployeeName}
           onClicked={(s) => handleShowHide(s)}/>
@@ -106,4 +106,4 @@ const ContainerSidebar = ({pEmployeeId, pEmployeeName, pEmployeeRoles}) => {
   );
 }
 
-export default ContainerSidebar;
+export default ContainerLogin;

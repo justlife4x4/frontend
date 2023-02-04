@@ -1,21 +1,38 @@
-import { React, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 
-import Login from '../pages/Login';
-import Error404 from '../pages/Error404';
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+
+import Login from "../pages/Login";
+import Support from "../pages/Support";
+import Help from "../pages/Help";
+import Privacy from "../pages/Privacy";
+import Terms from "../pages/Terms";
+import Error404 from "../pages/Error404";
 
 const Container = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-      navigate("/login");
-  }, []);
-
   return ( 
-      <Routes>
-        <Route exact path="/login" element={<Login />} />
-        <Route element={<Error404 />} />
-      </Routes>
+    <>
+      <div className="main">
+        <Navbar/>
+
+        <main className="content">
+          <div className="container-fluid p-0">
+            <Routes>
+              <Route exact path="/" element={<Login />} />
+              <Route exact path="/support" element={<Support />} />
+              <Route exact path="/help" element={<Help />} />
+              <Route exact path="/privacy" element={<Privacy />} />
+              <Route exact path="/terms" element={<Terms />} />
+              <Route path="*" element={<Error404 />} />
+            </Routes>
+          </div>
+        </main>
+
+        <Footer/>
+      </div>
+    </>
   );
 }
 

@@ -1,13 +1,12 @@
-import { React, createContext, useEffect, useState } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import jwt_decode from 'jwt-decode';
+import { React, createContext, useEffect, useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+import { toast } from "react-toastify";
+import jwt_decode from "jwt-decode";
 
-import { ContextProvider } from './contexts/ContextProvider';
-// import Container from './components/Container';
-import ContainerSidebar from './components/ContainerSidebar';
-import Login from './pages/Login';
-import useFetchWithAuth from './components/useFetchWithAuth';
+import { ContextProvider } from "./contexts/ContextProvider";
+import Container from "./components/Container";
+import ContainerLogin from "./components/ContainerLogin";
+import useFetchWithAuth from "./components/useFetchWithAuth";
 
 const HotelId = createContext();
 
@@ -56,12 +55,18 @@ function App() {
       <ContextProvider>
         <BrowserRouter>
           <div className="wrapper">
-            {pEmployeeId && <ContainerSidebar 
+
+            {/* Start :: call container after login */}
+            {pEmployeeId && <ContainerLogin 
                 pEmployeeId={ pEmployeeId }
                 pEmployeeName={ pEmployeeName }
                 pEmployeeRoles={ pEmployeeRoles }/>}
+            {/* End :: call container after login */}
 
-            {!pEmployeeId && <Login/>}  
+            {/* Start :: call container before login */}
+            {!pEmployeeId && <Container/>}
+            {/* End :: call container before login */}
+
           </div>
         </BrowserRouter>
       </ContextProvider>
