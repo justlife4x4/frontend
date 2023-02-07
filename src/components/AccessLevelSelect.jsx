@@ -1,7 +1,7 @@
-import {React, useEffect, useState, useRef} from 'react';
-import Select from 'react-select';
+import React, { useEffect, useState, useRef } from "react";
+import Select from "react-select";
 
-import useFetchWithAuth from './useFetchWithAuth';
+import useFetchWithAuth from "./useFetchWithAuth";
 
 const AccessLevelSelect = ({onChange, name, value, disabled = false}) => {
 	const inputRef = useRef();

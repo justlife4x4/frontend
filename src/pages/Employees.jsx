@@ -1,98 +1,121 @@
-import {React, useContext, useEffect, useState, useRef, forwardRef} from 'react';
-import {Breadcrumb} from 'react-bootstrap';
-import {OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {ToastContainer, toast} from 'react-toastify';
-import {Paperclip} from 'react-feather';
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react"
+import { Breadcrumb } from "react-bootstrap"
+import { ToastContainer, toast } from "react-toastify"
 
-import {HotelId} from '../App';
-import {useStateContext} from '../contexts/ContextProvider';
-import EmployeeSearch from '../components/employee/EmployeeSearch';
-import EmployeeAdd from '../components/employee/EmployeeAdd';
-import EmployeeCard from '../components/employee/EmployeeCard';
-import Paging from '../components/Paging';
-import useFetchWithAuth from '../components/useFetchWithAuth';
+import { HotelId } from "../App"
+import { useStateContext } from "../contexts/ContextProvider"
+import EmployeeAdd from "../components/employee/EmployeeAdd"
+import EmployeeCard from "../components/employee/EmployeeCard"
+import Paging from "../components/Paging"
+import useFetchWithAuth from "../components/useFetchWithAuth"
+
 
 const CloseButton = ({closeToast}) => (
     <i className="material-icons"
-      onClick={closeToast}>
+        onClick={closeToast}>
     </i>
-);
+)
 
 const Employees = forwardRef((props, ref) => {
-    const hotelId = useContext(HotelId);
-    const contextValues = useStateContext();
-
-    const itemPerRow = contextValues.itemPerRow;
-    const itemPerPage = contextValues.itemPerPage;
-
-    const searchRef = useRef(null);
-    let cardRefs = useRef([]);
-    cardRefs.current = [itemPerRow];
-    
-    const [search, setSearch] = useState('');
-    const addRef = useRef(null);
-    const [changed, setChanged] = useState(false);
-    const [selectedPage, setSelectedPage] = useState(1);
-    
-    const indexOfLastItem = selectedPage * itemPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemPerPage;
-
+    const hotelId = useContext(HotelId)
+    const contextValues = useStateContext()
+    const itemPerRow = contextValues.itemPerRow
+    const itemPerPage = contextValues.itemPerPage
+    const [search, setSearch] = useState("")
+    const addRef = useRef(null)
+    let cardRefs = useRef([])
+    cardRefs.current = [itemPerRow]
+    const [selectedCardIndex, setSelectedCardIndex] = useState(null)
+    const [dataChanged, setDataChanged] = useState(false)
+    const [selectedPage, setSelectedPage] = useState(1)
+    const indexOfLastItem = selectedPage * itemPerPage
+    const indexOfFirstItem = indexOfLastItem - itemPerPage
     const {data, loading, error, doFetch} = useFetchWithAuth({
         url: `/employees/${hotelId}`,
         params: {
             search: search
         }
     });
-    
+
     useEffect(() => {
-        hotelId && doFetch();
+        doFetch()
+        setDataChanged(false)
+    }, [dataChanged, search])
 
-        error && toast.error(error.message);
-        !loading && searchRef.current.setFocus();
-        changed && setChanged(!changed);
-        search && setSearch(!search);
-    }, [changed, search, hotelId, error, loading]);
+    useEffect(() => {
+        error && toast.error(error)
+    }, [data, error, loading])
 
-    const handleSearch = (search) => {
-        setSearch(search);
+
+    const changeSearch = (text) => {
+        setSearch(text);
         setSelectedPage(1);
     };
 
-    const handelOpenAdd = () => {
+    const openAdd = () => {
         addRef.current.handleShowModal();
-    };
+    }
+
 
     const handleAdded = () => {
         toast.success('Data successfully added');
-        setChanged(true);
+        setDataChanged(true);
     };
+
+    const openEdit = () => {
+        !selectedCardIndex && toast.warning('Nothing selected to edit');
+
+        selectedCardIndex && cardRefs.current.forEach((item, idx) => {
+            if (selectedCardIndex === idx) {
+                cardRefs.current[idx] && cardRefs.current[idx].handelOpenEdit();    
+            }
+        });
+    }
 
     const handleEdited = () => {
         toast.success('Data successfully changed');
-        setChanged(true);
-   };
-
-    const handleDeleted = () => {
-        toast.success('Data successfully deleted');
-        setChanged(true);
+        setDataChanged(true);
     };
 
-    const handelActivated = (index) => {
-        cardRefs.current.forEach((item, idx) => {
+    const openDelete = () => {
+        !selectedCardIndex && toast.warning('Nothing selected to delete');
+    
+        selectedCardIndex && cardRefs.current.forEach((item, idx) => {
+            if (selectedCardIndex === idx) {
+                cardRefs.current[idx] && cardRefs.current[idx].handelOpenDel();    
+            }
+        })
+   };
+
+   const handleDeleted = () => {
+        toast.success('Data successfully deleted');
+        setDataChanged(true);
+   };
+
+   const handelActivated = (index) => {
+        setSelectedCardIndex(index);
+
+        cardRefs.current && cardRefs.current.forEach((item, idx) => {
             if (index !== idx)
                 cardRefs.current[idx] && cardRefs.current[idx].setDeSelect();    
         })
-
-    }
+   }
 
     const handleClosed = () => {
-        searchRef.current.setFocus();
+        // searchRef.current.setFocus();
     };
 
     const handelPaging = (pageNumber) => {
         cardRefs.current = [itemPerRow];
         setSelectedPage(pageNumber);
     };
+
+    useImperativeHandle(ref, () => {
+        return {
+            changeSearch, openAdd, openEdit, openDelete
+        }
+    });
+
 
     const displayData = (pData = []) => {
         let rowIdx = 0;
@@ -137,18 +160,18 @@ const Employees = forwardRef((props, ref) => {
         return (
             <div className="col-xl-4 col-md-4 m-0" key={colKey}>
                 <EmployeeCard 
-                    ref={(el)=>cardRefs.current[itemIdx] = el}
-                    pIndex={itemIdx}
-                    pAccessLevels={pData.accessLevels}
-                    pId={pData._id} 
-                    pName={pData.name}
-                    pAddress={pData.address}
-                    pMobile={pData.mobile}
-                    pEmail={pData.email}
-                    onEdited={handleEdited}
-                    onDeleted={handleDeleted} 
-                    onClosed={handleClosed} 
-                    onActivated={handelActivated}/>                
+                    ref = { (el) => cardRefs.current[itemIdx] = el }
+                    pIndex = { itemIdx }
+                    pAccessLevels = { pData.accessLevels }
+                    pId = { pData._id } 
+                    pName = { pData.name }
+                    pAddress = { pData.address }
+                    pMobile = { pData.mobile }
+                    pEmail = { pData.email }
+                    onEdited = { handleEdited }
+                    onDeleted = { handleDeleted } 
+                    onClosed = { handleClosed } 
+                    onActivated = { handelActivated } />                
             </div>);
     }
 
@@ -168,68 +191,45 @@ const Employees = forwardRef((props, ref) => {
                     <div className="card">
                         {/* Start :: Header & operational panel */}
                         <div className="card-header mx-3">
-                            <div className="row">    
-                                <div className="col-xs-12 col-md-4">
-                                    <h3>Employees</h3>        
-                                </div>
-                                <div className="col-xs-12 col-md-8">
-                                    <div className="input-group justify-content-end mt-2">
-                                        <EmployeeSearch 
-                                            onSearchChange={handleSearch}
-                                            ref={searchRef}/>
-                                            
-                                        <OverlayTrigger
-                                            overlay={<Tooltip>new</Tooltip>}>
-                                            <button 
-                                                className="btn btn-info ml-2" 
-                                                size="md" 
-                                                onClick={handelOpenAdd}>
-                                                <Paperclip className="feather-16"/>
-                                            </button>
-                                        </OverlayTrigger>
-
-                                        {/* <EmployeeAdd 
-                                            onAdded={handleAdded}
-                                            onClosed={handleClosed}/> */}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">    
-                                <div className="col-12 text-right mt-4 text-muted">
-                                    {/* Start :: Display data count */}
-                                        {!loading && 
-                                            data && 
-                                                `display count : ${selectedPage * itemPerPage > data.length ? data.length : selectedPage * itemPerPage} of ${data.length}`}
-                                    {/* End :: Display data count */}
-                                </div>
-                            </div>
                         </div>
                         {/* End :: Header & operational panel */}
 
                         {/* Start :: Display data */}
-                        <div className="card-body m-0 py-0">
-                            {loading &&
+                        <div className="card-body py-0">
+                            { loading &&
                                 <div className="d-flex justify-content-center">
                                     <div className="spinner-border text-primary" role="status"/>
-                                </div>}
+                                </div> }
 
-                            {!loading && 
+                            { !loading && 
                                 data && 
-                                    displayData(data.slice(indexOfFirstItem, indexOfLastItem))}
+                                    displayData(data.slice(indexOfFirstItem, indexOfLastItem)) }
                         </div>
                         {/* End :: Display data */}
                         
-                        {/* Start :: Pagination */}
-                        <div className="card-header d-flex justify-content-end mx-3">
-                            {!loading && 
-                                    data && 
-                                        <Paging
-                                            itemPerPage={itemPerPage}
-                                            totalItem={data.length}
-                                            selectedPage={selectedPage}
-                                            onPaging={handelPaging} />}
+                        <div className="card-footer ">
+                            <div className="row">
+                                {/* Start :: Display data count */}
+                                <div className="col-4 text-danger">
+                                    {!loading && 
+                                        data && 
+                                            `display count : ${selectedPage * itemPerPage > data.length ? data.length : selectedPage * itemPerPage} of ${data.length}`}
+                                </div>
+                                {/* End :: Display data count */}
+
+                                {/* Start :: Pagination */}
+                                <div className="col-8 text-muted d-flex justify-content-end">
+                                    {!loading && 
+                                            data && 
+                                                <Paging
+                                                    itemPerPage={itemPerPage}
+                                                    totalItem={data.length}
+                                                    selectedPage={selectedPage}
+                                                    onPaging={handelPaging} />}
+                                </div>
+                                {/* End :: Pagination */}
+                            </div>
                         </div>
-                        {/* End :: Pagination */}
                     </div>
                 </div>
             </div>
@@ -237,9 +237,9 @@ const Employees = forwardRef((props, ref) => {
 
             {/* Start :: add employee component */}
             <EmployeeAdd 
-                ref={addRef}   
-                onAdded={handleAdded}
-                onClosed={handleClosed}/>
+                ref = { addRef }   
+                onAdded = { handleAdded }
+                onClosed = { handleClosed } />
             {/* End :: add employee component */}
 
             {/* Start :: display message */}
@@ -258,4 +258,4 @@ const Employees = forwardRef((props, ref) => {
     );
 })
 
-export default Employees;
+export default Employees

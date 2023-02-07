@@ -1,19 +1,19 @@
-import {React, useContext, useEffect, useState, forwardRef, useImperativeHandle} from 'react';
-import {Modal, NavLink} from 'react-bootstrap';
-import {useFormik} from 'formik';
-import {toast} from 'react-toastify';
-import {X} from 'react-feather';
+import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react"
+import { Modal, NavLink } from "react-bootstrap"
+import { useFormik } from "formik"
+import { toast } from "react-toastify"
+import { X } from "react-feather"
 
-import {HotelId} from '../../App';
-import {employeeSchema} from '../../schemas';
-import AccessLevelSelect from '../AccessLevelSelect';
-import useFetchWithAuth from '../useFetchWithAuth';
+import { HotelId } from "../../App"
+import { employeeSchema } from "../../schemas"
+import AccessLevelSelect from "../AccessLevelSelect"
+import useFetchWithAuth from "../useFetchWithAuth"
 
 
 // Start:: form
-const EmployeeForm = ({onSubmited, onClosed}) => {
-    const hotelId = useContext(HotelId);
-    const [validateOnChange, setValidateOnChange] = useState(false);
+const EmployeeForm = ({ onSubmited, onClosed }) => {
+    const hotelId = useContext(HotelId)
+    const [validateOnChange, setValidateOnChange] = useState(false)
     const { loading, error, doInsert } = useFetchWithAuth({
         url: `/employees/${hotelId}`
     });
@@ -21,14 +21,14 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
     useEffect(() => {
         document.addEventListener('keydown', (event) => {
           if (event.keyCode === 27) {
-            onClosed();
+            onClosed()
           }
-        });
+        })
     
         return () => {
-          document.removeEventListener('keydown', onClosed);
-        };
-    }, []);
+          document.removeEventListener('keydown', onClosed)
+        }
+    }, [])
 
     const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
@@ -47,23 +47,23 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
                 'address': values.keyInputAddress.toUpperCase(), 
                 'mobile': values.keyInputMobile.toString(), 
                 'email': values.keyInputEmail.toLowerCase() 
-            };
+            }
 
-            await doInsert(payload);
+            await doInsert(payload)
         
             if (error === null) {
-                resetForm();
-                onSubmited();
+                resetForm()
+                onSubmited()
             } else {
-                toast.error(error);
+                toast.error(error)
             }
         }
-    });
+    })
 
     const handleClose = () => {
-        setValidateOnChange(false);
-        resetForm(); 
-        onClosed();
+        setValidateOnChange(false)
+        resetForm()
+        onClosed()
     }
 
     return (
@@ -72,23 +72,23 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
                 <div className="row mb-3">
                     <div className="col-12">
                         <label className="form-label" 
-                                htmlFor={"keyInputAccessLevels"}>Role</label>
+                                htmlFor = { "keyInputAccessLevels" }>Role</label>
 
                         <AccessLevelSelect 
-                            name={"keyInputAccessLevels"}
-                            onChange={(value) => {setFieldValue("keyInputAccessLevels", value)}}/>
+                            name = { "keyInputAccessLevels" }
+                            onChange = { (value) => { setFieldValue("keyInputAccessLevels", value) } }/>
 
-                        {errors.keyInputAccessLevelId && 
+                        { errors.keyInputAccessLevelId && 
                             touched.keyInputAccessLevels ? 
-                                (<small className="text-danger">{errors.keyInputAccessLevels}</small>) : 
-                                    null}
+                                (<small className="text-danger">{ errors.keyInputAccessLevels }</small>) : 
+                                    null }
                     </div>
                 </div>
 
                 <div className="row mb-3">
                     <div className="col-12">
                         <label className="form-label" 
-                            htmlFor={"keyInputName"}>Name</label>
+                            htmlFor = { "keyInputName" }>Name</label>
 
                         <input 
                             type="text" 
@@ -96,36 +96,36 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
                             placeholder="Name"
                             className="form-control"
                             autoComplete="off"
-                            maxLength={100}
-                            disabled={loading} 
-                            value={values.keyInputName} 
-                            onChange={handleChange}/>
+                            maxLength = { 100 }
+                            disabled = { loading } 
+                            value = { values.keyInputName } 
+                            onChange = { handleChange } />
 
-                        {errors.keyInputName && 
+                        { errors.keyInputName && 
                             touched.keyInputName ? 
-                                (<small className="text-danger">{errors.keyInputName}</small>) : 
-                                    null}
+                                (<small className="text-danger">{ errors.keyInputName }</small>) : 
+                                    null }
                     </div>
                 </div>
 
                 <div className="row mb-3">
                     <div className="col-12">
                         <label className="form-label" 
-                                htmlFor={"keyInputAddress"}>Address</label>
+                                htmlFor = { "keyInputAddress" }>Address</label>
                         <textarea
-                            name={"keyInputAddress"}
-                            rows={"5"}
-                            placeholder="Address"
-                            className="form-control"
-                            autoComplete="off"
-                            maxLength={1000}
-                            disabled={loading}
-                            value={values.keyInputAddress} 
-                            onChange={handleChange}/>
+                            name = { "keyInputAddress" }
+                            rows = { "5" }
+                            placeholder = "Address"
+                            className = "form-control"
+                            autoComplete = "off"
+                            maxLength = { 1000 }
+                            disabled = { loading }
+                            value = { values.keyInputAddress } 
+                            onChange = { handleChange}  />
 
-                        {errors.keyInputAddress && 
+                        { errors.keyInputAddress && 
                             touched.keyInputAddress ? 
-                                (<small className="text-danger">{errors.keyInputAddress}</small>) : 
+                                (<small className="text-danger">{ errors.keyInputAddress }</small>) : 
                                     null}
                     </div>
                 </div>
@@ -133,7 +133,7 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
                 <div className="row mb-3">
                     <div className="col-xs-12 col-md-6">
                         <label className="form-label" 
-                            htmlFor={"keyInputMobile"}>Mobile no.</label>
+                            htmlFor= { "keyInputMobile" }>Mobile no.</label>
                             
                         <input
                             type="number"
@@ -142,13 +142,13 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
                             className="form-control"
                             autoComplete="off"
                             maxLength="10"
-                            disabled={loading}
-                            value={values.keyInputMobile} 
-                            onChange={handleChange}/>
+                            disabled = { loading }
+                            value = { values.keyInputMobile } 
+                            onChange = { handleChange } />
 
                         { errors.keyInputMobile && 
                             touched.keyInputMobile ? 
-                                (<small className="text-danger">{errors.keyInputMobile}</small>) : 
+                                (<small className="text-danger">{ errors.keyInputMobile }</small>) : 
                                     null }
                     </div>
 
@@ -160,15 +160,15 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
                             className="form-control"
                             autoComplete="off"
                             name="keyInputEmail"
-                            maxLength={100}
-                            disabled={loading}
-                            value={values.keyInputEmail} 
-                            onChange={handleChange}/>
+                            maxLength = {100}
+                            disabled = { loading }
+                            value = { values.keyInputEmail } 
+                            onChange = { handleChange } />
 
-                        {errors.keyInputEmail && 
+                        { errors.keyInputEmail && 
                             touched.keyInputEmail ? 
                                 (<small className="text-danger">{errors.keyInputEmail}</small>) : 
-                                    null}    
+                                    null }    
                     </div>
                 </div>
             </Modal.Body>
@@ -176,32 +176,33 @@ const EmployeeForm = ({onSubmited, onClosed}) => {
                 <button 
                     type="button"
                     className="btn btn-danger"
-                    disabled={loading}
-                    onClick={handleClose} >
+                    disabled = { loading }
+                    onClick = { handleClose } >
                     Close
                 </button>
 
                 <button 
                     type="button"
                     className="btn btn-success"
-                    disabled={loading} 
-                    onClick={handleSubmit}>
+                    disabled = { loading } 
+                    onClick = { handleSubmit } >
 
-                    {!loading && "Confirm"}
-                    {loading && 
+                    { !loading && "Confirm" }
+                    { loading && 
                         <>
                             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Working
-                        </>}
+                        </> }
                 </button>
             </Modal.Footer>
         </form>
-    );
-};
+    )
+}
 // End:: form
 
+
 // Start:: Component
-const EmployeeAdd = forwardRef((props, ref) => {
+const EmployeeAdd = forwardRef(( props, ref ) => {
     const [showModal, setShowModal] = useState(false)
 
     const handleShowModal = () => {
@@ -213,10 +214,10 @@ const EmployeeAdd = forwardRef((props, ref) => {
     }
 
     const handleSave = () => {
-        props.onAdded();
-        setShowModal(false);
+        props.onAdded()
+        setShowModal(false)
     }
-
+    
     useImperativeHandle(ref, () => {
         return {
             handleShowModal
@@ -227,18 +228,18 @@ const EmployeeAdd = forwardRef((props, ref) => {
         <>
             {/* Start:: Add modal */}
             <Modal 
-                show={showModal}>
+                show = { showModal } >
 
                 <Modal.Header>
                     <Modal.Title>Add employee</Modal.Title>
-                    <NavLink className="nav-icon" href="#" onClick={handleCloseModal}>
+                    <NavLink className="nav-icon" href="#" onClick = { handleCloseModal } >
                         <i className="align-middle"><X/></i>
                     </NavLink>
                 </Modal.Header>
 
                 <EmployeeForm
-                    onSubmited={handleSave} 
-                    onClose={handleCloseModal}/>
+                    onSubmited = { handleSave } 
+                    onClose = { handleCloseModal } />
             </Modal>
             {/* End:: Add modal */}
         </>            
@@ -246,4 +247,4 @@ const EmployeeAdd = forwardRef((props, ref) => {
 })
 // End:: Component
 
-export default EmployeeAdd;
+export default EmployeeAdd
