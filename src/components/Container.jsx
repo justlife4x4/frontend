@@ -1,15 +1,15 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import React from "react"
+import { Routes, Route } from "react-router-dom"
 
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import Navbar from "./Navbar"
+import Footer from "./Footer"
 
-import Login from "../pages/Login";
-import Support from "../pages/Support";
-import Help from "../pages/Help";
-import Privacy from "../pages/Privacy";
-import Terms from "../pages/Terms";
-import Error404 from "../pages/Error404";
+import Login from "../pages/Login"
+import Support from "../pages/Support"
+import Help from "../pages/Help"
+import Privacy from "../pages/Privacy"
+import Terms from "../pages/Terms"
+import Error404 from "../pages/Error404"
 
 const Container = () => {
   return ( 
@@ -36,4 +36,4 @@ const Container = () => {
   );
 }
 
-export default Container;
+export default Container

@@ -1,47 +1,47 @@
-import React, { useEffect, useState, useRef } from "react";
-import Select from "react-select";
+import React, { useEffect, useState, useRef } from "react"
+import Select from "react-select"
 
-import useFetchWithAuth from "./useFetchWithAuth";
+import useFetchWithAuth from "./useFetchWithAuth"
 
-const AccessLevelSelect = ({onChange, name, value, disabled = false}) => {
-	const inputRef = useRef();
-	const [accesslevelList, setAccesslevelList] = useState([]);
-	const [selectedList, setSelectedList] = useState(value);
+const AccessLevelSelect = ({ onChange, name, value, disabled = false }) => {
+	const inputRef = useRef()
+	const [accesslevelList, setAccesslevelList] = useState([])
+	const [selectedList, setSelectedList] = useState(value)
     const { data, loading, error, doFetch } = useFetchWithAuth({
         url: `/accessLevels`
-    });
-	let defaultList = [];
+    })
+	let defaultList = []
 
 	useEffect(() => {
-        doFetch();
+        doFetch()
 		
 		value && value.map((item) => {
-			defaultList.push({ value: item.id, label: item.name });
-		});
-    }, []);
+			defaultList.push({ value: item.id, label: item.name })
+		})
+    }, [])
 
     useEffect(() => {
 		let list = [];
 		data && data.map((item) => {
-			list.push({ value: item._id, label: item.name });
-		});
-		setAccesslevelList(list);
-		!loading && inputRef.current.focus();
-    }, [data, loading, error]);
+			list.push({ value: item._id, label: item.name })
+		})
+		setAccesslevelList(list)
+		!loading && inputRef.current.focus()
+    }, [data, loading, error])
 
 	useEffect(() => {
-        onChange(selectedList);
-    }, [selectedList]);
+        onChange(selectedList)
+    }, [selectedList])
 
 
 	const onSelect = (selectedList) => {
-		let list = [];
+		let list = []
 		selectedList.map((item) => {
-			list.push({id: item.value, name: item.label});
-		});
+			list.push({id: item.value, name: item.label})
+		})
 
-		setSelectedList(list);
-	};
+		setSelectedList(list)
+	}
 
 	return (
 		<Select 
@@ -52,7 +52,7 @@ const AccessLevelSelect = ({onChange, name, value, disabled = false}) => {
 			disabled={loading && disabled} 
 			onChange={onSelect}
 			isMulti />
-    );
+    )
 }
  
-export default AccessLevelSelect;
+export default AccessLevelSelect

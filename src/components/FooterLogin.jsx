@@ -1,5 +1,5 @@
-import React from "react";
-import { NavLink } from 'react-router-dom';
+import React from "react"
+import { NavLink } from "react-router-dom"
 
 const FooterLogin = () => {
     return ( 
@@ -30,7 +30,7 @@ const FooterLogin = () => {
 				</div>
 			</div>
 		</footer>      
-    );
+    )
 }
  
-export default FooterLogin;
+export default FooterLogin

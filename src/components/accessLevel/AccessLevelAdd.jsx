@@ -1,49 +1,53 @@
-import {React, useEffect, useRef, useState} from 'react';
-import {Modal, NavLink, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {useFormik} from 'formik';
-import {toast} from 'react-toastify';
-import {X, Paperclip} from 'react-feather';
+import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { useFormik } from "formik";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import {accessLevelSchema} from '../../schemas';
-import useFetchWithAuth from '../useFetchWithAuth';
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import { accessLevelSchema } from "../../schemas";
+import useFetchWithAuth from "../useFetchWithAuth";
+
 
 // Start:: form
-const AccessLevelForm = ({onSubmited, onClosed}) => {
-    const inputRef = useRef();
+const Form = ({ onSubmited, onClosed }) => {
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
     const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doInsert } = useFetchWithAuth({
-        url: `/accessLevels`
+        url: `${contextValues.accessLevelAPI}`
     });
-    
+
+
+    // Strat:: close modal on key press esc    
     useEffect(() => {
         document.addEventListener('keydown', (event) => {
           if (event.keyCode === 27) {
             onClosed();
           }
-        });
+        })
     
         return () => {
           document.removeEventListener('keydown', onClosed);
-        };
-    }, []);
+        }
+    }, [])
+    // End:: close modal on key press esc    
 
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-    }, [loading]);
-    
-    const {values, errors, touched, handleChange, handleSubmit, resetForm} = useFormik({
+
+    // Start:: Form validate and save data
+    const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
-            keyInputName: '',
-            keyInputDescription: ''
+            keyInputName: "",
+            keyInputDescription: "",
         },
         validationSchema: accessLevelSchema,
         validateOnChange,
-        onSubmit: async (values, action) => {
-            setValidateOnChange(true);
+        onSubmit: async (values) => {
             const payload = {   
-                            'name': values.keyInputName.toUpperCase(), 
-                            'description': values.keyInputDescription, 
-                        };
+                "name": values.keyInputName.toUpperCase(), 
+                "description": values.keyInputDescription
+            }
 
             await doInsert(payload);
         
@@ -54,143 +58,215 @@ const AccessLevelForm = ({onSubmited, onClosed}) => {
                 toast.error(error);
             }
         }
-    });
+    })
+    // End:: Form validate and save data
 
+    
+    // Strat:: close form    
     const handleClose = () => {
         setValidateOnChange(false);
-        resetForm(); 
+        resetForm();
         onClosed();
     }
+    // End:: close form    
 
+
+    // Start:: Html
     return (
         <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column name */}
                     <div className="col-12">
+
+                        {/* Label element */}
                         <label className="form-label" 
-                            htmlFor="keyInputName">Name</label>
-                        
-                        <input
+                            htmlFor = { "keyInputName" }>Name</label>
+
+                        {/* Input element text*/}
+                        <input 
                             type="text" 
                             name="keyInputName"
-                            placeholder="name"
+                            placeholder="Name"
                             className="form-control"
                             autoComplete="off"
-                            maxLength={100}
-                            ref={inputRef}
-                            disabled={loading}
-                            value={values.keyInputName}
-                            onChange={handleChange} />
+                            autoFocus
+                            maxLength = { 100 }
+                            disabled = { loading } 
+                            value = { values.keyInputName } 
+                            onChange = { handleChange } />
 
-                        {errors.keyInputName && 
+                        {/* Validation message */}
+                        { errors.keyInputName && 
                             touched.keyInputName ? 
-                                (<small className="text-danger">{errors.keyInputName}</small>) : null}
+                                (<small className="text-danger">{ errors.keyInputName }</small>) : 
+                                    null }
+                    
                     </div>
+                    {/* End:: Column name */}
+
                 </div>
+                {/* End:: Row */}
 
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
-                    <div className="col-12">
-                        <label className="form-label" 
-                                htmlFor={"keyInputDescription"}>Description</label>
-                        <textarea 
-                            placeholder="description"
-                            className="form-control"
-                            autoComplete="off"
-                            name={"keyInputDescription"}
-                            rows={"5"}
-                            maxLength={10000}
-                            disabled={loading}
-                            value={values.keyInputDescription} 
-                            onChange={handleChange} />
 
-                        {errors.keyInputDescription && 
+                    {/* Start:: Column description */}
+                    <div className="col-12">
+                        
+                        {/* Label element */}
+                        <label className="form-label" 
+                                htmlFor = { "keyInputDescription" }>Description</label>
+                        
+                        {/* Input element text*/}
+                        <textarea
+                            name = { "keyInputDescription" }
+                            rows = { "5" }
+                            placeholder = "Description"
+                            className = "form-control"
+                            autoComplete = "off"
+                            maxLength = { 1000 }
+                            disabled = { loading }
+                            value = { values.keyInputAddress } 
+                            onChange = { handleChange}  />
+
+                        {/* Validation message */}
+                        { errors.keyInputDescription && 
                             touched.keyInputDescription ? 
-                                (<small className="text-danger">{errors.keyInputDescription}</small>) : 
+                                (<small className="text-danger">{ errors.keyInputDescription }</small>) : 
                                     null}
                     </div>
-                </div>
-            </Modal.Body>
+                    {/* End:: Column description */}
 
+                </div>
+                {/* End:: Row */}
+
+            </Modal.Body>
+            {/* End:: Modal body */}
+
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+                
+                {/* Start:: Close button */}
                 <button 
                     type="button"
                     className="btn btn-danger"
-                    disabled={loading}
-                    onClick={handleClose}>
+                    disabled = { loading }
+                    onClick = { handleClose } >
                     Close
                 </button>
+                {/* End:: Close button */}
 
+                {/* Start:: Save button */}
                 <button 
                     type="button"
                     className="btn btn-success"
-                    disabled={loading}
-                    onClick={handleSubmit}>
+                    disabled = { loading } 
+                    onClick = { handleSubmit } >
 
-                    {!loading && "Confirm"}
-                    {loading && 
+                    { !loading && "Confirm" }
+                    { loading && 
                         <>
                             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Working
-                        </>}
+                        </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form>
-    );
-};
+    )
+    // End:: Html
+
+}
 // End:: form
 
+
+
 // Start:: Component
-const AccessLevelAdd = ({onAdded, onClosed}) => {
+// props parameters
+// onAdded()
+// onClosed()
+
+// useImperativeHandle
+// handleShowModal
+const AccessLevelAdd = forwardRef(( props, ref ) => {
     const [showModal, setShowModal] = useState(false);
 
+
+    // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
     }
+    // End:: Show modal
 
+
+    // Start:: Close modal
     const handleCloseModal = () => {
         setShowModal(false);
-        onClosed();
+        props.onClosed();
     }
-
+    // End:: Close modal
+    
+    // Start:: Save
     const handleSave = () => {
+        props.onAdded();
         setShowModal(false);
-        onAdded();  
     }
+    // End:: Save
 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+
+    // Start:: Html
     return (
-        <div className="text-left">
-            {/* Start:: Add buttom */}
-            <OverlayTrigger
-                overlay={<Tooltip>new</Tooltip>}>
-                <button 
-                    type="button"
-                    className="btn btn-info hover:drop-shadow-xl ml-2" 
-                    size="md" 
-                    onClick={handleShowModal}>
-                    <Paperclip className="feather-16"/>
-                </button>
-            </OverlayTrigger>
-            {/* End:: Add buttom */}
-
+        <>
             {/* Start:: Add modal */}
             <Modal 
-                show={showModal}>
+                show = { showModal } >
 
+                {/* Start:: Modal header */}
                 <Modal.Header>
-                    <Modal.Title>Add access level</Modal.Title>
-                    <NavLink className="nav-icon" href="#" onClick={handleCloseModal}>
+                    {/* Header text */}
+                    <Modal.Title>Add role</Modal.Title>
+
+                    {/* Close button */}
+                    <NavLink className="nav-icon" href="#" onClick = { handleCloseModal } >
                         <i className="align-middle"><X/></i>
                     </NavLink>
                 </Modal.Header>
+                {/* End:: Modal header */}
 
-                <AccessLevelForm 
-                    onSubmited={handleSave} 
-                    onClosed={handleCloseModal}/>
+                {/* Start:: Form component */}
+                <Form
+                    onSubmited = { handleSave } 
+                    onClosed = { handleCloseModal } />
+                {/* End:: Form component */}
+
             </Modal>
             {/* End:: Add modal */}
-        </div>  
+        </>            
     );
-}
+    // End:: Html
+
+})
 // End:: Component
+
 
 export default AccessLevelAdd;

@@ -1,46 +1,65 @@
-import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react"
-import { Modal, NavLink } from "react-bootstrap"
-import { toast } from "react-toastify"
-import { X } from "react-feather"
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import { HotelId } from "../../App"
-import useFetchWithAuth from "../useFetchWithAuth"
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import useFetchWithAuth from "../useFetchWithAuth";
 
 // Start:: form
-const EmployeeForm = ({ pId, pName, onSubmited, onClosed }) => {
-    const hotelId = useContext(HotelId)
-    const inputRef = useRef()
+const Form = ({ pId, pName, onSubmited, onClosed }) => {
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
+    const inputRef = useRef(null);
     const { loading, error, doDelete } = useFetchWithAuth({
-        url: `/employees/${hotelId}/${pId}`
-    })
+        url: `${contextValues.employeeAPI}/${hotelId}/${pId}`
+    });
     
+    // Strat:: close modal on key press esc    
     useEffect(() => {
-        !loading && inputRef.current.focus()
+        !loading && inputRef.current.focus();
 
-        document.addEventListener('keydown', (event) => {
+        document.addEventListener("keydown", (event) => {
             if (event.keyCode === 27) onClosed()
-        })
+        });
     
         return () => {
-          document.removeEventListener('keydown', onClosed)
+          document.removeEventListener("keydown", onClosed);
         }
-    }, [])
+    }, []);
+    // End:: close modal on key press esc    
 
+
+    // Strat:: On delete result 
     useEffect(() => {
-        !loading && inputRef.current.focus()
-    }, [loading, error])
+        !loading && inputRef.current.focus();
+    }, [loading, error]);
+    // End:: On delete result
 
+
+    // Start:: Call delete api
     const handleSave = async () => {
-        await doDelete()
-        error === null ? onSubmited() : toast.error(error)
-    }
+        await doDelete();
+        error === null ? onSubmited() : toast.error(error);
+    };
+    // End:: Call delete api
 
+
+    // Start:: Html
     return (
         <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
                 <label className="form-label">Are you really want to remove <mark><code>{ pName }</code></mark> ?</label>
             </Modal.Body>
+            {/* End:: Modal body */}
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+
+                {/* Start:: Close button */}
                 <button 
                     type="button"   
                     className="btn btn-danger"
@@ -49,7 +68,9 @@ const EmployeeForm = ({ pId, pName, onSubmited, onClosed }) => {
                     onClick = { onClosed } >
                     Close
                 </button>
+                {/* End:: Close button */}
 
+                {/* Start:: Save button */}
                 <button 
                     type="button"
                     className="btn btn-success"
@@ -63,58 +84,86 @@ const EmployeeForm = ({ pId, pName, onSubmited, onClosed }) => {
                             Working
                         </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form>                    
     );
-}
+    // End:: Html
+
+};
 // End:: form
 
 
 // Start:: Component
+// props parameters
+// pId
+// onDeleted()
+// onClosed()
+
+// useImperativeHandle
+// handleShowModal
 const EmployeeDelete = forwardRef(( props, ref ) => {
-    const hotelId = useContext(HotelId)
-    const [showModal, setShowModal] = useState(false)
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
+    const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/employees/${hotelId}/${props.pId}`
-    })
+        url: `${contextValues.employeeAPI}/${hotelId}/${props.pId}`
+    });
+
+
+    // Start:: fetch id wise detail from api
+    useEffect(() => {
+        (async () => {
+            try {
+                showModal && await doFetch();
+            } catch (err) {
+              console.log('Error occured when fetching data');
+            }
+          })();
+    }, [showModal]);
+    // End:: fetch id wise detail from api
+
 
     useEffect(() => {
-        showModal && doFetch()
-    }, [props.pId, showModal])
-
-    useEffect(() => {
-        error && toast.error(error)
-    }, [data, error, loading])
+        error && toast.error(error);
+    }, [data, error, loading]);
 
 
     // Start :: Show modal 
     const handleShowModal = () => {
-        setShowModal(true)
-    }
+        setShowModal(true);
+    };
     // End :: Show modal 
 
-    // Start :: Hide modal 
+
+    // Start :: Close modal 
     const handleCloseModal = () => {
-        setShowModal(false)
-        props.onClosed()
-    }
-    // End :: Hide modal 
+        setShowModal(false);
+        props.onClosed();
+    };
+    // End :: Close modal 
+
 
     // Start :: Save 
     const handleSave = () => {
-        setShowModal(false)
-        props.onDeleted() 
-    }
+        setShowModal(false);
+        props.onDeleted(); 
+    };
     // End :: Save 
 
-    // Start :: forward reff show modal function
+
+    // Start:: forward reff show modal function
     useImperativeHandle(ref, () => {
         return {
             handleShowModal
         }
-    })
+    });
+    // End:: forward reff show modal function
 
-
+    // Start:: Html
     return (
         <>
             {/* Start:: Delete modal */}
@@ -123,24 +172,35 @@ const EmployeeDelete = forwardRef(( props, ref ) => {
                     size="sm"
                     show = { showModal } >
 
+                    {/* Start:: Modal header */}
                     <Modal.Header>
+                        {/* Header text */}
                         <Modal.Title>Delete employee</Modal.Title>
+
+                        {/* Close button */}
                         <NavLink 
                             className="nav-icon" href="#" 
                             onClick = { handleCloseModal } >
                             <i className="align-middle"><X/></i>
                         </NavLink>
                     </Modal.Header>
-                    <EmployeeForm 
+                    {/* End:: Modal header */}
+
+                    {/* Start:: Form component */}
+                    <Form 
                         pId = { props.pId } 
                         pName = { data.name }
                         onSubmited = { handleSave } 
                         onClosed = { handleCloseModal } />
+                        {/* End:: Form component */}
             </Modal>}
             {/* End:: Delete modal */}
         </>
-    )
-})
+    );
+    // End:: Html
+
+});
 // End:: Component
 
-export default EmployeeDelete
+
+export default EmployeeDelete;

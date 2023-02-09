@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react"
 import { Modal, NavLink } from "react-bootstrap"
 import { useFormik } from "formik"
-import { ToastContainer, toast } from "react-toastify"
+import { toast } from "react-toastify"
 import { X, User } from "react-feather"
 
 import { HotelId } from "../../App"
@@ -10,14 +10,8 @@ import AccessLevelSelect from "../AccessLevelSelect"
 import useFetchWithAuth from "../useFetchWithAuth"
 
 
-const CloseButton = ({ closeToast }) => (
-    <i className="material-icons"
-        onClick = { closeToast } >
-    </i>
-)
-
 // Start:: form
-const ProfileForm = ({ pAccessLevelId, pId, pName, pAddress, pMobile, pEmail, onSubmited, onClose }) => {
+const Form = ({ pAccessLevelId, pId, pName, pAddress, pMobile, pEmail, onSubmited, onClose }) => {
     const hotelId = useContext(HotelId)
     const {loading, error, doUpdate} = useFetchWithAuth({
         url: `/employees/${hotelId}/${pId}`
@@ -153,7 +147,7 @@ const ProfileForm = ({ pAccessLevelId, pId, pName, pAddress, pMobile, pEmail, on
                     type="reset"
                     className="btn btn-danger"
                     disabled={loading}
-                    onClick={(e) => {onClose(e)}} >
+                    onClick={onClose} >
                     Close
                 </button>
                 
@@ -210,15 +204,15 @@ const Profile = ({ pEmployeeId, onEdited }) => {
         <div className="text-left">
 
             {/* Start:: Profile link */}
-			<a className="dropdown-item" href="#" onClick={handleShowModal}>
-                <User size={16}/>
+			<a className="dropdown-item" href="#" onClick = { handleShowModal } >
+                <User size={16} />
 				&nbsp;Profile
 			</a>
             {/* End:: Profile link */}
 
             {/* Start:: Edit modal */}
             <Modal 
-                show={showModal}>
+                show = { showModal } >
 
                 <Modal.Header>
                     <Modal.Title>Profile</Modal.Title>
@@ -230,31 +224,18 @@ const Profile = ({ pEmployeeId, onEdited }) => {
                 </Modal.Header>
 
                 {data && 
-                    <ProfileForm 
-                        pId={pEmployeeId}    
-                        pAccessLevelId={data.accessLevelId}
-                        pName={data.name}
-                        pAddress={data.address}
-                        pMobile={data.mobile}
-                        pEmail={data.email}
-                        onSubmited={handleSave} 
-                        onClose={handleCloseModal} />
+                    <Form 
+                        pId = { pEmployeeId }    
+                        pAccessLevelId = { data.accessLevelId }
+                        pName = { data.name }
+                        pAddress = { data.address }
+                        pMobile = { data.mobile }
+                        pEmail = { data.email }
+                        onSubmited = { handleSave } 
+                        onClose = { handleCloseModal } />
                 }
             </Modal>
             {/* End:: Edit modal */}
-
-            {/* Start :: display message */}
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={2000}
-                hideProgressBar={true}
-                newestOnTop={true}
-                rtl={false}
-                closeButton={CloseButton}
-                pauseOnFocusLoss
-                pauseOnHover/>
-            {/* End :: display message */}
 
         </div>  
     )

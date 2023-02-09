@@ -1,122 +1,173 @@
-import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react"
-import { Breadcrumb } from "react-bootstrap"
-import { ToastContainer, toast } from "react-toastify"
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { Breadcrumb } from "react-bootstrap";
+import { toast } from "react-toastify";
 
-import { HotelId } from "../App"
-import { useStateContext } from "../contexts/ContextProvider"
-import EmployeeAdd from "../components/employee/EmployeeAdd"
-import EmployeeCard from "../components/employee/EmployeeCard"
-import Paging from "../components/Paging"
-import useFetchWithAuth from "../components/useFetchWithAuth"
+import { HotelId } from "../App";
+import { useStateContext } from "../contexts/ContextProvider";
+import EmployeeAdd from "../components/employee/EmployeeAdd";
+import EmployeeCard from "../components/employee/EmployeeCard";
+import Paging from "../components/Paging";
+import useFetchWithAuth from "../components/useFetchWithAuth";
 
 
-const CloseButton = ({closeToast}) => (
-    <i className="material-icons"
-        onClick={closeToast}>
-    </i>
-)
+// Start:: Component
+// props parameters
+// onSuccess
+// onClose
 
-const Employees = forwardRef((props, ref) => {
-    const hotelId = useContext(HotelId)
-    const contextValues = useStateContext()
-    const itemPerRow = contextValues.itemPerRow
-    const itemPerPage = contextValues.itemPerPage
-    const [search, setSearch] = useState("")
-    const addRef = useRef(null)
-    let cardRefs = useRef([])
-    cardRefs.current = [itemPerRow]
-    const [selectedCardIndex, setSelectedCardIndex] = useState(null)
-    const [dataChanged, setDataChanged] = useState(false)
-    const [selectedPage, setSelectedPage] = useState(1)
-    const indexOfLastItem = selectedPage * itemPerPage
-    const indexOfFirstItem = indexOfLastItem - itemPerPage
+// useImperativeHandle
+// changeSearch
+// openAdd
+// openEdit 
+// openDelete
+// close
+const Employees = forwardRef(( props, ref ) => {
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
+    const itemPerRow = contextValues.itemPerRow;
+    const itemPerPage = contextValues.itemPerPage;
+    const [search, setSearch] = useState("");
+    const addRef = useRef(null);
+    let cardRefs = useRef([]);
+    cardRefs.current = [itemPerRow];
+    const [selectedCardIndex, setSelectedCardIndex] = useState(null);
+    const [dataChanged, setDataChanged] = useState(false);
+    const [selectedPage, setSelectedPage] = useState(1);
+    const indexOfLastItem = selectedPage * itemPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemPerPage;
     const {data, loading, error, doFetch} = useFetchWithAuth({
-        url: `/employees/${hotelId}`,
+        url: `${contextValues.employeeAPI}/${hotelId}`,
         params: {
             search: search
         }
     });
 
+
+    // Start:: fetch data list from api
     useEffect(() => {
-        doFetch()
-        setDataChanged(false)
-    }, [dataChanged, search])
+        (async () => {
+            try {
+              await doFetch();
+              setDataChanged(false);
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [dataChanged, search]);
+    // End:: fetch data list from api
 
     useEffect(() => {
-        error && toast.error(error)
-    }, [data, error, loading])
+        error && toast.error(error);
+    }, [data, error, loading]);
 
 
+    // Start:: Change search text
     const changeSearch = (text) => {
         setSearch(text);
         setSelectedPage(1);
     };
+    // End:: Change search text
 
+
+    // Start:: Open add modal
     const openAdd = () => {
         addRef.current.handleShowModal();
-    }
-
-
-    const handleAdded = () => {
-        toast.success('Data successfully added');
-        setDataChanged(true);
     };
+    // End:: Open add modal
 
+
+    // Start:: Open edit modal
     const openEdit = () => {
-        !selectedCardIndex && toast.warning('Nothing selected to edit');
-
+        !selectedCardIndex && toast.warning("Nothing selected to edit");
+        
         selectedCardIndex && cardRefs.current.forEach((item, idx) => {
             if (selectedCardIndex === idx) {
-                cardRefs.current[idx] && cardRefs.current[idx].handelOpenEdit();    
+                cardRefs.current[idx] && cardRefs.current[idx].handelOpenEdit();
             }
         });
-    }
-
-    const handleEdited = () => {
-        toast.success('Data successfully changed');
-        setDataChanged(true);
     };
+    // End:: Open edit modal
 
+
+    // Start:: Open delete modal
     const openDelete = () => {
-        !selectedCardIndex && toast.warning('Nothing selected to delete');
+        !selectedCardIndex && toast.warning("Nothing selected to delete");
     
         selectedCardIndex && cardRefs.current.forEach((item, idx) => {
             if (selectedCardIndex === idx) {
-                cardRefs.current[idx] && cardRefs.current[idx].handelOpenDel();    
+                cardRefs.current[idx] && cardRefs.current[idx].handelOpenDelete();
             }
-        })
-   };
-
-   const handleDeleted = () => {
-        toast.success('Data successfully deleted');
-        setDataChanged(true);
-   };
-
-   const handelActivated = (index) => {
-        setSelectedCardIndex(index);
-
-        cardRefs.current && cardRefs.current.forEach((item, idx) => {
-            if (index !== idx)
-                cardRefs.current[idx] && cardRefs.current[idx].setDeSelect();    
-        })
-   }
-
-    const handleClosed = () => {
-        // searchRef.current.setFocus();
+        });
     };
+    // End:: Open delete modal
 
-    const handelPaging = (pageNumber) => {
+
+    // Start:: Close modal
+    const close = () => {
+        props.onClose();
+    };
+    // End:: Close modal
+    
+
+    // Start:: on data operation successfully
+    const handleSuccess = ( operation ) => {
+        switch (operation) {
+            case "add":
+                toast.success("Data successfully added");
+                setDataChanged(true);
+                props.onSuccess();
+                break;
+
+            case "edit":
+                console.log("Employees::handleSuccess");
+                toast.success("Data successfully changed");
+                setDataChanged(true);
+                props.onSuccess();
+                break;                
+
+            case "delete":
+                toast.success("Data successfully deleted");
+                setDataChanged(true);
+                props.onSuccess();
+                break;                
+
+            default:                
+                break;                
+        }
+    };
+    // End:: on data operation successfully
+
+
+    // Start:: change selection of card element    
+    const handleActivated = (index) => {
+            setSelectedCardIndex(index);
+
+            cardRefs.current && cardRefs.current.forEach((item, idx) => {
+                if (index !== idx)
+                    cardRefs.current[idx] && cardRefs.current[idx].handleDeSelect();
+            });
+    };
+    // End:: change selection of card element    
+
+
+    // Seart:: handle page change
+    const handlePaging = (pageNumber) => {
         cardRefs.current = [itemPerRow];
         setSelectedPage(pageNumber);
     };
+    // End:: handle page change
 
+
+    // Start:: forward reff change search and open add/edit/delete modal
     useImperativeHandle(ref, () => {
         return {
-            changeSearch, openAdd, openEdit, openDelete
+            changeSearch, openAdd, openEdit, openDelete, close
         }
     });
+    // End:: forward reff change search and open add/edit/delete modal
 
 
+    // Start:: show all data in card format
     const displayData = (pData = []) => {
         let rowIdx = 0;
         let colIdx = 0;
@@ -135,24 +186,24 @@ const Employees = forwardRef((props, ref) => {
 
                 return createRow(d, r);
             } else { 
-                return null 
+                return null;
             }
         })
-    }
+    };
 
-    const createRow = (pData, rowIdx) => {
+    const createRow = ( pData, rowIdx ) => {
         const rowKey=`row_${rowIdx}`;
 
         return (
             <div className="row m-0 p-0" key={rowKey}>
                 {
                     pData.map((item, idx) => {
-                        const itemIdx = (rowIdx * itemPerRow) + idx; 
+                        const itemIdx = (rowIdx * itemPerRow) + idx;
                         return createCol(item, itemIdx);
                     })
                 }
             </div>);
-    }
+    };
 
     const createCol = (pData = undefined, itemIdx) => {
         const colKey = `col_${pData._id}`;
@@ -168,13 +219,16 @@ const Employees = forwardRef((props, ref) => {
                     pAddress = { pData.address }
                     pMobile = { pData.mobile }
                     pEmail = { pData.email }
-                    onEdited = { handleEdited }
-                    onDeleted = { handleDeleted } 
-                    onClosed = { handleClosed } 
-                    onActivated = { handelActivated } />                
+                    onEdited = {() => {handleSuccess("edit")} }
+                    onDeleted = {() => handleSuccess("delete") } 
+                    onClosed = { close } 
+                    onActivated = { handleActivated } />                
             </div>);
-    }
+    };
+    // End:: show all data in card format
 
+
+    // Start:: Html
     return ( 
         <>
             {/* Seart :: Bread crumb */}
@@ -222,10 +276,10 @@ const Employees = forwardRef((props, ref) => {
                                     {!loading && 
                                             data && 
                                                 <Paging
-                                                    itemPerPage={itemPerPage}
-                                                    totalItem={data.length}
-                                                    selectedPage={selectedPage}
-                                                    onPaging={handelPaging} />}
+                                                    itemPerPage = { itemPerPage }
+                                                    totalItem = { data.length }
+                                                    selectedPage = { selectedPage }
+                                                    onPaging = { handlePaging } />}
                                 </div>
                                 {/* End :: Pagination */}
                             </div>
@@ -238,24 +292,15 @@ const Employees = forwardRef((props, ref) => {
             {/* Start :: add employee component */}
             <EmployeeAdd 
                 ref = { addRef }   
-                onAdded = { handleAdded }
-                onClosed = { handleClosed } />
+                onAdded = { () => { handleSuccess("add") } }
+                onClosed = { close } />
             {/* End :: add employee component */}
 
-            {/* Start :: display message */}
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={2000}
-                hideProgressBar={true}
-                newestOnTop={true}
-                rtl={false}
-                closeButton={CloseButton}
-                pauseOnFocusLoss
-                pauseOnHover/>
-            {/* End :: display message */}
         </>
-    );
-})
+    )
+    // End:: Html
 
-export default Employees
+});
+
+
+export default Employees;

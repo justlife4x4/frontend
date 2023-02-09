@@ -1,4 +1,4 @@
-import { React, createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { toast } from "react-toastify";
 import jwt_decode from "jwt-decode";
@@ -22,15 +22,15 @@ function App() {
   });
 
   function getRoles(data) {
-    let roles = '';
+    let roles = "";
     
     data && data.accessLevels.map(role => {
-      if (roles.length === 0){
-        roles = role.name; 
+      if (roles.length === 0) {
+        roles = role.name;
       } else {
-        roles = roles + "," + role.name; 
+        roles = roles + "," + role.name;
       }
-    });
+    })
 
     return roles;
   }
@@ -41,14 +41,20 @@ function App() {
       setPEmployeeId(employeeInfo.UserInfo.userid);
       setPEmployeeName(employeeInfo.UserInfo.username);
 
-      pEmployeeId && doFetch();
+      (async () => {
+        try {
+          pEmployeeId && await doFetch();
+        } catch (err) {
+          console.log('Error occured when fetching data');
+        }
+      })();
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     error && toast.error(error);
     !error && setPEmployeeRoles(getRoles(data));
-  }, [data, error, loading]);
+  }, [data, error, loading])
 
   return (
     <HotelId.Provider value={hotelId}>
@@ -71,8 +77,8 @@ function App() {
         </BrowserRouter>
       </ContextProvider>
     </HotelId.Provider>
-  );
+  )
 }
 
 export default App;
-export {HotelId};
+export { HotelId };

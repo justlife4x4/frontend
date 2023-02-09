@@ -1,29 +1,24 @@
-import {React, useContext, useEffect, useRef, useState} from 'react';
-import {useFormik} from 'formik';
-import {Modal, NavLink} from 'react-bootstrap';
-import {ToastContainer, toast} from 'react-toastify';
-import {X, Key} from 'react-feather';
+import React, { useContext, useEffect, useRef, useState } from "react"
+import { useFormik } from "formik"
+import { Modal, NavLink } from "react-bootstrap"
+import { toast } from "react-toastify"
+import { X, Key } from "react-feather"
 
-import {HotelId} from '../../App';
-import {changePasswordSchema} from '../../schemas';
-import useFetchWithAuth from '../useFetchWithAuth';
+import { HotelId } from "../../App"
+import { changePasswordSchema } from "../../schemas"
+import useFetchWithAuth from "../useFetchWithAuth"
 
-const CloseButton = ({closeToast}) => (
-    <i className="material-icons"
-      onClick={closeToast}>
-    </i>
-  );
 
 // Start:: form
 const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
-    const hotelId = useContext(HotelId);
-    const inputRef = useRef();
+    const hotelId = useContext(HotelId)
+    const inputRef = useRef()
     const { loading, error, doUpdate } = useFetchWithAuth({
         url: `/changePassword/${hotelId}/${pEmployeeId}`
-    });
+    })
     
     useEffect(() => {
-        !loading && inputRef.current.focus();
+        !loading && inputRef.current.focus()
     }, [loading, error]);
 
     const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
@@ -42,13 +37,13 @@ const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
             await doUpdate(payload);
 
             if (error === null) {
-                action.resetForm();
-                onSubmited();
+                action.resetForm()
+                onSubmited()
             } else {
-                toast.error(error);
+                toast.error(error)
             }
         }
-    });
+    })
 
     return (
         <form onSubmit={handleSubmit}>
@@ -147,21 +142,21 @@ const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
                 </button>
             </Modal.Footer>
         </form>                   
-    );
-};
+    )
+}
 // End:: form
 
 // Start:: Component
 const ChangePassword = ({pEmployeeId, onEdited}) => {
-    const hotelId = useContext(HotelId);
+    const hotelId = useContext(HotelId)
     const [showModal, setShowModal] = useState(false)
     const { data, loading, error, doChangePassword } = useFetchWithAuth({
         url: `/changePassword/${hotelId}/${pEmployeeId}`
-    });
+    })
     
     useEffect(() => {
         error && toast.error(error);
-    }, [data, error, loading, pEmployeeId, showModal]);
+    }, [data, error, loading, pEmployeeId, showModal])
 
     const {values, errors, handleBlur, handleChange, touched, handleSubmit} = useFormik({
         initialValues: {
@@ -176,29 +171,29 @@ const ChangePassword = ({pEmployeeId, onEdited}) => {
                             'newPassword': values.keyInputNewPassword 
                         };
 
-            await doChangePassword(payload);
+            await doChangePassword(payload)
 
             if (error === null) {
-                action.resetForm();
-                handleSave();
+                action.resetForm()
+                handleSave()
             } else {
-                toast.error(error);
+                toast.error(error)
             }
         }
-    });
+    })
 
     const handleShowModal = () => {
-        setShowModal(true);
+        setShowModal(true)
     }
 
     const handleCloseModal = () => {
-        setShowModal(false);
+        setShowModal(false)
     }
 
     const handleSave = () => {
-        toast.success('Data successfully updated');
-        setShowModal(false);
-        onEdited();  
+        toast.success("Data successfully updated")
+        setShowModal(false)
+        onEdited()
     }
 
     return (
@@ -227,22 +222,9 @@ const ChangePassword = ({pEmployeeId, onEdited}) => {
             </Modal>
             {/* End:: Mod modal */}
 
-            {/* Start :: display message */}
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={2000}
-                hideProgressBar={true}
-                newestOnTop={true}
-                rtl={false}
-                closeButton={CloseButton}
-                pauseOnFocusLoss
-                pauseOnHover/>
-            {/* End :: display message */}
-
         </div>  
-    );
+    )
 }
 // End:: Component
 
-export default ChangePassword;
+export default ChangePassword

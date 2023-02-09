@@ -1,95 +1,128 @@
-import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react"
-import { Modal, NavLink } from "react-bootstrap"
-import { useFormik } from "formik"
-import { toast } from "react-toastify"
-import { X } from "react-feather"
+import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { useFormik } from "formik";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import { HotelId } from "../../App"
-import { employeeSchema } from "../../schemas"
-import AccessLevelSelect from "../AccessLevelSelect"
-import useFetchWithAuth from "../useFetchWithAuth"
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import { employeeSchema } from "../../schemas";
+import AccessLevelSelect from "../AccessLevelSelect";
+import useFetchWithAuth from "../useFetchWithAuth";
 
 
 // Start:: form
-const EmployeeForm = ({ onSubmited, onClosed }) => {
-    const hotelId = useContext(HotelId)
-    const [validateOnChange, setValidateOnChange] = useState(false)
+const Form = ({ onSubmited, onClosed }) => {
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
+    const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doInsert } = useFetchWithAuth({
-        url: `/employees/${hotelId}`
+        url: `${contextValues.employeeAPI}/${hotelId}`
     });
 
+
+    // Strat:: close modal on key press esc    
     useEffect(() => {
         document.addEventListener('keydown', (event) => {
           if (event.keyCode === 27) {
-            onClosed()
+            onClosed();
           }
         })
     
         return () => {
-          document.removeEventListener('keydown', onClosed)
+          document.removeEventListener('keydown', onClosed);
         }
-    }, [])
+    }, []);
+    // End:: close modal on key press esc    
 
+
+    // Start:: Form validate and save data
     const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
-            keyInputAccessLevels: '',
-            keyInputName: '',
-            keyInputAddress: '',
-            keyInputMobile: '',
-            keyInputEmail: ''
+            keyInputAccessLevels: "",
+            keyInputName: "",
+            keyInputAddress: "",
+            keyInputMobile: "",
+            keyInputEmail: ""
         },
         validationSchema: employeeSchema,
         validateOnChange,
         onSubmit: async (values) => {
             const payload = {   
-                'accessLevels': values.keyInputAccessLevels, 
-                'name': values.keyInputName.toUpperCase(), 
-                'address': values.keyInputAddress.toUpperCase(), 
-                'mobile': values.keyInputMobile.toString(), 
-                'email': values.keyInputEmail.toLowerCase() 
+                "accessLevels": values.keyInputAccessLevels, 
+                "name": values.keyInputName.toUpperCase(), 
+                "address": values.keyInputAddress.toUpperCase(), 
+                "mobile": values.keyInputMobile.toString(), 
+                "email": values.keyInputEmail.toLowerCase() 
             }
 
-            await doInsert(payload)
+            await doInsert(payload);
         
             if (error === null) {
-                resetForm()
-                onSubmited()
+                resetForm();
+                onSubmited();
             } else {
-                toast.error(error)
+                toast.error(error);
             }
         }
-    })
+    });
+    // End:: Form validate and save data
 
+    
+    // Strat:: close form    
     const handleClose = () => {
-        setValidateOnChange(false)
-        resetForm()
-        onClosed()
-    }
+        setValidateOnChange(false);
+        resetForm();
+        onClosed();
+    };
+    // End:: close form    
 
+
+    // Start:: Html
     return (
         <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column role */}
                     <div className="col-12">
+                        
+                        {/* Label element */}
                         <label className="form-label" 
                                 htmlFor = { "keyInputAccessLevels" }>Role</label>
 
+                        {/* Input element multi select */}
                         <AccessLevelSelect 
                             name = { "keyInputAccessLevels" }
                             onChange = { (value) => { setFieldValue("keyInputAccessLevels", value) } }/>
 
+                        {/* Validation message */}
                         { errors.keyInputAccessLevelId && 
                             touched.keyInputAccessLevels ? 
                                 (<small className="text-danger">{ errors.keyInputAccessLevels }</small>) : 
                                     null }
                     </div>
-                </div>
+                    {/* End:: Column role */}
 
+                </div>
+                {/* End:: Row */}
+
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column name */}
                     <div className="col-12">
+
+                        {/* Label element */}
                         <label className="form-label" 
                             htmlFor = { "keyInputName" }>Name</label>
 
+                        {/* Input element text*/}
                         <input 
                             type="text" 
                             name="keyInputName"
@@ -101,17 +134,30 @@ const EmployeeForm = ({ onSubmited, onClosed }) => {
                             value = { values.keyInputName } 
                             onChange = { handleChange } />
 
+                        {/* Validation message */}
                         { errors.keyInputName && 
                             touched.keyInputName ? 
                                 (<small className="text-danger">{ errors.keyInputName }</small>) : 
                                     null }
+                    
                     </div>
-                </div>
+                    {/* End:: Column name */}
 
+                </div>
+                {/* End:: Row */}
+
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column address */}
                     <div className="col-12">
+                        
+                        {/* Label element */}
                         <label className="form-label" 
                                 htmlFor = { "keyInputAddress" }>Address</label>
+                        
+                        {/* Input element text*/}
                         <textarea
                             name = { "keyInputAddress" }
                             rows = { "5" }
@@ -123,18 +169,29 @@ const EmployeeForm = ({ onSubmited, onClosed }) => {
                             value = { values.keyInputAddress } 
                             onChange = { handleChange}  />
 
+                        {/* Validation message */}
                         { errors.keyInputAddress && 
                             touched.keyInputAddress ? 
                                 (<small className="text-danger">{ errors.keyInputAddress }</small>) : 
                                     null}
                     </div>
-                </div>
+                    {/* End:: Column address */}
 
+                </div>
+                {/* End:: Row */}
+
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+                    
+                    {/* Start:: Column mobile */}
                     <div className="col-xs-12 col-md-6">
+                        
+                        {/* Label element */}
                         <label className="form-label" 
                             htmlFor= { "keyInputMobile" }>Mobile no.</label>
                             
+                        {/* Input element text*/}
                         <input
                             type="number"
                             name="keyInputMobile"
@@ -146,14 +203,23 @@ const EmployeeForm = ({ onSubmited, onClosed }) => {
                             value = { values.keyInputMobile } 
                             onChange = { handleChange } />
 
+                        {/* Validation message */}
                         { errors.keyInputMobile && 
                             touched.keyInputMobile ? 
                                 (<small className="text-danger">{ errors.keyInputMobile }</small>) : 
                                     null }
+                    
                     </div>
+                    {/* End:: Column mobile */}
 
+                    {/* Start:: Column email */}
                     <div className="col-xs-12 col-md-6">
-                        <label className="form-label" htmlFor={"keyInputEmail"}>Email</label>
+
+                        {/* Label element */}
+                        <label className="form-label" 
+                            htmlFor={"keyInputEmail"}>Email</label>
+                        
+                        {/* Input element text*/}
                         <input 
                             type="text"
                             placeholder="Email" 
@@ -165,14 +231,26 @@ const EmployeeForm = ({ onSubmited, onClosed }) => {
                             value = { values.keyInputEmail } 
                             onChange = { handleChange } />
 
+                        {/* Validation message */}
                         { errors.keyInputEmail && 
                             touched.keyInputEmail ? 
                                 (<small className="text-danger">{errors.keyInputEmail}</small>) : 
                                     null }    
+
                     </div>
+                    {/* End:: Column email */}
+
                 </div>
+                {/* End:: Row */}
+
             </Modal.Body>
+            {/* End:: Modal body */}
+
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+                
+                {/* Start:: Close button */}
                 <button 
                     type="button"
                     className="btn btn-danger"
@@ -180,7 +258,9 @@ const EmployeeForm = ({ onSubmited, onClosed }) => {
                     onClick = { handleClose } >
                     Close
                 </button>
+                {/* End:: Close button */}
 
+                {/* Start:: Save button */}
                 <button 
                     type="button"
                     className="btn btn-success"
@@ -194,57 +274,95 @@ const EmployeeForm = ({ onSubmited, onClosed }) => {
                             Working
                         </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form>
-    )
-}
+    );
+    // End:: Html
+
+};
 // End:: form
 
 
+
 // Start:: Component
+// props parameters
+// onAdded()
+// onClosed()
+
+// useImperativeHandle
+// handleShowModal
 const EmployeeAdd = forwardRef(( props, ref ) => {
-    const [showModal, setShowModal] = useState(false)
+    const [showModal, setShowModal] = useState(false);
 
+
+    // Start:: Show modal
     const handleShowModal = () => {
-        setShowModal(true)
-    }
+        setShowModal(true);
+    };
+    // End:: Show modal
 
+
+    // Start:: Close modal
     const handleCloseModal = () => {
-        setShowModal(false)
-    }
-
-    const handleSave = () => {
-        props.onAdded()
-        setShowModal(false)
-    }
+        setShowModal(false);
+        props.onClosed();
+    };
+    // End:: Close modal
     
+    // Start:: Save
+    const handleSave = () => {
+        props.onAdded();
+        setShowModal(false);
+    };
+    // End:: Save
+
+
+    // Start:: forward reff show modal function
     useImperativeHandle(ref, () => {
         return {
             handleShowModal
         }
     });
+    // End:: forward reff show modal function
 
+
+    // Start:: Html
     return (
         <>
             {/* Start:: Add modal */}
             <Modal 
                 show = { showModal } >
 
+                {/* Start:: Modal header */}
                 <Modal.Header>
+                    {/* Header text */}
                     <Modal.Title>Add employee</Modal.Title>
+
+                    {/* Close button */}
                     <NavLink className="nav-icon" href="#" onClick = { handleCloseModal } >
                         <i className="align-middle"><X/></i>
                     </NavLink>
                 </Modal.Header>
+                {/* End:: Modal header */}
 
-                <EmployeeForm
+                {/* Start:: Form component */}
+                <Form
                     onSubmited = { handleSave } 
-                    onClose = { handleCloseModal } />
+                    onClosed = { handleCloseModal } />
+                {/* End:: Form component */}
+
             </Modal>
             {/* End:: Add modal */}
         </>            
     );
-})
+    // End:: Html
+
+});
 // End:: Component
 
-export default EmployeeAdd
+
+export default EmployeeAdd;
