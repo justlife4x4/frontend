@@ -11,11 +11,8 @@ import AccessLevelDelete from "./AccessLevelDelete";
 // Start:: Component
 // props parameters
 // pIndex
-// pAccessLevels
 // pName
-// pMobile
-// pEmail
-// pAddress
+// pDescription
 // onActivated()
 // onClosed()
 

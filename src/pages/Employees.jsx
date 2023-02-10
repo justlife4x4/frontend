@@ -68,36 +68,39 @@ const Employees = forwardRef(( props, ref ) => {
     };
     // End:: Change search text
 
-
     // Start:: Open add modal
     const openAdd = () => {
         addRef.current.handleShowModal();
     };
     // End:: Open add modal
 
-
     // Start:: Open edit modal
     const openEdit = () => {
-        !selectedCardIndex && toast.warning("Nothing selected to edit");
-        
-        selectedCardIndex && cardRefs.current.forEach((item, idx) => {
-            if (selectedCardIndex === idx) {
-                cardRefs.current[idx] && cardRefs.current[idx].handelOpenEdit();
+        if (selectedCardIndex !== null) {
+            if (selectedCardIndex >= 0) { 
+                cardRefs.current.forEach((item, idx) => {
+                    if (selectedCardIndex === idx)
+                        cardRefs.current[idx] && cardRefs.current[idx].handelOpenEdit();
+                });
+            } else {
+                toast.warning("Nothing selected to edit");
             }
-        });
+        }
     };
     // End:: Open edit modal
 
-
     // Start:: Open delete modal
     const openDelete = () => {
-        !selectedCardIndex && toast.warning("Nothing selected to delete");
-    
-        selectedCardIndex && cardRefs.current.forEach((item, idx) => {
-            if (selectedCardIndex === idx) {
-                cardRefs.current[idx] && cardRefs.current[idx].handelOpenDelete();
+        if (selectedCardIndex !== null) {
+            if (selectedCardIndex >= 0) { 
+                cardRefs.current.forEach((item, idx) => {
+                    if (selectedCardIndex === idx)
+                        cardRefs.current[idx] && cardRefs.current[idx].handelOpenDelete();
+                });
+            } else {
+                toast.warning("Nothing selected to delete");
             }
-        });
+        }
     };
     // End:: Open delete modal
 
@@ -119,7 +122,6 @@ const Employees = forwardRef(( props, ref ) => {
                 break;
 
             case "edit":
-                console.log("Employees::handleSuccess");
                 toast.success("Data successfully changed");
                 setDataChanged(true);
                 props.onSuccess();

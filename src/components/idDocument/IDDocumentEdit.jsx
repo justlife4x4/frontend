@@ -1,50 +1,53 @@
-import {React, useEffect, useRef, useState} from 'react';
-import {Modal, NavLink} from 'react-bootstrap';
-import {useFormik} from 'formik';
-import {toast} from 'react-toastify';
-import {X, Edit3} from 'react-feather';
+import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { useFormik } from "formik";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import {idDocumentSchema} from '../../schemas';
-import useFetchWithAuth from '../useFetchWithAuth';
+import { useStateContext } from "../../contexts/ContextProvider";
+import { idDocumentSchema } from "../../schemas";
+import useFetchWithAuth from "../useFetchWithAuth";
+
 
 // Start:: form
-const IDDocumentForm = ({pId, pName, pDescription, onSubmited, onClosed}) => {
-    const inputRef = useRef();
+const Form = ({ pId, pName, pDescription, onSubmited, onClosed }) => {
+    const contextValues = useStateContext();
+    const inputRef = useRef(null);
     const [validateOnChange, setValidateOnChange] = useState(false);
-    const {loading, error, doUpdate} = useFetchWithAuth({
-        url: `/idDocuments/${pId}`
-    });
-    
+    const { loading, error, doUpdate } = useFetchWithAuth({
+        url: `${contextValues.accessLevelAPI}/${pId}`
+    })
+
+
+    // Strat:: close modal on key press esc    
     useEffect(() => {
         !loading && inputRef.current.focus();
         
         document.addEventListener('keydown', (event) => {
-          if (event.keyCode === 27) {
-            onClosed();
-          }
+            if (event.keyCode === 27) {
+                onClosed()
+            }
         });
 
         return () => {
-          document.removeEventListener('keydown', onClosed);
-        };
+            document.removeEventListener('keydown', onClosed);
+        }
     }, []);
+    // End:: close modal on key press esc    
 
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-    }, [loading]);
 
-    const {values, errors, touched, handleChange,  handleSubmit, resetForm} = useFormik({
+    // Start:: Form validate and save data
+    const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
             keyInputName: pName,
-            keyInputDescription: pDescription,
+            keyInputDescription: pDescription
         },
         validationSchema: idDocumentSchema,
         onSubmit: async (values) => {
-            setValidateOnChange(true);
             const payload = {   
-                                'name': values.keyInputName.toUpperCase(), 
-                                'description': values.keyInputDescription
-                            };
+                "name": values.keyInputName.toUpperCase(), 
+                "description": values.keyInputDescription
+            }
 
             await doUpdate(payload);
         
@@ -56,153 +59,238 @@ const IDDocumentForm = ({pId, pName, pDescription, onSubmited, onClosed}) => {
             }
         }
     });
+    // End:: Form validate and save data
 
+
+    // Strat:: close form    
     const handleClose = () => {
         setValidateOnChange(false);
-        resetForm(); 
+        resetForm();
         onClosed();
-    }
+    };
+    // End:: close form    
 
+
+    // Start:: Html
     return (
         <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
+
+                {/* Start:: Row */}
                 <div className="row mb-2">
-                    <div className="col-xs-12 col-md-12">
+                    
+                    {/* Start:: Column role */}
+                    <div className="col-12">
+
+                        {/* Label element */}
                         <label className="form-label" 
                             htmlFor="keyInputName">Name</label>
-                        
+
+                        {/* Input element text*/}
                         <input 
                             type="text" 
                             id="keyInputName"
                             className="form-control"
-                            placeholder="name"
+                            placeholder="Name" 
                             autoComplete="off"
-                            maxLength={100}
-                            disabled={true}
-                            value={values.keyInputName}
-                            onChange={handleChange}/>
+                            maxLength = { 100 }
+                            disabled = { true }
+                            value = { values.keyInputName } 
+                            onChange = { handleChange } />
 
-                    {errors.keyInputName && 
-                        touched.keyInputName ? 
-                            (<small className="text-danger">{errors.keyInputName}</small>) : 
-                                null}
+                        {/* Validation message */}
+                        { errors.keyInputName && 
+                            touched.keyInputName ? 
+                                (<small className="text-danger">{ errors.keyInputName }</small>) : 
+                                    null }
                     </div>
-                </div>
+                    {/* End:: Column role */}
 
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
                 <div className="row mb-2">
+
+                    {/* Start:: Column description */}
                     <div className="col-12">
-                        <label className="form-label" htmlFor="keyInputDescription">Description</label>
+
+                        {/* Label element */}
+                        <label className="form-label" 
+                            htmlFor="keyInputDescription">Description</label>
+
+                        {/* Input element text*/}
                         <textarea 
                             id="keyInputDescription"
+                            placeholder="Description"
                             className="form-control"
-                            placeholder="description"
-                            rows={"5"}
-                            maxLength={"256"}
-                            ref={inputRef}
-                            disabled={loading}
-                            value={values.keyInputDescription} 
-                            onChange={handleChange}/>
+                            rows = { "5" }
+                            maxLength = { "256" }
+                            disabled = { loading || error !== null }
+                            ref = { inputRef }
+                            value = { values.keyInputDescription } 
+                            onChange = { handleChange } />
 
-                    {errors.keyInputDescription && 
+                    {/* Validation message */}
+                    { errors.keyInputDescription && 
                         touched.keyInputDescription ? 
-                            (<small className="text-danger">{errors.keyInputDescription}</small>) : 
-                                null}
+                            (<small className="text-danger">{ errors.keyInputDescription }</small>) : 
+                                null }
                     </div>
-                </div>
-            </Modal.Body>
+                    {/* End:: Column description */}
 
+                </div>
+                {/* End:: Row */}
+
+            </Modal.Body>
+            {/* End:: Modal body */}
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+
+                {/* Start:: Close button */}
                 <button
                     type="button"
                     className="btn btn-danger"
-                    disabled={loading}
-                    onClick={handleClose}>
+                    disabled = { loading }
+                    onClick = { handleClose } >
                     Close
                 </button>
+                {/* End:: Close button */}
                 
+                {/* Start:: Save button */}
                 <button 
                     type="button"
                     className="btn btn-success"
-                    disabled={loading}
-                    onClick={handleSubmit}>
+                    disabled = { loading } 
+                    onClick = { handleSubmit } >
 
-                    {!loading && "Confirm"}
-                    {loading && 
+                    { !loading && "Confirm" }
+                    { loading && 
                                 <>
                                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                     Working
-                                </>}
+                                </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form> 
     );
+    // End:: Html
+
 };
 // End:: form
 
+
 // Start:: Component
-const IDDocumentEdit = ({pId, onEdited, onClosed}) => {
+// props parameters
+// pId
+// onEdited()
+// onClosed()
+
+// useImperativeHandle
+// handleShowModal
+const IDDocumentEdit = forwardRef(( props, ref ) => {    
+    const contextValues = useStateContext();
     const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/idDocuments/${pId}`
-    });
+        url: `${contextValues.idDocumentAPI}/${props.pId}`
+    })
 
+    // Start:: fetch id wise detail from api
     useEffect(() => {
-        showModal && doFetch();
-    }, [pId, showModal]);
+        (async () => {
+            try {
+                showModal && await doFetch();
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [showModal]);
+    // End:: fetch id wise detail from api
+
 
     useEffect(() => {
         error && toast.error(error);
     }, [data, error, loading]);
 
+
+    // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
     };
+    // End:: Show modal
 
+
+    // Start:: Close modal
     const handleCloseModal = () => {
         setShowModal(false);
-        onClosed();
+        props.onClosed();
     };
+    // End:: Close modal
 
-    const handleSave = () => {
+
+    // Start:: Save
+    const handleSave = () => { 
         setShowModal(false);
-        onEdited();
-    }
+        props.onEdited();
+    };
+    // End:: Save
 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+
+    // Start:: Html
     return (
-        <div className="text-left">
-            {/* Start:: Edit buttom */}
-            <span 
-                className="pr-5" 
-                onClick={handleShowModal}>
-                <Edit3 className="feather-16 mr-3"/>Edit
-            </span>
-            {/* End:: Edit buttom */}
-
+        <>
             {/* Start:: Edit modal */}
-            {data &&
+            { data &&
                 <Modal 
-                    show={showModal}>
+                    show = { showModal } >
 
+                    {/* Start:: Modal header */}
                     <Modal.Header>
+                        {/* Header text */}
                         <Modal.Title>Edit id document</Modal.Title>
+                        
+                        {/* Close button */}
                         <NavLink 
                             className="nav-icon" href="#" 
-                            onClick={handleCloseModal}>
+                            onClick = { handleCloseModal } >
                             <i className="align-middle"><X/></i>
                         </NavLink>
                     </Modal.Header>
+                    {/* End:: Modal header */}
+
+                    {/* Start:: Form component */}
+                    <Form 
+                        pId = { data._id }    
+                        pName = { data.name }
+                        pDescription = { data.description }
+                        onSubmited = { handleSave } 
+                        onClosed = { handleCloseModal } />
+                        {/* End:: Form component */}
                     
-                    <IDDocumentForm 
-                        pId={pId}
-                        pName={data.name}
-                        pDescription={data.description}
-                        onSubmited={handleSave} 
-                        onClosed={handleCloseModal} />
                 </Modal>}
             {/* End:: Edit modal */}
-        </div>  
+        </>
     );
-}
+    // End:: Html
+
+});
 // End:: Component
+
 
 export default IDDocumentEdit;

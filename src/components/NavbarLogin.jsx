@@ -51,21 +51,19 @@ const NavbarLogin = forwardRef(( props, ref ) => {
         setMenuState(!menuState);
     };
 
-    const handleChangeProfileSuccess = (e) => {
-        e.preventDefault();
+    const handleChangeProfileSuccess = () => {
+        // e.preventDefault();
     };
     
-    const handleChangePasswordSuccess = (e) => {
-        e.preventDefault();
+    const handleChangePasswordSuccess = () => {
+        // e.preventDefault();
     };
         
-    const handleLogoutSuccess = (e) => {
-        e.preventDefault();
-
+    const handleLogoutSuccess = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
 
-        navigate("./login", { replace: true });
+        navigate("./", { replace: true });
         navigate(0);
     };
     // End:: on success of user options
@@ -80,8 +78,8 @@ const NavbarLogin = forwardRef(( props, ref ) => {
 
     // Start:: Open add modal
     const handleOpenAdd = () => {
-        props.onClickAdd()
-    }
+        props.onClickAdd();
+    };
     // End:: Open add modal
 
     // Start:: Open edit modal
@@ -98,7 +96,6 @@ const NavbarLogin = forwardRef(( props, ref ) => {
 
     // Start:: on successfull operation
     const success = () => {
-        console.log("NavbarLogin:success");
         searchRef.current.setFocus();
     };
     // End:: on successfull operation

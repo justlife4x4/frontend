@@ -1,43 +1,60 @@
-import { React, useContext, useEffect, useRef, useState } from 'react';
-import { Modal, NavLink } from 'react-bootstrap';
-import { useFormik } from 'formik';
-import { ToastContainer, toast } from 'react-toastify';
-import { X, Edit3 } from 'react-feather';
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { useFormik } from "formik";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import { HotelId } from '../../App';
-import { roomCategorySchema } from '../../schemas';
-import useFetch from '../useFetchWithAuth';
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import { roomCategorySchema } from "../../schemas";
+import useFetchWithAuth from "../useFetchWithAuth";
 
-import 'react-toastify/dist/ReactToastify.css';
 
 // Start:: form
-const RoomCategoryForm = ({ id, name, tariff, discount, bed, person, onSubmited, onClose }) => {
+const Form = ({ pId, pName, pTariff, pDiscount, pBed, pPerson, onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
-    const inputRef = useRef();
-    const { loading, error, doUpdate } = useFetch({
-        url: `/roomCategories/${hotelId}/${id}`
+    const contextValues = useStateContext();
+    const inputRef = useRef(null);
+    const [validateOnChange, setValidateOnChange] = useState(false);
+    const { loading, error, doUpdate } = useFetchWithAuth({
+        url: `${contextValues.roomCategoryAPI}/${hotelId}/${pId}`
     });
-    
-    useEffect(() => {
-        !loading && inputRef.current.focus()
-    }, [loading, error]);
 
-    const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
+
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        !loading && inputRef.current.focus();
+        
+        document.addEventListener('keydown', (event) => {
+            if (event.keyCode === 27) {
+                onClosed()
+            }
+        });
+
+        return () => {
+            document.removeEventListener('keydown', onClosed);
+        }
+    }, []);
+    // End:: close modal on key press esc    
+
+
+    // Start:: Form validate and save data
+    const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
-            keyInputName: name,
-            keyInputTariff: tariff,
-            keyInputDiscount: discount,
-            keyInputBed: bed,   
-            keyInputPerson: person
+            keyInputName: pName,
+            keyInputTariff: pTariff,
+            keyInputDiscount: pDiscount,
+            keyInputBed: pBed,   
+            keyInputPerson: pPerson
         },
         validationSchema: roomCategorySchema,
         onSubmit: async (values, action) => {
             const payload = {   
-                                'name': values.keyInputName, 
-                                'tariff': parseFloat(Number.isNaN(values.keyInputTariff) ? 0 : values.keyInputTariff, 10), 
-                                'maxDiscount': parseFloat(Number.isNaN(values.keyInputDiscount) ? 0 : values.keyInputDiscount, 10), 
-                                'extraBedTariff': parseFloat(Number.isNaN(values.keyInputBed) ? 0 : values.keyInputBed, 10), 
-                                'extraPersonTariff': parseFloat(Number.isNaN(values.keyInputPerson) ? 0 : values.keyInputPerson, 10),
+                                "name": values.keyInputName, 
+                                "tariff": parseFloat(Number.isNaN(values.keyInputTariff) ? 0 : values.keyInputTariff, 10), 
+                                "maxDiscount": parseFloat(Number.isNaN(values.keyInputDiscount) ? 0 : values.keyInputDiscount, 10), 
+                                "extraBedTariff": parseFloat(Number.isNaN(values.keyInputBed) ? 0 : values.keyInputBed, 10), 
+                                "extraPersonTariff": parseFloat(Number.isNaN(values.keyInputPerson) ? 0 : values.keyInputPerson, 10)
                             };
 
             await doUpdate(payload);
@@ -50,37 +67,70 @@ const RoomCategoryForm = ({ id, name, tariff, discount, bed, person, onSubmited,
             }
         }
     });
+    // End:: Form validate and save data
 
+
+    // Strat:: close form    
+    const handleClose = () => {
+        setValidateOnChange(false);
+        resetForm();
+        onClosed();
+    };
+    // End:: close form    
+
+
+    // Start:: Html
     return (
         <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
+
+                {/* Start:: Row */}
                 <div className="row mb-2">
+
+                    {/* Start:: Column name */}
                     <div className="col-xs-12 col-md-12">
+
+                        {/* Label element */}
                         <label className="form-label" 
-                            htmlFor="keyInputName">Name</label>
+                             htmlFor="keyInputName">Name</label>
                         
+                        {/* Input element text*/}
                         <input 
                             type="text" 
                             id="keyInputName"
                             placeholder="name"
                             className="form-control"
                             autoComplete="off"
+                            autoFocus
                             maxLength={100}
                             value={values.keyInputName}
                             disabled={true}
-                            onChange={handleChange}
-                            onBlur = { handleBlur} />
+                            onChange={handleChange} />
 
-                    {errors.keyInputName && 
-                        touched.keyInputName ? 
-                            (<small className="text-danger">{ errors.keyInputName }</small>) : 
-                                null}
+                        {/* Validation message */}
+                        {errors.keyInputName && 
+                             touched.keyInputName ? 
+                                 (<small className="text-danger">{ errors.keyInputName }</small>) : 
+                                     null}
                     </div>
-                </div>
+                    {/* End:: Column name */}
 
-                <div className="row mb-2">
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
+                 <div className="row mb-2">
+
+                    {/* Start:: Column tariff */}
                     <div className="col-xs-12 col-md-6">
-                        <label className="form-label" htmlFor="keyInputTariff">Tariff</label>
+
+                        {/* Label element */}
+                        <label className="form-label" 
+                            htmlFor="keyInputTariff">Tariff</label>
+                        
+                        {/* Input element text*/}
                         <input 
                             type="number" 
                             id="keyInputTariff"
@@ -89,17 +139,24 @@ const RoomCategoryForm = ({ id, name, tariff, discount, bed, person, onSubmited,
                             ref={inputRef}
                             disabled={loading || error !== null}
                             value={values.keyInputTariff} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
-                    {errors.keyInputTariff && 
-                        touched.keyInputTariff ? 
-                            (<small className="text-danger">{errors.keyInputTariff}</small>) : 
-                                null}
+                        {/* Validation message */}
+                        {errors.keyInputTariff && 
+                             touched.keyInputTariff ? 
+                                 (<small className="text-danger">{errors.keyInputTariff}</small>) : 
+                                     null}
                     </div>
+                    {/* End:: Column tariff */}
 
+                    {/* Start:: Column max. discount */}
                     <div className="col-xs-12 col-md-6">
-                        <label className="form-label" htmlFor="keyInputDiscount">Maximum discount</label>
+                        
+                        {/* Label element */}
+                        <label className="form-label" 
+                            htmlFor="keyInputDiscount">Maximum discount</label>
+
+                        {/* Input element text*/}
                         <input 
                             type="number" 
                             id="keyInputDiscount"
@@ -107,19 +164,30 @@ const RoomCategoryForm = ({ id, name, tariff, discount, bed, person, onSubmited,
                             className="form-control"
                             disabled={loading || error !== null}
                             value={values.keyInputDiscount} 
-                            onChange={handleChange}
-                            onBlur={handleBlur}/>
+                            onChange={handleChange} />
                         
+                        {/* Validation message */}
                         {errors.keyInputDiscount && 
-                            touched.keyInputDiscount ? 
+                             touched.keyInputDiscount ? 
                                 (<small className="text-danger">{errors.keyInputDiscount}</small>) : 
                                     null}
                     </div>
-                </div>
+                    {/* End:: Column max. discount */}
 
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
                 <div className="row mb-2">
+
+                    {/* Start:: Column ext. bed tariff */}
                     <div className="col-xs-12 col-md-6">
-                        <label className="form-label" htmlFor="keyInputBed">Extra bed tariff</label>
+
+                        {/* Label element */}
+                        <label className="form-label" 
+                            htmlFor="keyInputBed">Extra bed tariff</label>
+                        
+                        {/* Input element text*/}
                         <input 
                             type="number"
                             id="keyInputBed"
@@ -127,17 +195,24 @@ const RoomCategoryForm = ({ id, name, tariff, discount, bed, person, onSubmited,
                             className="form-control"
                             disabled={loading || error !== null}
                             value={values.keyInputBed} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
+                        {/* Validation message */}
                         {errors.keyInputBed && 
                             touched.keyInputBed ? 
                                 (<small className="text-danger">{ errors.keyInputBed }</small>) : 
                                     null}
                     </div>
+                    {/* End:: Column ext. bed tariff */}
 
+                    {/* Start:: Column ext. person tariff */}
                     <div className="col-xs-12 col-md-6">
-                        <label className="form-label" htmlFor="keyInputPerson">Extra person tariff</label>
+
+                        {/* Label element */}
+                        <label className="form-label" 
+                            htmlFor="keyInputPerson">Extra person tariff</label>
+                        
+                        {/* Input element text*/}
                         <input 
                             type="number"
                             id="keyInputPerson"
@@ -145,122 +220,170 @@ const RoomCategoryForm = ({ id, name, tariff, discount, bed, person, onSubmited,
                             className="form-control"
                             disabled={loading || error !== null}
                             value={values.keyInputPerson} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
+                        {/* Validation message */}
                         {errors.keyInputPerson && 
                             touched.keyInputPerson ? 
                                 (<small className="text-danger">{ errors.keyInputPerson }</small>) : 
                                     null}
                     </div>
-                </div>
-            </Modal.Body>
+                    {/* End:: Column ext. person tariff */}
 
+                </div>
+                {/* End:: Row */}
+
+            </Modal.Body>
+            {/* End:: Modal body */}
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+
+                {/* Start:: Close button */}
                 <button
+                    type="button"
                     className="btn btn-danger"
-                    disabled={loading}
-                    onClick={(e) => {onClose(e)}}>
+                    disabled = { loading }
+                    onClick = { handleClose } >
                     Close
                 </button>
+                {/* End:: Close button */}
                 
+                {/* Start:: Save button */}
                 <button 
+                    type="button"
                     className="btn btn-success"
-                    onClick={handleSubmit}
-                    disabled={loading} >
+                    disabled = { loading } 
+                    onClick = { handleSubmit } >
 
-                    {!loading && "Confirm"}
-                    {loading && 
+                    { !loading && "Confirm" }
+                    { loading && 
                                 <>
                                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                     Working
-                                </>}
+                                </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form> 
     );
+    // End:: Html
+
 };
 // End:: form
 
+
 // Start:: Component
-const RoomCategoryEdit = ({ pId, onEdited }) => {
+// props parameters
+// pId
+// onEdited()
+// onClosed()
+
+// useImperativeHandle
+// handleShowModal
+const RoomCategoryEdit = forwardRef(( props, ref ) => {    
     const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
     const [showModal, setShowModal] = useState(false);
-    const { data, loading, error, doFetch } = useFetch({
-        url: `/roomCategories/${hotelId}/${pId}`
+    const { data, loading, error, doFetch } = useFetchWithAuth({
+        url: `${contextValues.roomCategoryAPI}/${hotelId}/${props.pId}`
     });
 
+    // Start:: fetch id wise detail from api
     useEffect(() => {
-        doFetch();
-    }, [pId]);
+        (async () => {
+            try {
+                showModal && await doFetch();
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [showModal]);
+    // End:: fetch id wise detail from api
+
 
     useEffect(() => {
         error && toast.error(error);
-    }, [data, error, loading, pId, showModal]);
+    }, [data, error, loading]);
 
+
+    // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
     };
+    // End:: Show modal
 
+
+    // Start:: Close modal
     const handleCloseModal = () => {
         setShowModal(false);
+        props.onClosed();
     };
+    // End:: Close modal
 
-    const handleSave = () => {
-        onEdited();
+
+    // Start:: Save
+    const handleSave = () => { 
         setShowModal(false);
-    }
+        props.onEdited();
+    };
+    // End:: Save
 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+
+    // Start:: Html
     return (
-        <div className="text-left">
-            {/* Start:: Edit buttom */}
-            <span 
-                className="pr-5" 
-                onClick={(e) => {handleShowModal()}}>
-                <Edit3 className="feather-16 mr-3"/>Edit
-            </span>
-            {/* End:: Edit buttom */}
-
+        <>
             {/* Start:: Edit modal */}
-            <Modal 
-                show={ showModal }>
+            { data &&
+                <Modal 
+                    show = { showModal } >
 
-                <Modal.Header>
-                    <Modal.Title>Edit room category</Modal.Title>
-                    <NavLink 
-                        className="nav-icon" href="#" 
-                        onClick={(e) => {handleCloseModal()}}>
-                        <i className="align-middle"><X/></i>
-                    </NavLink>
-                </Modal.Header>
+                    {/* Start:: Modal header */}
+                    <Modal.Header>
+                        {/* Header text */}
+                        <Modal.Title>Edit room category</Modal.Title>
+                        
+                        {/* Close button */}
+                        <NavLink 
+                            className="nav-icon" href="#" 
+                            onClick={handleCloseModal}>
+                            <i className="align-middle"><X/></i>
+                        </NavLink>
+                    </Modal.Header>
+                    {/* End:: Modal header */}
 
-                {data &&
-                    <RoomCategoryForm 
-                        id={pId}
-                        name={data.name}
-                        tariff={data.tariff}
-                        discount= {data.maxDiscount}
-                        bed={data.extraBedTariff}
-                        person={data.extraPersonTariff}
-                        onSubmited={handleSave} 
-                        onClose={handleCloseModal} />}
-            </Modal>
+                    {/* Start:: Form component */}
+                    <Form 
+                         pId = { data._id }
+                         pName = { data.name }
+                         pTariff = { parseFloat(data.tariff, 10).toFixed(2) }
+                         pDiscount = { parseFloat(data.maxDiscount, 10).toFixed(2) }
+                         pBed = { parseFloat(data.extraBedTariff, 10).toFixed(2) }
+                         pPerson = { parseFloat(data.extraPersonTariff, 10).toFixed(2) }
+                         onSubmited = { handleSave } 
+                         onClosed = { handleCloseModal } />
+                        {/* End:: Form component */}
+                    
+                </Modal>}
             {/* End:: Edit modal */}
-
-            <ToastContainer
-                position="bottom-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"/>
-        </div>  
+        </>
     );
-}
+    // End:: Html
+
+});
 // End:: Component
+
 
 export default RoomCategoryEdit;

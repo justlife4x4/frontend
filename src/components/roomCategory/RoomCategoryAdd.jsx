@@ -1,32 +1,44 @@
-import { React, useContext, useEffect, useRef, useState } from 'react';
-import { useFormik } from 'formik';
-import { Modal, NavLink, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
-import { X, Paperclip } from 'react-feather';
+import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { useFormik } from "formik";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import { HotelId } from '../../App';
-import { roomCategorySchema } from '../../schemas';
-import useFetch from '../useFetchWithAuth';
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import { roomCategorySchema } from "../../schemas";
+import useFetchWithAuth from "../useFetchWithAuth";
 
-import 'react-toastify/dist/ReactToastify.css';
 
 // Start:: form
-const RoomCategoryForm = ({ onSubmited, onClose }) => {
+const Form = ({ onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
-    const inputRef = useRef();
-
-    const { loading, error, doInsert } = useFetch({
-        method: 'GET',
-        url: `/roomCategories/${hotelId}`
+    const contextValues = useStateContext();
+    const [validateOnChange, setValidateOnChange] = useState(false);
+    const { loading, error, doInsert } = useFetchWithAuth({
+        url: `${contextValues.roomCategoryAPI}/${hotelId}`
     });
-    
+
+
+    // Strat:: close modal on key press esc    
     useEffect(() => {
-        !loading && inputRef.current.focus()
-    }, [error, loading]);
+        document.addEventListener('keydown', (event) => {
+          if (event.keyCode === 27) {
+            onClosed();
+          }
+        })
     
-    const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
+        return () => {
+          document.removeEventListener('keydown', onClosed);
+        }
+    }, []);
+    // End:: close modal on key press esc    
+
+
+    // Start:: Form validate and save data
+    const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
-            keyInputName: '',
+            keyInputName: "",
             keyInputTariff: 0 ,
             keyInputDiscount: 0,
             keyInputBed: 0,
@@ -35,11 +47,11 @@ const RoomCategoryForm = ({ onSubmited, onClose }) => {
         validationSchema: roomCategorySchema,
         onSubmit: async (values, action) => {
             const payload = {   
-                            'name': values.keyInputName, 
-                            'tariff': parseFloat(Number.isNaN(values.keyInputTariff) ? 0 : values.keyInputTariff, 10), 
-                            'maxDiscount': parseFloat(Number.isNaN(values.keyInputDiscount) ? 0 : values.keyInputDiscount, 10), 
-                            'extraBedTariff': parseFloat(Number.isNaN(values.keyInputBed) ? 0 : values.keyInputBed, 10), 
-                            'extraPersonTariff': parseFloat(Number.isNaN(values.keyInputPerson) ? 0 : values.keyInputPerson, 10),
+                            "name": values.keyInputName, 
+                            "tariff": parseFloat(Number.isNaN(values.keyInputTariff) ? 0 : values.keyInputTariff, 10), 
+                            "maxDiscount": parseFloat(Number.isNaN(values.keyInputDiscount) ? 0 : values.keyInputDiscount, 10), 
+                            "extraBedTariff": parseFloat(Number.isNaN(values.keyInputBed) ? 0 : values.keyInputBed, 10), 
+                            "extraPersonTariff": parseFloat(Number.isNaN(values.keyInputPerson) ? 0 : values.keyInputPerson, 10)
                         };
 
             await doInsert(payload);
@@ -52,39 +64,70 @@ const RoomCategoryForm = ({ onSubmited, onClose }) => {
             }
         }
     });
+    // End:: Form validate and save data
 
+    
+    // Strat:: close form    
+    const handleClose = () => {
+        setValidateOnChange(false);
+        resetForm();
+        onClosed();
+    };
+    // End:: close form    
+
+
+    // Start:: Html
     return (
-        <form onSubmit={ handleSubmit }>
+        <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column name */}
                     <div className="col-12">
+                        
+                        {/* Label element */}
                         <label className="form-label" 
                             htmlFor="keyInputName">Name</label>
                         
+                        {/* Input element text*/}
                         <input
                             type="text" 
                             name="keyInputName"
                             placeholder="name"
                             className="form-control"
                             autoComplete="off"
-                            maxLength={100}
-                            ref={inputRef}
-                            disabled={loading}
-                            value={values.keyInputName}
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            autoFocus
+                            maxLength = { 100 }
+                            disabled = { loading }
+                            value = { values.keyInputName }
+                            onChange = { handleChange } />
 
+                        {/* Validation message */}
                         {errors.keyInputName && 
                             touched.keyInputName ? 
                                 (<small className="text-danger">{errors.keyInputName}</small>) : 
                                     null}
                     </div>
-                </div>
+                    {/* End:: Column name */}
 
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column tariff */}
                     <div className="col-xs-12 col-md-6">
+                        
+                        {/* Label element */}
                         <label className="form-label" 
                                 htmlFor={"keyInputTariff"}>Tariff</label>
+                        
+                        {/* Input element text*/}
                         <input 
                             type="number" 
                             name={"keyInputTariff"}
@@ -94,19 +137,24 @@ const RoomCategoryForm = ({ onSubmited, onClose }) => {
                             maxLength={8}
                             disabled={loading}
                             value={values.keyInputTariff} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
+                        {/* Validation message */}
                         {errors.keyInputTariff && 
                             touched.keyInputTariff ? 
                                 (<small className="text-danger">{ errors.keyInputTariff }</small>) : 
                                     null}
                     </div>
+                    {/* End:: Column tariff */}
 
+                    {/* Start:: Column max discount */}
                     <div className="col-xs-12 col-md-6">
+
+                        {/* Label element */}
                         <label className="form-label" 
                             htmlFor={"keyInputDiscount"}>Maximum discount</label>
 
+                        {/* Input element text*/}
                         <input 
                             type="number" 
                             name={"keyInputDiscount"}
@@ -116,21 +164,30 @@ const RoomCategoryForm = ({ onSubmited, onClose }) => {
                             maxLength={8}
                             disabled={loading} 
                             value={values.keyInputDiscount} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
+                        {/* Validation message */}
                         {errors.keyInputDiscount && 
                             touched.keyInputDiscount ? 
                                 (<small className="text-danger">{errors.keyInputDiscount}</small>) : 
                                     null}
                     </div>
-                </div>
+                    {/* End:: Column max discount */}
 
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column extra bed tariff */}
                     <div className="col-xs-12 col-md-6">
+                        
+                        {/* Label element */}
                         <label className="form-label" 
                             htmlFor={"keyInputBed"}>Extra bed tariff</label>
                         
+                        {/* Input element text*/}
                         <input
                             type="number"
                             name={"keyInputBed"}
@@ -140,17 +197,24 @@ const RoomCategoryForm = ({ onSubmited, onClose }) => {
                             maxLength={8}
                             disabled={loading}
                             value={values.keyInputBed} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
+                        {/* Validation message */}
                         {errors.keyInputBed && 
                             touched.keyInputBed ? 
                                 (<small className="text-danger">{errors.keyInputBed}</small>) : 
                                     null}
                     </div>
+                    {/* End:: Column extra bed tariff */}
 
+                    {/* Start:: Column extra person tariff */}
                     <div className="col-xs-12 col-md-6">
-                        <label className="form-label" htmlFor={"keyInputPerson"}>Extra person tariff</label>
+
+                        {/* Label element */}
+                        <label className="form-label" 
+                            htmlFor={"keyInputPerson"}>Extra person tariff</label>
+                        
+                        {/* Input element text*/}
                         <input 
                             type="number"
                             name={"keyInputPerson"}
@@ -160,106 +224,138 @@ const RoomCategoryForm = ({ onSubmited, onClose }) => {
                             maxLength={8}
                             disabled={loading}
                             value={values.keyInputPerson} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
+                        {/* Validation message */}
                         {errors.addPerson && 
                             touched.addPerson ? 
                                 (<small className="text-danger">{errors.addPerson}</small>) : 
                                     null}    
                     </div>
+                    {/* End:: Column extra person tariff */}
+
                 </div>
+                {/* End:: Row */}
+
             </Modal.Body>
+            {/* End:: Modal body */}
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+                
+                {/* Start:: Close button */}
                 <button 
+                    type="button"
                     className="btn btn-danger"
-                    disabled={loading}
-                    onClick={(e) => {onClose(e)}} >
+                    disabled = { loading }
+                    onClick = { handleClose } >
                     Close
                 </button>
+                {/* End:: Close button */}
 
+                {/* Start:: Save button */}
                 <button 
-                    type="submit"
+                    type="button"
                     className="btn btn-success"
-                    disabled={loading} >
+                    disabled = { loading } 
+                    onClick = { handleSubmit } >
 
-                    {!loading && "Confirm"}
-                    {loading && 
+                    { !loading && "Confirm" }
+                    { loading && 
                         <>
                             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Working
-                        </>}
+                        </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form>                   
     );
+    // End:: Html
+
 };
 // End:: form
 
+
+
 // Start:: Component
-const RoomCategoryAdd = ({ onAdded }) => {
+// props parameters
+// onAdded()
+// onClosed()
+
+// useImperativeHandle
+// handleShowModal
+const RoomCategoryAdd = forwardRef(( props, ref ) => {
     const [showModal, setShowModal] = useState(false);
 
+
+    // Start:: Show modal
     const handleShowModal = () => {
-        setShowModal(true)
-    }
+        setShowModal(true);
+    };
+    // End:: Show modal
 
+
+    // Start:: Close modal
     const handleCloseModal = () => {
-        setShowModal(false)
-    }
-
-    const handleSave = () => {
-        onAdded();  
         setShowModal(false);
-    }
+        props.onClosed();
+    };
+    // End:: Close modal
+    
+    // Start:: Save
+    const handleSave = () => {
+        props.onAdded();
+        setShowModal(false);
+    };
+    // End:: Save
 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+
+    // Start:: Html
     return (
-        <div className="text-left">
-            {/* Start:: Add buttom */}
-            <OverlayTrigger
-                overlay={<Tooltip>new</Tooltip>}>
-                <button 
-                    name = {"keyButtonAdd"}
-                    className="btn btn-info hover:drop-shadow-xl ml-2" 
-                    size="md" 
-                    onClick={handleShowModal}>
-                    <Paperclip className="feather-16"/>
-                </button>
-            </OverlayTrigger>
-            {/* End:: Add buttom */}
-
+        <>
             {/* Start:: Add modal */}
             <Modal 
-                show={showModal}>
+                show = { showModal } >
 
+                {/* Start:: Modal header */}
                 <Modal.Header>
+                    {/* Header text */}
                     <Modal.Title>Add room category</Modal.Title>
-                    <NavLink className="nav-icon" href="#" onClick={handleCloseModal}>
+
+                    {/* Close button */}
+                    <NavLink className="nav-icon" href="#" onClick = { handleCloseModal } >
                         <i className="align-middle"><X/></i>
                     </NavLink>
                 </Modal.Header>
+                {/* End:: Modal header */}
 
-                <RoomCategoryForm 
-                    onSubmited={handleSave} 
-                    onClose={handleCloseModal} />
+                {/* Start:: Form component */}
+                <Form
+                    onSubmited = { handleSave } 
+                    onClosed = { handleCloseModal } />
+                {/* End:: Form component */}
+
             </Modal>
             {/* End:: Add modal */}
-
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                rtl={false}
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover />
-
-        </div>  
+        </>            
     );
-}
+    // End:: Html
+
+});
 // End:: Component
+
 
 export default RoomCategoryAdd;

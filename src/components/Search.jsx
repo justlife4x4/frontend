@@ -25,7 +25,6 @@ const Search = forwardRef(( props, ref ) => {
 
     // Start:: set focus to search box
     const setFocus = () => {
-        console.log("Search::setFocus");
         inputRef.current && inputRef.current.focus();
     };
     // End:: set focus to search box

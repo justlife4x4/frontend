@@ -1,49 +1,51 @@
-import React, { useContext, useEffect, useRef, useState } from "react"
-import { useFormik } from "formik"
-import { Modal, NavLink } from "react-bootstrap"
-import { toast } from "react-toastify"
-import { X, Key } from "react-feather"
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { useFormik } from "formik";
+import { Modal, NavLink } from "react-bootstrap";
+import { toast } from "react-toastify";
+import { X, Key } from "react-feather";
 
-import { HotelId } from "../../App"
-import { changePasswordSchema } from "../../schemas"
-import useFetchWithAuth from "../useFetchWithAuth"
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import { changePasswordSchema } from "../../schemas";
+import useFetchWithAuth from "../useFetchWithAuth";
 
 
 // Start:: form
 const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
-    const hotelId = useContext(HotelId)
-    const inputRef = useRef()
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
+    const inputRef = useRef();
     const { loading, error, doUpdate } = useFetchWithAuth({
-        url: `/changePassword/${hotelId}/${pEmployeeId}`
-    })
+        url: `${contextValues.changePasswordAPI}/${hotelId}/${pEmployeeId}`
+    });
     
     useEffect(() => {
-        !loading && inputRef.current.focus()
+        !loading && inputRef.current.focus();
     }, [loading, error]);
 
     const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
         initialValues: {
-            keyInputOldPassword: '',
-            keyInputNewPassword: '' ,
-            keyInputReEnterNewPassword: '',
+            keyInputOldPassword: "",
+            keyInputNewPassword: "",
+            keyInputReEnterNewPassword: "",
         },
         validationSchema: changePasswordSchema,
         onSubmit: async (values, action) => {
             const payload = {   
-                            'oldPassword': values.keyInputOldPassword, 
-                            'newPassword': values.keyInputNewPassword 
+                            "oldPassword": values.keyInputOldPassword, 
+                            "newPassword": values.keyInputNewPassword 
                         };
 
             await doUpdate(payload);
 
             if (error === null) {
-                action.resetForm()
-                onSubmited()
+                action.resetForm();
+                onSubmited();
             } else {
-                toast.error(error)
+                toast.error(error);
             }
         }
-    })
+    });
 
     return (
         <form onSubmit={handleSubmit}>
@@ -142,59 +144,60 @@ const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
                 </button>
             </Modal.Footer>
         </form>                   
-    )
-}
+    );
+};
 // End:: form
 
 // Start:: Component
 const ChangePassword = ({pEmployeeId, onEdited}) => {
-    const hotelId = useContext(HotelId)
-    const [showModal, setShowModal] = useState(false)
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
+    const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doChangePassword } = useFetchWithAuth({
-        url: `/changePassword/${hotelId}/${pEmployeeId}`
-    })
+        url: `${contextValues.changePasswordAPI}/${hotelId}/${pEmployeeId}`
+    });
     
     useEffect(() => {
         error && toast.error(error);
-    }, [data, error, loading, pEmployeeId, showModal])
+    }, [data, error, loading, pEmployeeId, showModal]);
 
     const {values, errors, handleBlur, handleChange, touched, handleSubmit} = useFormik({
         initialValues: {
-            keyInputOldPassword: '',
-            keyInputNewPassword: '' ,
-            keyInputReEnterNewPassword: '',
+            keyInputOldPassword: "",
+            keyInputNewPassword: "",
+            keyInputReEnterNewPassword: "",
         },
         validationSchema: changePasswordSchema,
         onSubmit: async (values, action) => {
             const payload = {   
-                            'oldPassword': values.keyInputOldPassword, 
-                            'newPassword': values.keyInputNewPassword 
+                            "oldPassword": values.keyInputOldPassword, 
+                            "newPassword": values.keyInputNewPassword 
                         };
 
             await doChangePassword(payload)
 
             if (error === null) {
-                action.resetForm()
-                handleSave()
+                action.resetForm();
+                handleSave();
             } else {
-                toast.error(error)
+                toast.error(error);
             }
         }
-    })
+    });
 
     const handleShowModal = () => {
-        setShowModal(true)
-    }
+        setShowModal(true);
+    };
 
     const handleCloseModal = () => {
-        setShowModal(false)
-    }
+        setShowModal(false);
+    };
 
     const handleSave = () => {
-        toast.success("Data successfully updated")
-        setShowModal(false)
-        onEdited()
-    }
+        toast.success("Data successfully updated");
+        setShowModal(false);
+        onEdited();
+    };
 
     return (
         <div className="text-left">
@@ -223,8 +226,8 @@ const ChangePassword = ({pEmployeeId, onEdited}) => {
             {/* End:: Mod modal */}
 
         </div>  
-    )
-}
+    );
+};
 // End:: Component
 
 export default ChangePassword

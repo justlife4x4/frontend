@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { Modal, NavLink } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { X } from "react-feather";
@@ -6,51 +6,64 @@ import { X } from "react-feather";
 import { useStateContext } from "../../contexts/ContextProvider";
 import useFetchWithAuth from "../useFetchWithAuth";
 
+
 // Start:: form
-const Form = ({ pId, pName, onSubmited, onClosed }) => {
-    const contextValues = useStateContext();
-    const inputRef = useRef(null);
-    const { loading, error, doDelete } = useFetchWithAuth({
-        url: `${contextValues.bookingAgentAPI}/${pId}`
-    });
-    
+const Form = ({ pName, pDescription, onClosed }) => {
+    const buttonRef = useRef(null);
+
     // Strat:: close modal on key press esc    
     useEffect(() => {
-        !loading && inputRef.current.focus();
+        buttonRef.current.focus();
+        
+        document.addEventListener('keydown', (event) => {
+          if (event.keyCode === 27) {
+            onClosed();
+          }
+        })
 
-        document.addEventListener("keydown", (event) => {
-            if (event.keyCode === 27) onClosed()
-        });
-    
         return () => {
-          document.removeEventListener("keydown", onClosed);
+          document.removeEventListener('keydown', onClosed);
         }
     }, []);
     // End:: close modal on key press esc    
 
-
-    // Strat:: On delete result 
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-    }, [loading, error]);
-    // End:: On delete result
-
-
-    // Start:: Call delete api
-    const handleSave = async () => {
-        await doDelete();
-        error === null ? onSubmited() : toast.error(error);
-    };
-    // End:: Call delete api
-
-
+    
     // Start:: Html
     return (
         <form>
-
             {/* Start:: Modal body */}
             <Modal.Body>
-                <label className="form-label">Are you really want to remove <mark><code>{ pName }</code></mark> ?</label>
+
+                {/* Start:: Row */}
+                <div className="row mb-2">
+
+                    {/* Start:: Column name */}
+                    <div className="col-12">
+
+                        {/* Label element */}
+                        <label className="form-label mr-2">Name :</label>
+                        <label className="form-label">{ pName }</label>
+                    </div>
+                    {/* Start:: Column name */}
+
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
+                <div className="row mb-2">
+
+                    {/* Start:: Column description */}
+                    <div className="col-12">
+
+                        {/* Label element */}
+                        <label className="form-label mr-2">Description :</label>
+                        <label className="form-label">{ pDescription }</label>
+                    </div>
+                    {/* End:: Column description */}
+
+                </div>
+                {/* End:: Row */}
+
             </Modal.Body>
             {/* End:: Modal body */}
 
@@ -58,36 +71,19 @@ const Form = ({ pId, pName, onSubmited, onClosed }) => {
             <Modal.Footer>
 
                 {/* Start:: Close button */}
-                <button 
-                    type="button"   
-                    className="btn btn-danger"
-                    disabled = { loading }
-                    ref = { inputRef }
+                <button
+                    ref = { buttonRef }
+                    type = "button"
+                    className = "btn btn-danger"
                     onClick = { onClosed } >
                     Close
                 </button>
                 {/* End:: Close button */}
 
-                {/* Start:: Save button */}
-                <button 
-                    type="button"
-                    className="btn btn-success"
-                    disabled = { loading || error }
-                    onClick = { handleSave } >
-
-                    { !loading && "Confirm" }
-                    { loading && 
-                        <>
-                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Working
-                        </> }
-                </button>
-                {/* End:: Save button */}
-
             </Modal.Footer>
             {/* End:: Modal footer */}
 
-        </form>                    
+        </form> 
     );
     // End:: Html
 
@@ -98,16 +94,15 @@ const Form = ({ pId, pName, onSubmited, onClosed }) => {
 // Start:: Component
 // props parameters
 // pId
-// onDeleted()
 // onClosed()
 
 // useImperativeHandle
 // handleShowModal
-const BookingAgentDelete = forwardRef(( props, ref ) => {
+const IDDocumentView = forwardRef(( props, ref ) => {    
     const contextValues = useStateContext();
     const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `${contextValues.bookingAgentAPI}/${props.pId}`
+        url: `${contextValues.idDocumentAPI}/${props.pId}`
     });
 
 
@@ -120,9 +115,8 @@ const BookingAgentDelete = forwardRef(( props, ref ) => {
               console.log("Error occured when fetching data");
             }
           })();
-    }, [showModal]);
+    }, [props.pId, showModal]);
     // End:: fetch id wise detail from api
-
 
     useEffect(() => {
         error && toast.error(error);
@@ -144,14 +138,6 @@ const BookingAgentDelete = forwardRef(( props, ref ) => {
     // End :: Close modal 
 
 
-    // Start :: Save 
-    const handleSave = () => {
-        setShowModal(false);
-        props.onDeleted(); 
-    };
-    // End :: Save 
-
-
     // Start:: forward reff show modal function
     useImperativeHandle(ref, () => {
         return {
@@ -160,24 +146,24 @@ const BookingAgentDelete = forwardRef(( props, ref ) => {
     });
     // End:: forward reff show modal function
 
+
     // Start:: Html
     return (
         <>
-            {/* Start:: Delete modal */}
+            {/* Start:: View modal */}
             { data &&
                 <Modal 
-                    size="sm"
-                    show = { showModal } >
+                    show = { showModal }>
 
                     {/* Start:: Modal header */}
                     <Modal.Header>
                         {/* Header text */}
-                        <Modal.Title>Delete booking agent</Modal.Title>
-
+                        <Modal.Title>View id document</Modal.Title>
+                        
                         {/* Close button */}
                         <NavLink 
                             className="nav-icon" href="#" 
-                            onClick = { handleCloseModal } >
+                            onClick={handleCloseModal}>
                             <i className="align-middle"><X/></i>
                         </NavLink>
                     </Modal.Header>
@@ -185,19 +171,20 @@ const BookingAgentDelete = forwardRef(( props, ref ) => {
 
                     {/* Start:: Form component */}
                     <Form 
-                        pId = { props.pId } 
+                        pAccessLevels = { data.accessLevels }
                         pName = { data.name }
-                        onSubmited = { handleSave } 
+                        pDescription = { data.description }
                         onClosed = { handleCloseModal } />
-                        {/* End:: Form component */}
-            </Modal>}
-            {/* End:: Delete modal */}
+                    {/* End:: Form component */}
+                    
+                </Modal> }
+            {/* End:: View modal */}
         </>
-    );
+    )
     // End:: Html
 
 });
 // End:: Component
 
 
-export default BookingAgentDelete;
+export default IDDocumentView;

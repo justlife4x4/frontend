@@ -1,62 +1,201 @@
-import {React} from 'react';
-import {Table, Card, Dropdown} from 'react-bootstrap';
+import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { Table, Card, Dropdown } from "react-bootstrap";
 
-import IDDocumentEdit from './IDDocumentEdit';
-import IDDocumentDelete from './IDDocumentDelete';
+import { Edit3, Scissors } from "react-feather";
+import { subStr } from "../Common";
+import IDDocumentView from "./IDDocumentView";
+import IDDocumentEdit from "./IDDocumentEdit";
+import IDDocumentDelete from "./IDDocumentDelete";
 
-const IDDocumentCard = ({pId, pName, pDescription, onEdited, onDeleted, onClosed}) => {
-    
+
+// Start:: Component
+// props parameters
+// pIndex
+// pName
+// pDescription
+// onActivated()
+// onClosed()
+
+// useImperativeHandle
+// handleDeSelect
+// handelOpenEdit 
+// handelOpenDelete
+const IDDocumentCard = forwardRef(( props, ref ) => {
+    const viewRef = useRef(null);
+    const editRef = useRef(null);
+    const deleteRef = useRef(null);
+    const [focus, setFocus] = useState(false);
+    const [active, setActive] = useState(false);
+
+
+    // Start:: Show view modal 
+    const handelOpenView = () => {
+        viewRef && viewRef.current.handleShowModal();
+    };
+    // End:: Show view modal 
+
+
+    // Start:: Show edit modal 
+    const handelOpenEdit = () => {
+        editRef && editRef.current.handleShowModal();
+    };
+    // End:: Show edit modal 
+
+
+    // Start:: Show delete modal 
+    const handelOpenDelete = () => {
+        deleteRef && deleteRef.current.handleShowModal();
+    };
+    // End:: Show delete modal 
+
+
+    // Start:: Close all modal 
     const handleClose = () => {
-        onClosed();
-    }
+        props.onClosed();
+    };
+    // End:: Close all modal 
 
+
+    // Start:: de-select card 
+    const handleDeSelect = () => {
+        setActive(false);
+        setFocus(false);
+    };
+    // End:: de-select card
+
+    
+    // Start:: forward reff de-select, show edit/delete modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleDeSelect, handelOpenEdit, handelOpenDelete
+        }
+    });
+    // Edit:: forward reff de-select, show edit/delete modal function
+
+
+    // Start:: Html
     return (
-        <Card className="border">
-            <Card.Body className="pt-3 pl-1 pb-1 pr-1 m-0">
-                <Card.Subtitle>
+        <>
+            {/* Start :: card component */}
+            <Card className='border'
+                ref = { ref }
+                index = { props.pIndex }
+                border = { active ? 'info' : focus ? 'primary' : '' }  
+                onMouseEnter = { () => setFocus(true) }
+                onMouseLeave = { () => setFocus(false) } 
+                onClick = { (e) => { 
+                                        if (e.detail === 1) {
+                                            setActive(!active) 
+                                            props.onActivated(props.pIndex)
+                                        }    
+                                        else if (e.detail === 2) {
+                                            handelOpenView()
+                                        }  
+                                   } } >
+
+                <Card.Body className="pt-3 pl-1 pb-1 pr-1 m-0 card-element">
+                    
+                    {/* Start:: card header */}
+                    <Card.Subtitle>
+
+                        {/* Start:: Row */}
                         <div className="row">
-                            <div className="col-md-9">
-                                <h4 className="text-muted">{pName}</h4>
+                            {/* Start:: Column name */}
+                            <div className="col-md-10">
+                                <h4>{ subStr(props.pName, 20) }</h4>
                             </div>
-                            <div className="col-md-3 text-right">
+                            {/* End:: Column name */}
+                            
+                            {/* Start:: Column menu */}
+                            <div className="col-md-2 text-right">
+                                
+                                {/* Start:: operational menu */}
                                 <Dropdown autoClose="true">
                                     <Dropdown.Toggle 
                                         variant="light" 
                                         size="sm"
                                         align="end"
-                                        drop="down"/>
-
-                                    <Dropdown.Menu style={{background: "#e5e5f0"}}>
+                                        drop="down" />
+                                    
+                                    <Dropdown.Menu>
+                                        {/* Start:: edit menu */}
                                         <Dropdown.Item 
                                             href="#" 
-                                            className="pl-2">
-                                            <IDDocumentEdit 
-                                                pId={pId} 
-                                                onEdited={onEdited} 
-                                                onClosed={handleClose} />
+                                            className="pl-2"
+                                            onClick = { handelOpenEdit } >
+                                            <span 
+                                                className="pr-5">
+                                                <Edit3 className="feather-16 mr-3"/>Edit
+                                            </span>
                                         </Dropdown.Item>
+                                        {/* End:: edit menu */}
 
-                                        <Dropdown.Item href="#" className="m-0 pl-2">
-                                            <IDDocumentDelete 
-                                                pId={pId} 
-                                                onDeleted={onDeleted} 
-                                                onClosed={handleClose} />
+                                        {/* Start:: delete menu */}
+                                        <Dropdown.Item 
+                                            href="#" 
+                                            className="m-0 pl-2"
+                                            onClick = { handelOpenDelete } >
+                                                <span 
+                                                    className="pr-5">
+                                                    <Scissors className="feather-16 mr-3"/>Delete
+                                                </span>
                                         </Dropdown.Item>
+                                        {/* End:: delete menu */}
+
                                     </Dropdown.Menu>
+                                    
                                 </Dropdown>
+                                {/* End:: operational menu */}
+
                             </div>
+                            {/* End:: Column menu */}
                         </div>
-                </Card.Subtitle>
-                <Table striped size="sm" className="text-muted mb-0 mt-2">
-                    <tbody>
-                        <tr>
-                            <td className="text-justify">{pDescription}</td>
-                        </tr>
-                    </tbody>                            
-                </Table>
-            </Card.Body>
-        </Card>
+                        {/* End:: Row */}
+
+                    </Card.Subtitle>
+                    {/* End:: card header */}
+
+                    {/* Start:: card body */}
+                    <Table striped size="sm" className="text-muted mb-0 mt-2">
+                        <tbody>
+                            <tr>
+                                <td>{ subStr(props.pDescription, 45) }</td>
+                            </tr>
+                        </tbody>                            
+                    </Table>
+                    {/* End:: card body */}
+
+                </Card.Body>
+            </Card>
+            {/* End :: card component */}
+
+            {/* Start :: view employee component */}
+            <IDDocumentView
+                ref = { viewRef }
+                pId = { props.pId } 
+                onClosed = { handleClose } />
+            {/* End :: view employee component */}
+
+            {/* Start :: edit employee component */}
+            <IDDocumentEdit 
+                ref = { editRef }
+                pId = { props.pId } 
+                onEdited = { props.onEdited } 
+                onClosed = { handleClose } />
+            {/* End :: edit employee component */}
+
+            {/* Start :: delete employee component */}
+            <IDDocumentDelete 
+                ref = { deleteRef }
+                pId = { props.pId } 
+                onDeleted = { props.onDeleted } 
+                onClosed = { handleClose } />
+            {/* End :: delete employee component */}
+        </>
     );
-}
+    // End:: Html
+
+});
+
 
 export default IDDocumentCard;

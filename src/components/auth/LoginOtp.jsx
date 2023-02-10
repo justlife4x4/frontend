@@ -1,21 +1,24 @@
-import { React, useContext, useEffect, useRef } from 'react';
-import { useFormik } from 'formik';
-import { NavLink } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
-import { HotelId } from '../../App';
-import { loginOtpSchema } from '../../schemas';
-import useFetch from '../useFetch';
+import { React, useContext, useEffect, useRef } from "react";
+import { useFormik } from "formik";
+import { NavLink } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify";
 
-import 'react-toastify/dist/ReactToastify.css';
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import { loginOtpSchema } from "../../schemas";
+import useFetch from "../useFetch";
+
+import "react-toastify/dist/ReactToastify.css";
 
 // Start:: Component
 const LoginOtp = ({ onSuccess, onBack }) => {
 	const hotelId = useContext(HotelId);
+	const contextValues = useStateContext();
 	const inputRef = useRef();
 
 	const { data, loading, error, doLoginOtp } = useFetch({
-        method: 'PUT',
-        url: `/login/${hotelId}`
+        method: "PUT",
+        url: `${contextValues.loginAPI}/${hotelId}`
     });
     
     useEffect(() => {

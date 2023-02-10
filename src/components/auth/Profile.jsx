@@ -5,6 +5,7 @@ import { toast } from "react-toastify"
 import { X, User } from "react-feather"
 
 import { HotelId } from "../../App"
+import { useStateContext } from "../../contexts/ContextProvider";
 import { employeeSchema } from "../../schemas"
 import AccessLevelSelect from "../AccessLevelSelect"
 import useFetchWithAuth from "../useFetchWithAuth"
@@ -12,10 +13,11 @@ import useFetchWithAuth from "../useFetchWithAuth"
 
 // Start:: form
 const Form = ({ pAccessLevelId, pId, pName, pAddress, pMobile, pEmail, onSubmited, onClose }) => {
-    const hotelId = useContext(HotelId)
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
     const {loading, error, doUpdate} = useFetchWithAuth({
-        url: `/employees/${hotelId}/${pId}`
-    })
+        url: `${contextValues.employeeAPI}/${hotelId}/${pId}`
+    });
 
     const {values, errors, handleBlur, handleChange, touched, setFieldValue, handleSubmit} = useFormik({
         initialValues: {
@@ -28,23 +30,23 @@ const Form = ({ pAccessLevelId, pId, pName, pAddress, pMobile, pEmail, onSubmite
         validationSchema: employeeSchema,
         onSubmit: async (values, action) => {
             const payload = {   
-                                'accessLevelId': values.keyInputAccessLevelId,
-                                'name': values.keyInputName.toUpperCase(), 
-                                'address': values.keyInputAddress.toUpperCase(), 
-                                'mobile': values.keyInputMobile.toString(), 
-                                'email': values.keyInputEmail.toLowerCase()
+                                "accessLevelId": values.keyInputAccessLevelId,
+                                "name": values.keyInputName.toUpperCase(), 
+                                "address": values.keyInputAddress.toUpperCase(), 
+                                "mobile": values.keyInputMobile.toString(), 
+                                "email": values.keyInputEmail.toLowerCase()
                             }
                             
-            await doUpdate(payload)
+            await doUpdate(payload);
         
             if (error === null) {
-                action.resetForm()
-                onSubmited()
+                action.resetForm();
+                onSubmited();
             } else {
-                toast.error(error)
+                toast.error(error);
             }
         }
-    })
+    });
 
     return (
         <form>
@@ -166,39 +168,40 @@ const Form = ({ pAccessLevelId, pId, pName, pAddress, pMobile, pEmail, onSubmite
                 </button>
             </Modal.Footer>
         </form> 
-    )
-}
+    );
+};
 // End:: form
 
 // Start:: Component
 const Profile = ({ pEmployeeId, onEdited }) => {
-    const hotelId = useContext(HotelId)
-    const [showModal, setShowModal] = useState(false)
+    const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
+    const [showModal, setShowModal] = useState(false);
     const {data, loading, error, doFetch} = useFetchWithAuth({
-        url: `/employees/${hotelId}/${pEmployeeId}`
-    })
+        url: `${contextValues.employeeAPI}/${hotelId}/${pEmployeeId}`
+    });
 
     useEffect(() => {
-        pEmployeeId && doFetch()
-    }, [pEmployeeId])
+        pEmployeeId && doFetch();
+    }, [pEmployeeId]);
 
     useEffect(() => {
-        error && toast.error(error)
-    }, [data, error, loading, pEmployeeId, showModal])
+        error && toast.error(error);
+    }, [data, error, loading, pEmployeeId, showModal]);
 
     const handleShowModal = () => {
-        setShowModal(true)
-    }
+        setShowModal(true);
+    };
 
     const handleCloseModal = () => {
-        setShowModal(false)
-    }
+        setShowModal(false);
+    };
 
     const handleSave = () => {
-        toast.success('Data successfully updated')
-        setShowModal(false)
-        onEdited()
-    }
+        toast.success("Data successfully updated");
+        setShowModal(false);
+        onEdited();
+    };
 
     return (
         <div className="text-left">
@@ -238,8 +241,8 @@ const Profile = ({ pEmployeeId, onEdited }) => {
             {/* End:: Edit modal */}
 
         </div>  
-    )
-}
+    );
+};
 // End:: Component
 
-export default Profile
+export default Profile;

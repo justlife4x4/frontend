@@ -9,13 +9,12 @@ import Navbar from "./NavbarLogin";
 import Footer from "./FooterLogin";
 import Dashboard from "../pages/Dashboard"
 import AccessLevels from "../pages/AccessLevels";
-import Employees from "../pages/Employees";
 import Plans from "../pages/Plans";
 import RoomCategories from "../pages/RoomCategories";
-import Rooms from "../pages/Rooms";
 import IDDocuments from "../pages/IDDocuments";
-// import BookingAgents from '../pages/BookingAgents';
-
+import BookingAgents from "../pages/BookingAgents";
+import Employees from "../pages/Employees";
+import Rooms from "../pages/Rooms";
 import Support from "../pages/Support";
 import Help from "../pages/Help";
 import Privacy from "../pages/Privacy";
@@ -37,7 +36,11 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
   const navRef =  useRef(null);
   const accessLevelRef = useRef(null);
   const employeeRef = useRef(null);
-
+  const idDocumentRef = useRef(null);
+  const planRef = useRef(null);
+  const roomCategoryRef = useRef(null);
+  const roomRef = useRef(null);
+  const bookingAgentRef = useRef(null);
 
   useEffect(() => {
     const page = getPage(contextValues.baseURL, window.location.href);
@@ -68,26 +71,65 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
         accessLevelRef && accessLevelRef.current.changeSearch(text);
         break;
 
+      case "plans":
+        planRef && planRef.current.changeSearch(text);
+        break;
+
+      case "roomcategories":
+        roomCategoryRef && roomCategoryRef.current.changeSearch(text);
+        break;
+          
+      case "iddocuments":
+        idDocumentRef && idDocumentRef.current.changeSearch(text);
+        break;
+
+      case "bookingagents":
+        bookingAgentRef && bookingAgentRef.current.changeSearch(text);
+        break;
+
       case "employees":
         employeeRef && employeeRef.current.changeSearch(text);
         break;
-
+  
+      case "rooms":
+        roomRef && roomRef.current.changeSearch(text);
+        break;
+          
       default:
         break;        
     }
   };
 
   const handleAdd = () => {
-    console.log(menuSelected)
     switch (menuSelected) {
       case "accesslevels":
         accessLevelRef && accessLevelRef.current.openAdd();
         break;
 
+      case "plans":
+        planRef && planRef.current.openAdd();
+        break;
+
+      case "roomcategories":
+        roomCategoryRef && roomCategoryRef.current.openAdd();
+        break;
+          
+      case "iddocuments":
+        idDocumentRef && idDocumentRef.current.openAdd();
+        break;
+
+      case "bookingagents":
+        bookingAgentRef && bookingAgentRef.current.openAdd();
+        break;
+  
       case "employees":
         employeeRef && employeeRef.current.openAdd();
         break;
-  
+
+      case "rooms":
+        roomRef && roomRef.current.openAdd();
+        break;
+          
       default:
         break;        
     }
@@ -99,12 +141,32 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
         accessLevelRef && accessLevelRef.current.openEdit();
         break;
 
+      case "plans":
+        planRef && planRef.current.openEdit();
+        break;
+
+      case "roomcategories":
+        roomCategoryRef && roomCategoryRef.current.openEdit();
+        break;
+          
+      case "iddocuments":
+        idDocumentRef && idDocumentRef.current.openEdit();
+        break;
+
+      case "bookingagents":
+        bookingAgentRef && bookingAgentRef.current.openEdit();
+        break;
+
       case "employees":
         employeeRef && employeeRef.current.openEdit();
         break;
-
-        default:
-          break;        
+          
+      case "rooms":
+        roomRef && roomRef.current.openEdit();
+        break;
+          
+      default:
+        break;        
       }
   };
 
@@ -114,13 +176,33 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
         accessLevelRef && accessLevelRef.current.openDelete();
         break;
 
+      case "plans":
+        planRef && planRef.current.openDelete();
+        break;
+
+      case "roomcategories":
+        roomCategoryRef && roomCategoryRef.current.openDelete();
+        break;
+          
+      case "iddocuments":
+        idDocumentRef && idDocumentRef.current.openDelete();
+        break;
+
+      case "bookingagents":
+        bookingAgentRef && bookingAgentRef.current.openDelete();
+        break;
+  
       case "employees":
         employeeRef && employeeRef.current.openDelete();
         break;
-
-        default:
-          break;
-      }
+  
+      case "rooms":
+        roomRef && roomRef.current.openDelete();
+        break;
+          
+      default:
+        break;
+    }
   };
 
   const handleClose = () => {
@@ -128,7 +210,6 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
   };
 
   const handleSuccess = () => {
-    console.log("ContainerLogin::handleSuccess");
     navRef.current.success();
   };
   // End:: handle header operational options
@@ -138,48 +219,50 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
   return ( 
     <>
       {/* Start:: side menus */}
-      <nav id="sidebar" className="sidebar mt-5">
-        <div className="sidebar-content">
-          <ul className="sidebar-nav mt-3">
-            {/* <li className="sidebar-header">{pEmployeeRoles}</li> */}
-            <li className="sidebar-item">
-              <a href="#masters" data-toggle="collapse" className="sidebar-link collapsed">
-                <Sliders size={16}/>
-                <span className="align-middle">Master</span>
-              </a>
-              <ul id="masters" className="sidebar-dropdown list-unstyled collapse" data-parent="#sidebar">
-                <li className={ `sidebar-item ${ menuSelected === 'accesslevels' ? 'active' : null }` } 
-                    onClick={ () => { handelClickMenuItem('accesslevels') } }>
-                    <NavLink to="/accesslevels" className="sidebar-link">Role</NavLink>
-                </li>
-                {/* <li className={`sidebar-item ${menuSelected === 'bookingagent' ? 'active' : ''}`} onClick={() => {handelMenuClick('bookingagent')}}>
-                    <NavLink to="/bookingagent" className="sidebar-link">Booking agent</NavLink>
-                </li> */}
-                <li className={ `sidebar-item ${ menuSelected === 'employees' ? 'active' : null }` } 
-                    onClick={ () => { handelClickMenuItem('employees') } }>
-                    <NavLink to="/employees" className="sidebar-link">Employee</NavLink>
-                </li>
-                <li className={ `sidebar-item ${ menuSelected === 'iddocuments' ? 'active' : null }` }
-                    onClick={ () => { handelClickMenuItem('iddocuments') } }>
-                    <NavLink to="/iddocuments" className="sidebar-link">ID document</NavLink>
-                </li>
-                <li className={ `sidebar-item ${ menuSelected === 'plans' ? 'active' : null }` }
-                    onClick={ () => { handelClickMenuItem('plans') } }>
-                    <NavLink to="/plans" className="sidebar-link">Plan</NavLink>
-                </li>
-                <li className={ `sidebar-item ${ menuSelected === 'roomcategories' ? 'active' : null }` }
-                    onClick={ () => { handelClickMenuItem('roomcategories') } }>
-                    <NavLink to="/roomcategories" className="sidebar-link">Room category</NavLink>
-                </li>
-                <li className={ `sidebar-item ${ menuSelected === 'rooms' ? 'active' : null }` }
-                    onClick={ () => { handelClickMenuItem('rooms') } }>
-                    <NavLink to="/rooms" className="sidebar-link">Room</NavLink>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </nav> 
+      { menuState &&
+        <nav id="sidebar" className="sidebar mt-5">
+          <div className="sidebar-content">
+            <ul className="sidebar-nav mt-3">
+              {/* <li className="sidebar-header">{pEmployeeRoles}</li> */}
+              <li className="sidebar-item">
+                <a href="#masters" data-toggle="collapse" className="sidebar-link collapsed">
+                  <Sliders size={16}/>
+                  <span className="align-middle">Master</span>
+                </a>
+                <ul id="masters" className="sidebar-dropdown list-unstyled collapse" data-parent="#sidebar">
+                  <li className={ `sidebar-item ${ menuSelected === 'accesslevels' ? 'active' : null }` } 
+                      onClick={ () => { handelClickMenuItem('accesslevels') } }>
+                      <NavLink to="/accesslevels" className="sidebar-link">Role</NavLink>
+                  </li>
+                  <li className={ `sidebar-item ${ menuSelected === 'plans' ? 'active' : null }` }
+                      onClick={ () => { handelClickMenuItem('plans') } }>
+                      <NavLink to="/plans" className="sidebar-link">Plan</NavLink>
+                  </li>
+                  <li className={ `sidebar-item ${ menuSelected === 'roomcategories' ? 'active' : null }` }
+                      onClick={ () => { handelClickMenuItem('roomcategories') } }>
+                      <NavLink to="/roomcategories" className="sidebar-link">Room category</NavLink>
+                  </li>
+                  <li className={ `sidebar-item ${ menuSelected === 'iddocuments' ? 'active' : null }` }
+                      onClick={ () => { handelClickMenuItem('iddocuments') } }>
+                      <NavLink to="/iddocuments" className="sidebar-link">ID document</NavLink>
+                  </li>
+                  <li className={`sidebar-item ${menuSelected === 'bookingagents' ? 'active' : null}`} 
+                      onClick={ () => { handelClickMenuItem('bookingagents') } }>
+                      <NavLink to="/bookingagents" className="sidebar-link">Booking agent</NavLink>
+                  </li>
+                  <li className={ `sidebar-item ${ menuSelected === 'employees' ? 'active' : null }` } 
+                      onClick={ () => { handelClickMenuItem('employees') } }>
+                      <NavLink to="/employees" className="sidebar-link">Employee</NavLink>
+                  </li>
+                  <li className={ `sidebar-item ${ menuSelected === 'rooms' ? 'active' : null }` }
+                      onClick={ () => { handelClickMenuItem('rooms') } }>
+                      <NavLink to="/rooms" className="sidebar-link">Room</NavLink>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav> }
       {/* End:: side menus */}
 
       <div className="main">
@@ -202,21 +285,42 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
           <div className="container-fluid p-0">
             <Routes>
               <Route exact path="/dashboard" element={<Dashboard />} />
+              
               <Route exact path="/accesslevels" element={<AccessLevels 
                                                           ref = { accessLevelRef } 
                                                           onSuccess = { handleSuccess }
                                                           onClose = { handleClose } />} />
+
+              <Route exact path="/iddocuments" element={<IDDocuments 
+                                                          ref = { idDocumentRef } 
+                                                          onSuccess = { handleSuccess }
+                                                          onClose = { handleClose } />} />
+
+              <Route exact path="/bookingagents" element={<BookingAgents 
+                                                            ref = { bookingAgentRef } 
+                                                            onSuccess = { handleSuccess }
+                                                            onClose = { handleClose } />} />
               
+              <Route exact path="/plans" element={<Plans 
+                                                    ref = { planRef } 
+                                                    onSuccess = { handleSuccess }
+                                                    onClose = { handleClose } />} />
+
+              <Route exact path="/roomcategories" element={<RoomCategories 
+                                                            ref = { roomCategoryRef } 
+                                                            onSuccess = { handleSuccess }
+                                                            onClose = { handleClose } />} />
+
               <Route exact path="/employees" element={<Employees 
                                                         ref = { employeeRef } 
                                                         onSuccess = { handleSuccess }
                                                         onClose = { handleClose } />} />
+
+              <Route exact path="/rooms" element={<Rooms
+                                                    ref = { roomRef } 
+                                                    onSuccess = { handleSuccess }
+                                                    onClose = { handleClose } />} />
               
-              <Route exact path="/iddocuments" element={<IDDocuments />} />
-              <Route exact path="/plans" element={<Plans />} />
-              <Route exact path="/roomcategories" element={<RoomCategories />} />
-              <Route exact path="/rooms" element={<Rooms />} />
-              {/* <Route exact path="/bookingagent" element={<BookingAgents />} /> */}
               <Route exact path="/support" element={<Support />} />
               <Route exact path="/help" element={<Help />} />
               <Route exact path="/privacy" element={<Privacy />} />

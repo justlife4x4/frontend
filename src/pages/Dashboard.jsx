@@ -1,5 +1,5 @@
-import {React, useContext} from 'react';
-import {HotelId} from "../App";
+import React, { useContext } from "react";
+import { HotelId } from "../App";
 
 const Dashboard = () => {
     const hotelId = useContext(HotelId);

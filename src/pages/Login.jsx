@@ -13,10 +13,10 @@ const Login = () => {
     const [showOtp, setShowOtp] = useState(false);
 
     const handleSuccess = (accessToken, refreshToken) => {
-        localStorage.setItem('token', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem("token", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
 
-        navigate('/dashboard');
+        navigate("/dashboard");
         navigate(0);
     };
 
@@ -41,7 +41,7 @@ const Login = () => {
 
     return ( 
         <>
-            {!localStorage.getItem('token') &&
+            {!localStorage.getItem("token") &&
                 <div className="container mt-5">
                     <div className="row">
                         <div className="col-md-6" style={{'borderRight': 'solid 1px #9e9f98'}}>
@@ -50,20 +50,20 @@ const Login = () => {
                         <div className="col-md-5 contents">
                             {showPassword &&
                                 <LoginPassword 
-                                    onSuccess={handleSuccess}
-                                    onBack={handleBack}/>
+                                    onSuccess = { handleSuccess }
+                                    onBack = { handleBack } />
                             }
 
                             {showForgetPassword &&
                                 <ForgetPassword 
-                                    onSuccess={handleOtpSuccess}
-                                    onBack={handleBack}/>
+                                    onSuccess = { handleOtpSuccess }
+                                    onBack = { handleBack } />
                             }
 
                             {showOtp &&
                                 <LoginOtp 
-                                    onSuccess={handleSuccess}
-                                    onBack={handleBack}/>
+                                    onSuccess = { handleSuccess }
+                                    onBack = { handleBack } />
                             }
                         </div>
                     </div>

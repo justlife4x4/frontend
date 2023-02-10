@@ -1,147 +1,206 @@
-import { React, useContext, useEffect, useRef, useState } from 'react';
-import { Modal, NavLink } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
-import { X, Scissors } from 'react-feather';
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import { HotelId } from '../../App';
-import useFetchWithAuth from '../useFetchWithAuth';
-
-import 'react-toastify/dist/ReactToastify.css';
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import useFetchWithAuth from "../useFetchWithAuth";
 
 // Start:: form
-const RoomForm = ({ id, no, onSubmit, onClose }) => {
+const Form = ({ pId, pNo, onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
-    const inputRef = useRef();
-    
+    const contextValues = useStateContext();
+    const inputRef = useRef(null);
     const { loading, error, doDelete } = useFetchWithAuth({
-        url: `/rooms/${hotelId}/${id}`
+        url: `${contextValues.roomAPI}/${hotelId}/${pId}`
     });
     
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        !loading && inputRef.current.focus();
+
+        document.addEventListener("keydown", (event) => {
+            if (event.keyCode === 27) onClosed()
+        });
+    
+        return () => {
+          document.removeEventListener("keydown", onClosed);
+        }
+    }, []);
+    // End:: close modal on key press esc    
+
+
+    // Strat:: On delete result 
     useEffect(() => {
         !loading && inputRef.current.focus();
     }, [loading, error]);
+    // End:: On delete result
 
+
+    // Start:: Call delete api
     const handleSave = async () => {
         await doDelete();
+        error === null ? onSubmited() : toast.error(error);
+    };
+    // End:: Call delete api
 
-        if (error === null) {
-            onSubmit();
-        } else {
-            toast.error(error);
-        }
-    }
 
+    // Start:: Html
     return (
         <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
-                <label className="form-label">Are you really want to remove <mark><code>{no}</code></mark> ?</label>
+                <label className="form-label">Are you really want to remove <mark><code>{ pNo }</code></mark> ?</label>
             </Modal.Body>
+            {/* End:: Modal body */}
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+
+                {/* Start:: Close button */}
                 <button 
+                    type="button"   
                     className="btn btn-danger"
-                    disabled={loading}
-                    ref={inputRef}
-                    onClick={(e) => {onClose(e)}}>
+                    disabled = { loading }
+                    ref = { inputRef }
+                    onClick = { onClosed } >
                     Close
                 </button>
+                {/* End:: Close button */}
 
+                {/* Start:: Save button */}
                 <button 
+                    type="button"
                     className="btn btn-success"
-                    disabled={loading || error}
-                    onClick={(e) => {handleSave()}}>
+                    disabled = { loading || error }
+                    onClick = { handleSave } >
 
-                    {!loading && "Confirm"}
-                    {loading && 
+                    { !loading && "Confirm" }
+                    { loading && 
                         <>
                             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Working
-                        </>}
+                        </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form>                    
     );
+    // End:: Html
+
 };
 // End:: form
 
+
 // Start:: Component
-const RoomDelete = ({ pCategoryId, pCategoryName, pId, onDeleted }) => {
+// props parameters
+// pId
+// onDeleted()
+// onClosed()
+
+// useImperativeHandle
+// handleShowModal
+const RoomDelete = forwardRef(( props, ref ) => {
     const hotelId = useContext(HotelId);
-    const [showModal, setShowModal] = useState(false)
+    const contextValues = useStateContext();
+    const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/rooms/${hotelId}/${pId}`
+        url: `${contextValues.roomAPI}/${hotelId}/${props.pId}`
     });
 
+
+    // Start:: fetch id wise detail from api
     useEffect(() => {
-        doFetch();
-    }, [pId]);
+        (async () => {
+            try {
+                showModal && await doFetch();
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [showModal]);
+    // End:: fetch id wise detail from api
+
 
     useEffect(() => {
         error && toast.error(error);
-    }, [data, error, loading, pId, showModal]);
+    }, [data, error, loading]);
 
+
+    // Start :: Show modal 
     const handleShowModal = () => {
         setShowModal(true);
-    }
+    };
+    // End :: Show modal 
 
+
+    // Start :: Close modal 
     const handleCloseModal = () => {
         setShowModal(false);
-    }
+        props.onClosed();
+    };
+    // End :: Close modal 
 
+
+    // Start :: Save 
     const handleSave = () => {
-        onDeleted();  
         setShowModal(false);
-    }
+        props.onDeleted(); 
+    };
+    // End :: Save 
 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+    // Start:: Html
     return (
-        <div className="text-left">
-            {/* Start:: Delete menu */}
-            <span 
-                className="pr-5" 
-                onClick={handleShowModal} >
-                <Scissors className="feather-16 mr-3"/>Delete
-            </span>
-            {/* End:: Delete menu */}
-
+        <>
             {/* Start:: Delete modal */}
-            <Modal 
-                size="sm"
-                show={showModal}>
+            { data &&
+                <Modal 
+                    size="sm"
+                    show = { showModal } >
 
-                <Modal.Header>
-                    <Modal.Title>Delete room</Modal.Title>
-                    <NavLink 
-                        className="nav-icon" href="#" 
-                        onClick={handleCloseModal}>
-                        <i className="align-middle"><X/></i>
-                    </NavLink>
-                </Modal.Header>
+                    {/* Start:: Modal header */}
+                    <Modal.Header>
+                        {/* Header text */}
+                        <Modal.Title>Delete room</Modal.Title>
 
-                {data &&
-                    <RoomForm 
-                        categoryId={pCategoryId}
-                        categoryName={pCategoryName}
-                        id={pId} 
-                        no={data.no}
-                        onSubmit={handleSave} 
-                        onClose={handleCloseModal} />}
-            </Modal>
+                        {/* Close button */}
+                        <NavLink 
+                            className="nav-icon" href="#" 
+                            onClick = { handleCloseModal } >
+                            <i className="align-middle"><X/></i>
+                        </NavLink>
+                    </Modal.Header>
+                    {/* End:: Modal header */}
+
+                    {/* Start:: Form component */}
+                    <Form 
+                        pId = { props.pId } 
+                        pNo = { data.no }
+                        onSubmited = { handleSave } 
+                        onClosed = { handleCloseModal } />
+                        {/* End:: Form component */}
+            </Modal>}
             {/* End:: Delete modal */}
-
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                rtl={false}
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover />
-
-        </div>  
+        </>
     );
-}
+    // End:: Html
+
+});
 // End:: Component
+
 
 export default RoomDelete;

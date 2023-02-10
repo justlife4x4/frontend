@@ -1,194 +1,272 @@
-import { React, useContext, useEffect, useRef, useState } from 'react';
-import { useFormik } from 'formik';
-import { Modal, NavLink, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
-import { X, Paperclip } from 'react-feather';
+import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { useFormik } from "formik";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import { HotelId } from '../../App';
-import { planSchema } from '../../schemas';
-import useFetchWithAuth from '../useFetchWithAuth';
-
-import 'react-toastify/dist/ReactToastify.css';
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import { planSchema } from "../../schemas";
+import useFetchWithAuth from "../useFetchWithAuth";
 
 
 // Start:: form
-const PlanForm = ({ onSubmited, onClose }) => {
+const Form = ({ onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
-    const inputRef = useRef();
+    const contextValues = useStateContext();
+    const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doInsert } = useFetchWithAuth({
-        method: 'GET',
-        url: `/plans/${hotelId}`
+        url: `${contextValues.planAPI}/${hotelId}`
     });
-    
+
+
+    // Strat:: close modal on key press esc    
     useEffect(() => {
-        !loading && inputRef.current.focus()
-    }, [error, loading]);
+        document.addEventListener('keydown', (event) => {
+          if (event.keyCode === 27) {
+            onClosed();
+          }
+        })
     
-    const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
+        return () => {
+          document.removeEventListener('keydown', onClosed);
+        }
+    }, []);
+    // End:: close modal on key press esc    
+
+
+    // Start:: Form validate and save data
+    const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
-            keyInputName: '',
-            keyInputDescription: ''
+            keyInputName: "",
+            keyInputDescription: ""
         },
         validationSchema: planSchema,
-        onSubmit: async (values, action) => {
+        validateOnChange,
+        onSubmit: async (values) => {
             const payload = {   
-                            'name': values.keyInputName.toUpperCase(), 
-                            'description': values.keyInputDescription, 
-                        };
+                "name": values.keyInputName.toUpperCase(), 
+                "description": values.keyInputDescription
+            }
 
             await doInsert(payload);
         
             if (error === null) {
-                action.resetForm();
+                resetForm();
                 onSubmited();
             } else {
                 toast.error(error);
             }
         }
     });
+    // End:: Form validate and save data
 
+    
+    // Strat:: close form    
+    const handleClose = () => {
+        setValidateOnChange(false);
+        resetForm();
+        onClosed();
+    };
+    // End:: close form    
+
+
+    // Start:: Html
     return (
-        <form onSubmit={handleSubmit}>
+        <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column name */}
                     <div className="col-12">
+
+                        {/* Label element */}
                         <label className="form-label" 
-                            htmlFor="keyInputName">Name</label>
-                        
-                        <input
+                            htmlFor = { "keyInputName" }>Name</label>
+
+                        {/* Input element text*/}
+                        <input 
                             type="text" 
                             name="keyInputName"
-                            placeholder="name"
+                            placeholder="Name"
                             className="form-control"
                             autoComplete="off"
-                            maxLength={100}
-                            ref={inputRef}
-                            disabled={loading}
-                            value={values.keyInputName}
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            autoFocus
+                            maxLength = { 100 }
+                            disabled = { loading } 
+                            value = { values.keyInputName } 
+                            onChange = { handleChange } />
 
-                        {errors.keyInputName && 
+                        {/* Validation message */}
+                        { errors.keyInputName && 
                             touched.keyInputName ? 
-                                (<small className="text-danger">{errors.keyInputName}</small>) : 
-                                    null}
+                                (<small className="text-danger">{ errors.keyInputName }</small>) : 
+                                    null }
+                    
                     </div>
-                </div>
+                    {/* End:: Column name */}
 
+                </div>
+                {/* End:: Row */}
+
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
-                    <div className="col-12">
-                        <label className="form-label" 
-                                htmlFor={"keyInputDescription"}>Description</label>
-                        <textarea 
-                            placeholder="description"
-                            className="form-control"
-                            autoComplete="off"
-                            name={"keyInputDescription"}
-                            rows={"5"}
-                            maxLength={10000}
-                            disabled={loading}
-                            value={values.keyInputDescription} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
 
-                        {errors.keyInputDescription && 
+                    {/* Start:: Column description */}
+                    <div className="col-12">
+                        
+                        {/* Label element */}
+                        <label className="form-label" 
+                                htmlFor = { "keyInputDescription" }>Description</label>
+                        
+                        {/* Input element text*/}
+                        <textarea
+                            name = { "keyInputDescription" }
+                            rows = { "5" }
+                            placeholder = "Address"
+                            className = "form-control"
+                            autoComplete = "off"
+                            maxLength = { 1000 }
+                            disabled = { loading }
+                            value = { values.keyInputDescription } 
+                            onChange = { handleChange}  />
+
+                        {/* Validation message */}
+                        { errors.keyInputDescription && 
                             touched.keyInputDescription ? 
-                                (<small className="text-danger">{errors.keyInputDescription}</small>) : 
+                                (<small className="text-danger">{ errors.keyInputDescription }</small>) : 
                                     null}
                     </div>
+                    {/* End:: Column description */}
+
                 </div>
+                {/* End:: Row */}
+
             </Modal.Body>
+            {/* End:: Modal body */}
+
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+                
+                {/* Start:: Close button */}
                 <button 
-                    type="reset"
+                    type="button"
                     className="btn btn-danger"
-                    disabled={loading}
-                    onClick={(e) => {onClose(e)}} >
+                    disabled = { loading }
+                    onClick = { handleClose } >
                     Close
                 </button>
+                {/* End:: Close button */}
 
+                {/* Start:: Save button */}
                 <button 
-                    type="submit"
+                    type="button"
                     className="btn btn-success"
-                    disabled={loading}>
+                    disabled = { loading } 
+                    onClick = { handleSubmit } >
 
-                    {!loading && "Confirm"}
-                    {loading && 
+                    { !loading && "Confirm" }
+                    { loading && 
                         <>
                             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Working
-                        </>}
+                        </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
-        </form>                   
+            {/* End:: Modal footer */}
+
+        </form>
     );
+    // End:: Html
+
 };
 // End:: form
 
+
+
 // Start:: Component
-const PlanAdd = ({ onAdded }) => {
-    const [showModal, setShowModal] = useState(false)
+// props parameters
+// onAdded()
+// onClosed()
 
+// useImperativeHandle
+// handleShowModal
+const PlanAdd = forwardRef(( props, ref ) => {
+    const [showModal, setShowModal] = useState(false);
+
+
+    // Start:: Show modal
     const handleShowModal = () => {
-        setShowModal(true)
-    }
+        setShowModal(true);
+    };
+    // End:: Show modal
 
+
+    // Start:: Close modal
     const handleCloseModal = () => {
-        setShowModal(false)
-    }
-
-    const handleSave = () => {
-        onAdded();  
         setShowModal(false);
-    }
+        props.onClosed();
+    };
+    // End:: Close modal
+    
+    // Start:: Save
+    const handleSave = () => {
+        props.onAdded();
+        setShowModal(false);
+    };
+    // End:: Save
 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+
+    // Start:: Html
     return (
-        <div className="text-left">
-            {/* Start:: Add buttom */}
-            <OverlayTrigger
-                overlay={<Tooltip>new</Tooltip>}>
-                <button 
-                    name={"keyButtonAdd"}
-                    className="btn btn-info hover:drop-shadow-xl ml-2" 
-                    size="md" 
-                    onClick={handleShowModal}>
-                    <Paperclip className="feather-16"/>
-                </button>
-            </OverlayTrigger>
-            {/* End:: Add buttom */}
-
+        <>
             {/* Start:: Add modal */}
             <Modal 
-                show={showModal}>
+                show = { showModal } >
 
+                {/* Start:: Modal header */}
                 <Modal.Header>
+                    {/* Header text */}
                     <Modal.Title>Add plan</Modal.Title>
-                    <NavLink className="nav-icon" href="#" onClick={handleCloseModal}>
+
+                    {/* Close button */}
+                    <NavLink className="nav-icon" href="#" onClick = { handleCloseModal } >
                         <i className="align-middle"><X/></i>
                     </NavLink>
                 </Modal.Header>
+                {/* End:: Modal header */}
 
-                <PlanForm 
-                    onSubmited={handleSave} 
-                    onClose={handleCloseModal}/>
+                {/* Start:: Form component */}
+                <Form
+                    onSubmited = { handleSave } 
+                    onClosed = { handleCloseModal } />
+                {/* End:: Form component */}
+
             </Modal>
             {/* End:: Add modal */}
-
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                rtl={false}
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover />
-
-        </div>  
+        </>            
     );
-}
+    // End:: Html
+
+});
 // End:: Component
+
 
 export default PlanAdd;

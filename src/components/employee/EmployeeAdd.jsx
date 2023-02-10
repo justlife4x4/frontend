@@ -37,7 +37,7 @@ const Form = ({ onSubmited, onClosed }) => {
 
 
     // Start:: Form validate and save data
-    const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
+    const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
             keyInputAccessLevels: "",
             keyInputName: "",

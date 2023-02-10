@@ -11,8 +11,18 @@ const initialState = {
 
 export const ContextProvider = ({children}) => {
   const [baseURL, setBaseURL] = useState("http://localhost:3000/");
+  const [forgetAPI, setForgetAPI] = useState("/forgetpassword");
+  const [loginAPI, setLoginAPI] = useState("/login");
+  const [logoutAPI, setLogoutAPI] = useState("/logout");
+  const [changePasswordAPI, setChangePasswordAPI] = useState("/changePassword");
   const [accessLevelAPI, setAccessLevelAPI] = useState("/accessLevels");
   const [employeeAPI, setEmployeeAPI] = useState("/employees");
+  const [idDocumentAPI, setIdDocumentAPI] = useState("/idDocuments");
+  const [planAPI, setPlanAPI] = useState("/plans");
+  const [roomCategoryAPI, setRoomCategoryAPI] = useState("/roomCategories");
+  const [roomAPI, setRoomAPI] = useState("/rooms");
+  const [bookingAgentAPI, setBookingAgentAPI] = useState("/bookingAgents");
+
   const [screenSize, setScreenSize] = useState(undefined);
   const [currentColor, setCurrentColor] = useState("#03C9D7");
   const [currentMode, setCurrentMode] = useState("Light");
@@ -41,7 +51,9 @@ export const ContextProvider = ({children}) => {
   const handleClick = (clicked) => setIsClicked({...initialState, [clicked]: true});
 
   return (
-    <StateContext.Provider value={{initialState, baseURL, employeeAPI, accessLevelAPI, screenSize, setScreenSize, currentColor, setCurrentColor, 
+    <StateContext.Provider value={{initialState, baseURL, forgetAPI, loginAPI, logoutAPI, changePasswordAPI,
+      accessLevelAPI, employeeAPI, idDocumentAPI, planAPI, roomCategoryAPI, roomAPI, bookingAgentAPI,
+      screenSize, setScreenSize, currentColor, setCurrentColor, 
       currentMode, setCurrentMode, themeSettings, setThemeSettings, 
       activeMenu, setActiveMenu, showMenu, setShowMenu,
       isClicked, setIsClicked, itemPerRow, setItemPerRow, 

@@ -31,7 +31,7 @@ const Form = ({ onSubmited, onClosed }) => {
         return () => {
           document.removeEventListener('keydown', onClosed);
         }
-    }, [])
+    }, []);
     // End:: close modal on key press esc    
 
 
@@ -58,7 +58,7 @@ const Form = ({ onSubmited, onClosed }) => {
                 toast.error(error);
             }
         }
-    })
+    });
     // End:: Form validate and save data
 
     
@@ -67,7 +67,7 @@ const Form = ({ onSubmited, onClosed }) => {
         setValidateOnChange(false);
         resetForm();
         onClosed();
-    }
+    };
     // End:: close form    
 
 
@@ -184,10 +184,10 @@ const Form = ({ onSubmited, onClosed }) => {
             {/* End:: Modal footer */}
 
         </form>
-    )
+    );
     // End:: Html
 
-}
+};
 // End:: form
 
 
@@ -206,7 +206,7 @@ const AccessLevelAdd = forwardRef(( props, ref ) => {
     // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
-    }
+    };
     // End:: Show modal
 
 
@@ -214,14 +214,14 @@ const AccessLevelAdd = forwardRef(( props, ref ) => {
     const handleCloseModal = () => {
         setShowModal(false);
         props.onClosed();
-    }
+    };
     // End:: Close modal
     
     // Start:: Save
     const handleSave = () => {
         props.onAdded();
         setShowModal(false);
-    }
+    };
     // End:: Save
 
 
@@ -265,7 +265,7 @@ const AccessLevelAdd = forwardRef(( props, ref ) => {
     );
     // End:: Html
 
-})
+});
 // End:: Component
 
 

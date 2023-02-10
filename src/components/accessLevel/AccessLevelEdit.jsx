@@ -208,7 +208,7 @@ const AccessLevelEdit = forwardRef(( props, ref ) => {
             try {
                 showModal && await doFetch();
             } catch (err) {
-              console.log('Error occured when fetching data');
+              console.log("Error occured when fetching data");
             }
           })();
     }, [showModal]);

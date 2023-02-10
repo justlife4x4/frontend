@@ -1,14 +1,16 @@
-import {React, useContext, useEffect} from 'react';
-import {Link} from 'react-router-dom';
-import {LogOut} from 'react-feather';
+import React, { useContext, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { LogOut } from "react-feather";
 
-import {HotelId} from '../../App';
-import useFetchWithAuth from '../useFetchWithAuth';
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import useFetchWithAuth from "../useFetchWithAuth";
 
 const Logout = ({pEmployeeId, onLogout}) => {
 	const hotelId = useContext(HotelId);
+	const contextValues = useStateContext();
 	const { data, loading, error, doLogout } = useFetchWithAuth({
-        url: `/logout/${hotelId}/${pEmployeeId}`
+        url: `${contextValues.logoutAPI}/${hotelId}/${pEmployeeId}`
     });
 
 	useEffect(() => {

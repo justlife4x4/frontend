@@ -1,124 +1,238 @@
-import { React, useContext, useEffect, useState } from 'react';
-import { Breadcrumb, Container } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { Breadcrumb } from "react-bootstrap";
+import { toast } from "react-toastify";
 
-import { HotelId } from '../App';
-import { useStateContext } from '../contexts/ContextProvider';
-import RoomSearch from '../components/room/RoomSearch';
-import RoomAdd from '../components/room/RoomAdd';
-import RoomCard from '../components/room/RoomCard';
-import Paging from '../components/Paging';
-import useFetchWithAuth from '../components/useFetchWithAuth';
+import { HotelId } from "../App";
+import { useStateContext } from "../contexts/ContextProvider";
+import RoomAdd from "../components/room/RoomAdd";
+import RoomCard from "../components/room/RoomCard";
+import Paging from "../components/Paging";
+import useFetchWithAuth from "../components/useFetchWithAuth";
 
-import 'react-toastify/dist/ReactToastify.css';
 
-const Rooms = () => {
+// Start:: Component
+// props parameters
+// onSuccess
+// onClose
+
+// useImperativeHandle
+// changeSearch
+// openAdd
+// openEdit 
+// openDelete
+// close
+const Rooms = forwardRef(( props, ref ) => {
     const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
-
-    const [search, setSearch] = useState('');
-    const [selectedPage, setSelectedPage] = useState(1);
-    const [changed, setChanged] = useState(false);
-
     const itemPerRow = contextValues.itemPerRow;
     const itemPerPage = contextValues.itemPerPage;
+    const [search, setSearch] = useState("");
+    const addRef = useRef(null);
+    let cardRefs = useRef([]);
+    cardRefs.current = [itemPerRow];
+    const [selectedCardIndex, setSelectedCardIndex] = useState(null);
+    const [dataChanged, setDataChanged] = useState(false);
+    const [selectedPage, setSelectedPage] = useState(1);
     const indexOfLastItem = selectedPage * itemPerPage;
     const indexOfFirstItem = indexOfLastItem - itemPerPage;
-    
-    const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/rooms/${hotelId}`,
+    const {data, loading, error, doFetch} = useFetchWithAuth({
+        url: `${contextValues.roomAPI}/${hotelId}`,
         params: {
             search: search
         }
     });
 
+
+    // Start:: fetch data list from api
     useEffect(() => {
-        doFetch();
-        setChanged(false);
-    }, [changed, search]);
+        (async () => {
+            try {
+              await doFetch();
+              setDataChanged(false);
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [dataChanged, search]);
+    // End:: fetch data list from api
+
 
     useEffect(() => {
         error && toast.error(error);
     }, [data, error, loading]);
 
-    const handleSearch = (search) => {
-        setSearch(search);
+
+    // Start:: Change search text
+    const changeSearch = (text) => {
+        setSearch(text);
         setSelectedPage(1);
     };
+    // End:: Change search text
 
-    const handleAdded = () => {
-        toast.success('Data successfully added');
-        setChanged(true);
+    // Start:: Open add modal
+    const openAdd = () => {
+        addRef.current.handleShowModal();
     };
+    // End:: Open add modal
 
-    const handleEdited = () => {
-        toast.success('Data successfully changed');
-        setChanged(true);
-   };
-
-    const handleDeleted = () => {
-        toast.success('Room successfully deleted');
-        setChanged(true);
+    // Start:: Open edit modal
+    const openEdit = () => {
+        if (selectedCardIndex !== null) {
+            if (selectedCardIndex >= 0) { 
+                cardRefs.current.forEach((item, idx) => {
+                    if (selectedCardIndex === idx)
+                        cardRefs.current[idx] && cardRefs.current[idx].handelOpenEdit();
+                });
+            } else {
+                toast.warning("Nothing selected to edit");
+            }
+        }
     };
+    // End:: Open edit modal
 
-    const handelPaging = (pageNumber) => {
-        setSelectedPage(pageNumber)
+    // Start:: Open delete modal
+    const openDelete = () => {
+        if (selectedCardIndex !== null) {
+            if (selectedCardIndex >= 0) { 
+                cardRefs.current.forEach((item, idx) => {
+                    if (selectedCardIndex === idx)
+                        cardRefs.current[idx] && cardRefs.current[idx].handelOpenDelete();
+                });
+            } else {
+                toast.warning("Nothing selected to delete");
+            }
+        }
     };
+    // End:: Open delete modal
 
-    const displayData = (data = []) => {
+
+    // Start:: Close modal
+    const close = () => {
+        props.onClose();
+    };
+    // End:: Close modal
+    
+
+    // Start:: on data operation successfully
+    const handleSuccess = ( operation ) => {
+        switch (operation) {
+            case "add":
+                toast.success("Data successfully added");
+                setDataChanged(true);
+                props.onSuccess();
+                break;
+
+            case "edit":
+                toast.success("Data successfully changed");
+                setDataChanged(true);
+                props.onSuccess();
+                break;                
+
+            case "delete":
+                toast.success("Data successfully deleted");
+                setDataChanged(true);
+                props.onSuccess();
+                break;                
+
+            default:                
+                break;                
+        }
+    };
+    // End:: on data operation successfully
+
+
+    // Start:: change selection of card element    
+    const handleActivated = (index) => {
+            setSelectedCardIndex(index);
+
+            cardRefs.current && cardRefs.current.forEach((item, idx) => {
+                if (index !== idx)
+                    cardRefs.current[idx] && cardRefs.current[idx].handleDeSelect();
+            });
+    };
+    // End:: change selection of card element    
+
+
+    // Seart:: handle page change
+    const handlePaging = (pageNumber) => {
+        cardRefs.current = [itemPerRow];
+        setSelectedPage(pageNumber);
+    };
+    // End:: handle page change
+
+
+    // Start:: forward reff change search and open add/edit/delete modal
+    useImperativeHandle(ref, () => {
+        return {
+            changeSearch, openAdd, openEdit, openDelete, close
+        }
+    });
+    // End:: forward reff change search and open add/edit/delete modal
+
+
+    // Start:: show all data in card format
+    const displayData = (pData = []) => {
         let rowIdx = 0;
         let colIdx = 0;
         let rowData = [];
 
-        return data.map((item) => {
+        return pData.map((item) => {
             rowData.push(item);
             colIdx++;
 
-            if ((rowData.length === itemPerRow) || (data.length === colIdx)) {
+            if ((rowData.length === itemPerRow) || (pData.length === colIdx)) {
                 const r = rowIdx;
                 const d = rowData;
 
                 rowIdx++;
                 rowData = [];
 
-                return createRow(d, r) ;
+                return createRow(d, r);
             } else { 
-                return null 
+                return null;
             }
         })
-    }
+    };
 
-    const createRow = (data, rowIdx) => {
-        const rowKey = `row_${rowIdx}`;
+    const createRow = ( pData, rowIdx ) => {
+        const rowKey=`row_${rowIdx}`;
 
         return (
             <div className="row m-0 p-0" key={rowKey}>
                 {
-                    data.map((item) => {
-                        return createCol(item);
+                    pData.map((item, idx) => {
+                        const itemIdx = (rowIdx * itemPerRow) + idx;
+                        return createCol(item, itemIdx);
                     })
                 }
             </div>);
-    }
+    };
 
-    const createCol = (data = undefined) => {
-        const colKey = `col_${data._id}`;
+    const createCol = (pData = undefined, itemIdx) => {
+        const colKey = `col_${pData._id}`;
 
         return (
-            <div className="col-xl-4 col-md-4 m-0" key={colKey}>
+            <div className="col-xl-4 col-md-4 m-0" key = { colKey } >
                 <RoomCard 
-                    pCategoryId={data.categoryId}
-                    pId={data._id} 
-                    pNo={data.no}
-                    pTariff={parseFloat(data.tariff, 10).toFixed(2)}
-                    pDiscount={parseFloat(data.maxDiscount, 10).toFixed(2)}
-                    pBed={parseFloat(data.extraBedTariff, 10).toFixed(2)}
-                    pPerson={parseFloat(data.extraPersonTariff, 10).toFixed(2)}
-                    onEdited={handleEdited}
-                    onDeleted={handleDeleted} />
+                    ref = { (el) => cardRefs.current[itemIdx] = el }
+                    pIndex = { itemIdx }
+                    pId = { pData._id }
+                    pCategoryId = { pData.categoryId } 
+                    pNo = { pData.no }
+                    pTariff = { parseFloat(pData.tariff, 10).toFixed(2) }
+                    pDiscount = { parseFloat(pData.maxDiscount, 10).toFixed(2) }
+                    pBed = { parseFloat(pData.extraBedTariff, 10).toFixed(2) }
+                    pPerson = { parseFloat(pData.extraPersonTariff, 10).toFixed(2) }
+                    onEdited = { () => { handleSuccess("edit") } }
+                    onDeleted = { () => { handleSuccess("delete") } } 
+                    onClosed = { close } 
+                    onActivated = { handleActivated } />                
             </div>);
-    }
+    };
+    // End:: show all data in card format
 
+
+    // Start:: Html
     return ( 
         <>
             {/* Seart :: Bread crumb */}
@@ -129,81 +243,68 @@ const Rooms = () => {
             </Breadcrumb>
             {/* End :: Bread crumb */}
 
+            {/* Start :: display data */}
             <div className="row">
                 <div className="col-12">
                     <div className="card">
                         {/* Start :: Header & operational panel */}
-                        <div className="card-header">
-                            <Container>
-                                <div className="row">    
-                                    <div className="col-xs-12 col-md-4">
-                                        <h3>Rooms</h3>        
-                                    </div>
-                                    <div className="col-xs-12 col-md-8">
-                                        <div className="input-group justify-content-end mt-2">
-                                            <RoomSearch onSearchChange={handleSearch} />
-                                            <RoomAdd onAdded={handleAdded} />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row">    
-                                    <div className="col-12 text-right mt-4 text-muted">
-                                        {/* Start :: Display data count */}
-
-                                            {!loading && 
-                                                data && 
-                                                    `display count : ${selectedPage * itemPerPage > data.length ? data.length : selectedPage * itemPerPage} of ${data.length}`}
-                                        {/* End :: Display data count */}
-                                    </div>
-                                </div>
-                            </Container>
+                        <div className="card-header mx-3">
                         </div>
                         {/* End :: Header & operational panel */}
 
                         {/* Start :: Display data */}
-                        <div className="card-body m-0 py-0">
-                            {loading &&
+                        <div className="card-body py-0">
+                            { loading &&
                                 <div className="d-flex justify-content-center">
                                     <div className="spinner-border text-primary" role="status"/>
-                                </div>}
-                            {!loading && 
+                                </div> }
+
+                            { !loading && 
                                 data && 
-                                    displayData(data.slice(indexOfFirstItem, indexOfLastItem))}
+                                    displayData(data.slice(indexOfFirstItem, indexOfLastItem)) }
                         </div>
                         {/* End :: Display data */}
                         
-                        {/* Start :: Pagination */}
-                        <div className="row px-2 mx-4 d-flex justify-content-end">
-                            {!loading && 
-                                    data && 
-                                        <Paging
-                                            itemPerPage={itemPerPage}
-                                            totalItem={data.length}
-                                            selectedPage={selectedPage}
-                                            onPaging={handelPaging} />
-                            }
+                        <div className="card-footer ">
+                            <div className="row">
+                                {/* Start :: Display data count */}
+                                <div className="col-4 text-danger">
+                                    {!loading && 
+                                        data && 
+                                            `display count : ${selectedPage * itemPerPage > data.length ? data.length : selectedPage * itemPerPage} of ${data.length}`}
+                                </div>
+                                {/* End :: Display data count */}
+
+                                {/* Start :: Pagination */}
+                                <div className="col-8 text-muted d-flex justify-content-end">
+                                    {!loading && 
+                                            data && 
+                                                <Paging
+                                                    itemPerPage = { itemPerPage }
+                                                    totalItem = { data.length }
+                                                    selectedPage = { selectedPage }
+                                                    onPaging = { handlePaging } />}
+                                </div>
+                                {/* End :: Pagination */}
+                            </div>
                         </div>
-                        {/* End :: Pagination */}
                     </div>
                 </div>
             </div>
+            {/* End :: display data */}
 
-            {/* Start :: display message */}
-            <ToastContainer
-                position="bottom-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"/>
-            {/* End :: display message */}
+            {/* Start :: add employee component */}
+            <RoomAdd 
+                ref = { addRef }   
+                onAdded = { () => { handleSuccess("add") } }
+                onClosed = { close } />
+            {/* End :: add employee component */}
 
         </>
     );
-}
- 
+    // End:: Html
+
+});
+
+
 export default Rooms;

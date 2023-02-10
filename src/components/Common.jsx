@@ -26,27 +26,31 @@ export const getPageName = (selectedCompont) => {
 
     switch(selectedCompont) {
         case "accesslevels":
-            name = "Roles";
+            name = "Role";
             break;
 
-        case "iddocuments":
-            name = "ID Documents";
-            break;
-
-        case "employees":
-            name = "Employees";
-            break;
-        
         case "plans":
-            name = "Plans";
+            name = "Plan";
             break;
 
         case "roomcategories":
-            name = "Room Categories";
+            name = "Room category";
+            break;
+
+        case "iddocuments":
+            name = "ID document";
+            break;
+                
+        case "bookingagents":
+            name = "Booking agent";
+            break;
+
+        case "employees":
+            name = "Employee";
             break;
 
         case "rooms":
-            name = "Rooms";
+            name = "Room";
             break;
                         
         default:

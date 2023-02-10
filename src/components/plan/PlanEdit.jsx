@@ -1,206 +1,299 @@
-import { React, useContext, useEffect, useRef, useState } from 'react';
-import { Modal, NavLink } from 'react-bootstrap';
-import { useFormik } from 'formik';
-import { ToastContainer, toast } from 'react-toastify';
-import { X, Edit3 } from 'react-feather';
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { Modal, NavLink } from "react-bootstrap";
+import { useFormik } from "formik";
+import { toast } from "react-toastify";
+import { X } from "react-feather";
 
-import { HotelId } from '../../App';
-import { planSchema } from '../../schemas';
-import useFetchWithAuth from '../useFetchWithAuth';
-
-import 'react-toastify/dist/ReactToastify.css';
+import { HotelId } from "../../App";
+import { useStateContext } from "../../contexts/ContextProvider";
+import { planSchema } from "../../schemas";
+import useFetchWithAuth from "../useFetchWithAuth";
 
 
 // Start:: form
-const PlanForm = ({ pId, pName, pDescription, onSubmited, onClose }) => {
+const Form = ({ pId, pName, pDescription, onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
-    const inputRef = useRef();
+    const contextValues = useStateContext();
+    const inputRef = useRef(null);
+    const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doUpdate } = useFetchWithAuth({
-        url: `/plans/${hotelId}/${pId}`
+        url: `${contextValues.planAPI}/${hotelId}/${pId}`
     });
-    
-    useEffect(() => {
-        !loading && inputRef.current.focus()
-    }, [loading, error]);
 
-    const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
+
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        !loading && inputRef.current.focus();
+        
+        document.addEventListener('keydown', (event) => {
+            if (event.keyCode === 27) {
+                onClosed()
+            }
+        });
+
+        return () => {
+            document.removeEventListener('keydown', onClosed);
+        }
+    }, []);
+    // End:: close modal on key press esc    
+
+
+    // Start:: Form validate and save data
+    const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
             keyInputName: pName,
-            keyInputDescription: pDescription,
+            keyInputDescription: pDescription
         },
         validationSchema: planSchema,
-        onSubmit: async (values, action) => {
+        onSubmit: async (values) => {
             const payload = {   
-                                'name': values.keyInputName.toUpperCase(), 
-                                'description': values.keyInputDescription 
-                            };
+                "name": values.keyInputName.toUpperCase(), 
+                "address": values.keyInputDescription
+            }
 
             await doUpdate(payload);
         
             if (error === null) {
-                action.resetForm();
+                resetForm();
                 onSubmited();
             } else {
                 toast.error(error);
             }
         }
     });
+    // End:: Form validate and save data
 
+
+    // Strat:: close form    
+    const handleClose = () => {
+        setValidateOnChange(false);
+        resetForm();
+        onClosed();
+    };
+    // End:: close form    
+
+
+    // Start:: Html
     return (
         <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
+
+                {/* Start:: Row */}
                 <div className="row mb-2">
-                    <div className="col-xs-12 col-md-12">
+                    
+                    {/* Start:: Column role */}
+                    <div className="col-12">
+
+                        {/* Label element */}
                         <label className="form-label" 
                             htmlFor="keyInputName">Name</label>
-                        
+
+                        {/* Input element text*/}
                         <input 
                             type="text" 
                             id="keyInputName"
-                            placeholder="name"
                             className="form-control"
+                            placeholder="Name" 
                             autoComplete="off"
-                            maxLength={100}
-                            value={values.keyInputName}
-                            disabled={true}
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            maxLength = { 100 }
+                            disabled = { true }
+                            value = { values.keyInputName } 
+                            onChange = { handleChange } />
 
-                    {errors.keyInputName && 
-                        touched.keyInputName ? 
-                            (<small className="text-danger">{errors.keyInputName}</small>) : 
-                                null}
+                        {/* Validation message */}
+                        { errors.keyInputName && 
+                            touched.keyInputName ? 
+                                (<small className="text-danger">{ errors.keyInputName }</small>) : 
+                                    null }
                     </div>
-                </div>
+                    {/* End:: Column role */}
 
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
                 <div className="row mb-2">
+
+                    {/* Start:: Column description */}
                     <div className="col-12">
-                        <label className="form-label" htmlFor="keyInputDescription">Description</label>
+
+                        {/* Label element */}
+                        <label className="form-label" 
+                            htmlFor="keyInputDescription">Description</label>
+
+                        {/* Input element text*/}
                         <textarea 
                             id="keyInputDescription"
-                            placeholder="description"
+                            placeholder="Description"
                             className="form-control"
-                            rows={"5"}
-                            ref={inputRef}
-                            disabled={loading || error !== null}
-                            value={values.keyInputDescription} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            rows = { "5" }
+                            maxLength = { "256" }
+                            disabled = { loading || error !== null }
+                            ref = { inputRef }
+                            value = { values.keyInputDescription } 
+                            onChange = { handleChange } />
 
-                    {errors.keyInputDescription && 
+                    {/* Validation message */}
+                    { errors.keyInputDescription && 
                         touched.keyInputDescription ? 
-                            (<small className="text-danger">{errors.keyInputDescription}</small>) : 
-                                null}
+                            (<small className="text-danger">{ errors.keyInputDescription }</small>) : 
+                                null }
                     </div>
+                    {/* End:: Column role */}
+
                 </div>
+                {/* End:: Row */}
 
             </Modal.Body>
+            {/* End:: Modal body */}
 
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+
+                {/* Start:: Close button */}
                 <button
-                    type="reset"
+                    type="button"
                     className="btn btn-danger"
-                    disabled={loading}
-                    onClick={(e) => {onClose(e)}}>
+                    disabled = { loading }
+                    onClick = { handleClose } >
                     Close
                 </button>
+                {/* End:: Close button */}
                 
+                {/* Start:: Save button */}
                 <button 
+                    type="button"
                     className="btn btn-success"
-                    onClick={handleSubmit}
-                    disabled={loading} >
+                    disabled = { loading } 
+                    onClick = { handleSubmit } >
 
-                    {!loading && "Confirm"}
-                    {loading && 
+                    { !loading && "Confirm" }
+                    { loading && 
                                 <>
                                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                     Working
-                                </>}
+                                </> }
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form> 
     );
+    // End:: Html
+
 };
 // End:: form
 
+
 // Start:: Component
-const PlanEdit = ({ pId, onEdited }) => {
+// props parameters
+// pId
+// onEdited()
+// onClosed()
+
+// useImperativeHandle
+// handleShowModal
+const PlanEdit = forwardRef(( props, ref ) => {    
     const hotelId = useContext(HotelId);
+    const contextValues = useStateContext();
     const [showModal, setShowModal] = useState(false);
     const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/plans/${hotelId}/${pId}`
+        url: `${contextValues.planAPI}/${hotelId}/${props.pId}`
     });
 
+    // Start:: fetch id wise detail from api
     useEffect(() => {
-        doFetch();
-    }, [pId]);
+        (async () => {
+            try {
+                showModal && await doFetch();
+            } catch (err) {
+              console.log('Error occured when fetching data');
+            }
+          })();
+    }, [showModal]);
+    // End:: fetch id wise detail from api
+
 
     useEffect(() => {
         error && toast.error(error);
-    }, [data, error, loading, pId, showModal]);
+    }, [data, error, loading]);
 
+
+    // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
     };
+    // End:: Show modal
 
+
+    // Start:: Close modal
     const handleCloseModal = () => {
         setShowModal(false);
+        props.onClosed();
     };
+    // End:: Close modal
 
-    const handleSave = () => {
-        onEdited();
+
+    // Start:: Save
+    const handleSave = () => { 
         setShowModal(false);
-    }
+        props.onEdited();
+    };
+    // End:: Save
 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+
+    // Start:: Html
     return (
-        <div className="text-left">
-            {/* Start:: Edit buttom */}
-            <span 
-                className="pr-5" 
-                onClick={(e) => {handleShowModal()}}>
-                <Edit3 className="feather-16 mr-3"/>Edit
-            </span>
-            {/* End:: Edit buttom */}
-
+        <>
             {/* Start:: Edit modal */}
-            <Modal 
-                show={ showModal }>
+            { data &&
+                <Modal 
+                    show = { showModal } >
 
-                <Modal.Header>
-                    <Modal.Title>Edit plan</Modal.Title>
-                    <NavLink 
-                        className="nav-icon" href="#" 
-                        onClick={(e) => {handleCloseModal()}}>
-                        <i className="align-middle"><X/></i>
-                    </NavLink>
-                </Modal.Header>
+                    {/* Start:: Modal header */}
+                    <Modal.Header>
+                        {/* Header text */}
+                        <Modal.Title>Edit plan</Modal.Title>
+                        
+                        {/* Close button */}
+                        <NavLink 
+                            className="nav-icon" href="#" 
+                            onClick={handleCloseModal}>
+                            <i className="align-middle"><X/></i>
+                        </NavLink>
+                    </Modal.Header>
+                    {/* End:: Modal header */}
 
-                { data &&
-                    <PlanForm 
-                        pId={pId}
-                        pName={data.name}
-                        pDescription={data.description}
-                        onSubmited={handleSave} 
-                        onClose={handleCloseModal} />
-                }
-            </Modal>
+                    {/* Start:: Form component */}
+                    <Form 
+                        pId = { data._id }    
+                        pName = { data.name }
+                        pDescription = { data.description }
+                        onSubmited = { handleSave } 
+                        onClosed = { handleCloseModal } />
+                        {/* End:: Form component */}
+                    
+                </Modal>}
             {/* End:: Edit modal */}
-
-            <ToastContainer
-                position="bottom-right"
-                theme="colored"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                rtl={false}
-                closeOnClick
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover />
-
-        </div>  
+        </>
     );
-}
+    // End:: Html
+
+});
 // End:: Component
+
 
 export default PlanEdit;
