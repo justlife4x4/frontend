@@ -28,7 +28,7 @@ const Form = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onSubmited
         
         document.addEventListener('keydown', (event) => {
             if (event.keyCode === 27) {
-                onClosed()
+                onClosed();
             }
         });
 
@@ -365,7 +365,7 @@ const EmployeeEdit = forwardRef(( props, ref ) => {
                         {/* Close button */}
                         <NavLink 
                             className="nav-icon" href="#" 
-                            onClick={handleCloseModal}>
+                            onClick = { handleCloseModal } >
                             <i className="align-middle"><X/></i>
                         </NavLink>
                     </Modal.Header>

@@ -151,7 +151,6 @@ const RoomCategoryView = forwardRef(( props, ref ) => {
               console.log('Error occured when fetching data');
             }
           })();
-
     }, [props.pId, showModal]);
     // End:: fetch id wise detail from api
 

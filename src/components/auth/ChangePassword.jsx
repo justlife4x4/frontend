@@ -11,19 +11,34 @@ import useFetchWithAuth from "../useFetchWithAuth";
 
 
 // Start:: form
-const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
+const Form = ({ pId, onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
+    const [validateOnChange, setValidateOnChange] = useState(false);
     const inputRef = useRef();
     const { loading, error, doUpdate } = useFetchWithAuth({
-        url: `${contextValues.changePasswordAPI}/${hotelId}/${pEmployeeId}`
+        url: `${contextValues.changePasswordAPI}/${hotelId}/${pId}`
     });
+    
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener('keydown', (event) => {
+            if (event.keyCode === 27) {
+                onClosed();
+            }
+        })
+    
+        return () => {
+            document.removeEventListener('keydown', onClosed);
+        }
+    }, []);
+    // End:: close modal on key press esc    
     
     useEffect(() => {
         !loading && inputRef.current.focus();
     }, [loading, error]);
 
-    const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
+    const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
             keyInputOldPassword: "",
             keyInputNewPassword: "",
@@ -39,7 +54,7 @@ const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
             await doUpdate(payload);
 
             if (error === null) {
-                action.resetForm();
+                resetForm();
                 onSubmited();
             } else {
                 toast.error(error);
@@ -47,61 +62,100 @@ const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
         }
     });
 
+    // Strat:: close form    
+    const handleClose = () => {
+        setValidateOnChange(false);
+        resetForm();
+        onClosed();
+    };
+    // End:: close form        
+
+    // Start:: Html
     return (
-        <form onSubmit={handleSubmit}>
+        <form>
+
+            {/* Start:: Modal body */}
             <Modal.Body>
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column old password */}
                     <div className="col-12">
+                        
+                        {/* Label element */}
                         <label className="form-label" 
                             htmlFor="keyInputOldPassword">Old password</label>
                         
+                        {/* Input element text*/}
                         <input
                             type="password" 
                             name="keyInputOldPassword"
                             placeholder="old password"
                             className="form-control"
                             autoComplete="off"
-                            maxLength={100}
-                            ref={inputRef}
-                            disabled={loading}
-                            value={values.keyInputOldPassword}
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            maxLength = { 100 }
+                            ref = { inputRef }
+                            disabled = { loading }
+                            value = { values.keyInputOldPassword }
+                            onChange = { handleChange } />
 
+                        {/* Validation message */}
                         {errors.keyInputOldPassword && 
                             touched.keyInputOldPassword ? 
                                 (<small className="text-danger">{ errors.keyInputOldPassword }</small>) : 
                                     null}
                     </div>
-                </div>
+                    {/* End:: Column old password */}
 
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column new password */}
                     <div className="col-12">
+
+                        {/* Label element */}
                         <label className="form-label" 
                                 htmlFor={"keyInputNewPassword"}>New password</label>
+                        
+                        {/* Input element text*/}
                         <input 
                             type="password" 
                             name={"keyInputNewPassword"}
                             placeholder="new password"
                             className="form-control"
                             autoComplete="off"
-                            maxLength={100}
-                            disabled={loading}
-                            value={values.keyInputNewPassword} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            maxLength = { 100 }
+                            disabled = { loading }
+                            value = { values.keyInputNewPassword } 
+                            onChange = { handleChange } />
 
+                        {/* Validation message */}
                         {errors.keyInputNewPassword && 
                             touched.keyInputNewPassword ? 
                                 (<small className="text-danger">{errors.keyInputNewPassword}</small>) : 
                                     null}
-                    </div>
-                </div>
 
+                    </div>
+                    {/* End:: Column new password */}
+
+                </div>
+                {/* End:: Row */}
+
+                {/* Start:: Row */}
                 <div className="row mb-3">
+
+                    {/* Start:: Column re-enter new password */}
                     <div className="col-12">
+
+                        {/* Label element */}
                         <label className="form-label" 
                                 htmlFor={"keyInputReEnterNewPassword"}>Re enter new password</label>
+                        
+                        {/* Input element text*/}
                         <input 
                             type="password" 
                             name={"keyInputReEnterNewPassword"}
@@ -111,29 +165,42 @@ const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
                             maxLength={100}
                             disabled={loading}
                             value={values.keyInputReEnterNewPassword} 
-                            onChange={handleChange}
-                            onBlur={handleBlur} />
+                            onChange={handleChange} />
 
+                        {/* Validation message */}
                         {errors.keyInputReEnterNewPassword && 
                             touched.keyInputNewPassword ? 
                                 (<small className="text-danger">{errors.keyInputReEnterNewPassword}</small>) : 
                                     null}
+                    
                     </div>
+                    {/* End:: Column re-enter new password */}
+
                 </div>
+                {/* End:: Row */}
+
             </Modal.Body>
+            {/* End:: Modal body */}
+
+            {/* Start:: Modal footer */}
             <Modal.Footer>
+
+                {/* Start:: Close button */}
                 <button 
                     type="reset"
                     className="btn btn-danger"
-                    disabled={loading}
-                    onClick={onClose} >
+                    disabled = { loading }
+                    onClick = { handleClose } >
                     Close
                 </button>
+                {/* End:: Close button */}
 
+                {/* Start:: Save button */}
                 <button 
-                    type="submit"
                     className="btn btn-success"
-                    disabled={loading} >
+                    type="button"
+                    disabled = { loading } 
+                    onClick = { handleSubmit } >
 
                     {!loading && "Confirm"}
                     {loading && 
@@ -142,63 +209,43 @@ const ChangePasswordForm = ({pEmployeeId, onSubmited, onClose}) => {
                             Working
                         </>}
                 </button>
+                {/* End:: Save button */}
+
             </Modal.Footer>
+            {/* End:: Modal footer */}
+
         </form>                   
     );
+    // End:: Html
+
 };
 // End:: form
 
 // Start:: Component
-const ChangePassword = ({pEmployeeId, onEdited}) => {
-    const hotelId = useContext(HotelId);
-    const contextValues = useStateContext();
+const ChangePassword = ({ pEmployeeId, onEdited, onClosed }) => {
     const [showModal, setShowModal] = useState(false);
-    const { data, loading, error, doChangePassword } = useFetchWithAuth({
-        url: `${contextValues.changePasswordAPI}/${hotelId}/${pEmployeeId}`
-    });
-    
-    useEffect(() => {
-        error && toast.error(error);
-    }, [data, error, loading, pEmployeeId, showModal]);
 
-    const {values, errors, handleBlur, handleChange, touched, handleSubmit} = useFormik({
-        initialValues: {
-            keyInputOldPassword: "",
-            keyInputNewPassword: "",
-            keyInputReEnterNewPassword: "",
-        },
-        validationSchema: changePasswordSchema,
-        onSubmit: async (values, action) => {
-            const payload = {   
-                            "oldPassword": values.keyInputOldPassword, 
-                            "newPassword": values.keyInputNewPassword 
-                        };
-
-            await doChangePassword(payload)
-
-            if (error === null) {
-                action.resetForm();
-                handleSave();
-            } else {
-                toast.error(error);
-            }
-        }
-    });
-
+    // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
     };
+    // End:: Show modal
 
+    // Start:: Close modal
     const handleCloseModal = () => {
         setShowModal(false);
+        onClosed();
     };
+    // End:: Close modal
 
+    // Start:: Save
     const handleSave = () => {
-        toast.success("Data successfully updated");
         setShowModal(false);
         onEdited();
     };
+    // End:: Save
 
+    // Start:: Html
     return (
         <div className="text-left">
             {/* Start:: Change password link */}
@@ -211,23 +258,35 @@ const ChangePassword = ({pEmployeeId, onEdited}) => {
             {/* Start:: Mod modal */}
             <Modal 
                 show={showModal}>
+
+                {/* Start:: Modal header */}
                 <Modal.Header>
+                    {/* Header text */}
                     <Modal.Title>Change password</Modal.Title>
+
+                    {/* Close button */}
                     <NavLink className="nav-icon" href="#" onClick={handleCloseModal}>
                         <i className="align-middle"><X/></i>
                     </NavLink>
                 </Modal.Header>
+                {/* End:: Modal header */}
 
-                <ChangePasswordForm
-                    pEmployeeId={pEmployeeId}
-                    onSubmited={handleSave} 
-                    onClose={handleCloseModal} />
+                {/* Start:: Form component */}
+                <Form
+                    pId = { pEmployeeId }
+                    onSubmited = { handleSave } 
+                    onClosed = { handleCloseModal } />
+                {/* End:: Form component */}                                            
+
             </Modal>
             {/* End:: Mod modal */}
 
         </div>  
     );
+    // End:: Html
+
 };
 // End:: Component
 
-export default ChangePassword
+
+export default ChangePassword;

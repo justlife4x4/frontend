@@ -11,6 +11,7 @@ const Search = forwardRef(( props, ref ) => {
     const inputRef = useRef(null);
 
     useEffect(() => {
+        inputRef.current.value = "";
         setFocus();
     }, [props.currentPage]);
 

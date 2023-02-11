@@ -1,10 +1,13 @@
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { Nav, Navbar, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useNavigate, NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
 import { ChevronsLeft, ChevronsRight, Paperclip, Edit3, Scissors, AtSign } from "react-feather";
 
+import { HotelId } from "../App";
 import { useStateContext } from "../contexts/ContextProvider";
 import { getFirstName, getPageName } from "../components/Common";
+import useFetchWithAuth from "./useFetchWithAuth";
 import Search from "../components/Search";
 import ChangePassword from "./auth/ChangePassword";
 import Profile from "./auth/Profile";
@@ -24,7 +27,8 @@ import Logout from "./auth/Logout";
 // useImperativeHandle
 // changePage
 // success
-const NavbarLogin = forwardRef(( props, ref ) => {        
+const NavbarLogin = forwardRef(( props, ref ) => {   
+    const hotelId = useContext(HotelId);     
     const contextValues = useStateContext();
     const [menuState, setMenuState] = useState(contextValues.showMenu);
     const [selectedPage, setSelectedPage] = useState(null);
@@ -32,7 +36,12 @@ const NavbarLogin = forwardRef(( props, ref ) => {
     const [sideBarHeaderTextClass, setSideBarHeaderTextClass] = useState("");
     const searchRef = useRef(null);
     const navigate = useNavigate();
-
+    const {data, loading, error, doFetch} = useFetchWithAuth({
+        url: `${contextValues.employeeAPI}/${hotelId}/${props.pEmployeeId}`
+    });
+	const { dataLogout, loadingLogout, errorLogout, doLogout } = useFetchWithAuth({
+        url: `${contextValues.logoutAPI}/${hotelId}/${props.pEmployeeId}`
+    });
 
     useEffect(() => {
         menuState && setSideBarHeaderClass("sidebar");
@@ -45,18 +54,48 @@ const NavbarLogin = forwardRef(( props, ref ) => {
         props.onShowHideSideBar(menuState);
     }, [menuState]);
 
-
     // Start:: on success of user options
     const handleShowHideMenu = () => {
         setMenuState(!menuState);
     };
 
-    const handleChangeProfileSuccess = () => {
-        // e.preventDefault();
+    const handleClose = () => {
     };
     
-    const handleChangePasswordSuccess = () => {
-        // e.preventDefault();
+    const handleChangeProfileSuccess = async () => {
+        toast.success("Profile successfully updated & your password has been reseated");
+
+        (async () => {
+            try {
+                await doFetch();
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+        })();
+
+        (async () => {
+            try {
+                await doLogout();
+
+                handleLogoutSuccess();
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+        })();        
+    };
+    
+    const handleChangePasswordSuccess = async() => {
+        toast.success("Password successfully updated");
+
+        (async () => {
+            try {
+                await doLogout();
+
+                handleLogoutSuccess();
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
     };
         
     const handleLogoutSuccess = () => {
@@ -204,7 +243,8 @@ const NavbarLogin = forwardRef(( props, ref ) => {
                             data-toggle="dropdown">
                             <span className="text-dark fw-bold mx-2">
                                 <AtSign size={20} className="mx-1"/>
-                                { getFirstName(props.pEmployeeName) }
+                                { data && getFirstName(data.name) }
+                                { !data && getFirstName(props.pEmployeeName) }
                             </span>
                         </a>
                         {/* End:: user first name & menu icon */}
@@ -214,12 +254,14 @@ const NavbarLogin = forwardRef(( props, ref ) => {
                             {/* Profile component */}
                             <Profile 
                                 pEmployeeId = { props.pEmployeeId }
-                                onEdited = { handleChangeProfileSuccess } />
+                                onEdited = { handleChangeProfileSuccess } 
+                                onClosed = { handleClose } />
 
                             {/* Change password component */}
                             <ChangePassword 
                                 pEmployeeId = { props.pEmployeeId }
-                                onChanged = { handleChangePasswordSuccess } />
+                                onEdited = { handleChangePasswordSuccess }
+                                onClosed = { handleClose } />
 
                             {/* Logout component */}
                             <Logout
