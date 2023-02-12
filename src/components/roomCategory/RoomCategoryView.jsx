@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { Modal, NavLink } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { X } from "react-feather";
@@ -10,23 +10,6 @@ import useFetchWithAuth from "../useFetchWithAuth";
 
 // Start:: form
 const Form = ({ pName, pTariff, pDiscount, pBed, pPerson, onClosed }) => {
-    const buttonRef = useRef(null);
-
-    // Strat:: close modal on key press esc    
-    useEffect(() => {
-        buttonRef.current.focus();
-        
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") onClosed();
-        });
-
-        return () => {
-            document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
-
-    
     // Start:: Html
     return (
         <form>
@@ -105,9 +88,9 @@ const Form = ({ pName, pTariff, pDiscount, pBed, pPerson, onClosed }) => {
 
                 {/* Start:: Close button */}
                 <button
-                    ref = { buttonRef }
                     type = "button"
                     className = "btn btn-danger"
+                    autoFocus
                     onClick = { onClosed } >
                     Close
                 </button>
@@ -139,30 +122,11 @@ const RoomCategoryView = forwardRef(( props, ref ) => {
         url: `${contextValues.roomCategoryAPI}/${hotelId}/${props.pId}`
     });
 
-
-    // Start:: fetch id wise detail from api
-    useEffect(() => {
-        (async () => {
-            try {
-                showModal && await doFetch();
-            } catch (err) {
-              console.log('Error occured when fetching data');
-            }
-          })();
-    }, [props.pId, showModal]);
-    // End:: fetch id wise detail from api
-
-    useEffect(() => {
-        error && toast.error(error);
-    }, [data, error, loading]);
-
-
     // Start :: Show modal 
     const handleShowModal = () => {
         setShowModal(true);
     };
     // End :: Show modal 
-
 
     // Start :: Close modal 
     const handleCloseModal = () => {
@@ -170,7 +134,6 @@ const RoomCategoryView = forwardRef(( props, ref ) => {
         props.onClosed();
     };
     // End :: Close modal 
-
 
     // Start:: forward reff show modal function
     useImperativeHandle(ref, () => {
@@ -180,7 +143,34 @@ const RoomCategoryView = forwardRef(( props, ref ) => {
     });
     // End:: forward reff show modal function
 
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
 
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
+
+    // Start:: fetch id wise detail from api
+    useEffect(() => {
+        (async () => {
+            try {
+                showModal && await doFetch();
+            } catch (err) {
+                console.log("Error occured when fetching data");
+            }
+            })();
+    }, [showModal, props.pId, doFetch]);
+    // End:: fetch id wise detail from api
+
+    useEffect(() => {
+        error && toast.error(error);
+    }, [data, error, loading]);
+    
     // Start:: Html
     return (
         <>

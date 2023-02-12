@@ -19,20 +19,6 @@ const Form = ({ onSubmited, onClosed }) => {
         url: `${contextValues.roomCategoryAPI}/${hotelId}`
     });
 
-
-    // Strat:: close modal on key press esc    
-    useEffect(() => {
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") onClosed();
-        });
-
-        return () => {
-            document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
-
-
     // Start:: Form validate and save data
     const { values, errors, touched, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
@@ -64,7 +50,6 @@ const Form = ({ onSubmited, onClosed }) => {
         }
     });
     // End:: Form validate and save data
-
     
     // Strat:: close form    
     const handleClose = () => {
@@ -73,7 +58,6 @@ const Form = ({ onSubmited, onClosed }) => {
         onClosed();
     };
     // End:: close form    
-
 
     // Start:: Html
     return (
@@ -279,7 +263,6 @@ const Form = ({ onSubmited, onClosed }) => {
 // End:: form
 
 
-
 // Start:: Component
 // props parameters
 // onAdded()
@@ -290,13 +273,11 @@ const Form = ({ onSubmited, onClosed }) => {
 const RoomCategoryAdd = forwardRef(( props, ref ) => {
     const [showModal, setShowModal] = useState(false);
 
-
     // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
     };
     // End:: Show modal
-
 
     // Start:: Close modal
     const handleCloseModal = () => {
@@ -312,7 +293,6 @@ const RoomCategoryAdd = forwardRef(( props, ref ) => {
     };
     // End:: Save
 
-
     // Start:: forward reff show modal function
     useImperativeHandle(ref, () => {
         return {
@@ -321,6 +301,17 @@ const RoomCategoryAdd = forwardRef(( props, ref ) => {
     });
     // End:: forward reff show modal function
 
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
+
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
 
     // Start:: Html
     return (
