@@ -19,18 +19,6 @@ const Form = ({ pId, pAccessLevels, pName, pAddress, pMobile, pEmail, onSubmited
     const {loading, error, doUpdate} = useFetchWithAuth({
         url: `${contextValues.employeeAPI}/${hotelId}/${pId}`
     });
-
-    // Strat:: close modal on key press esc    
-    useEffect(() => {
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") onClosed();
-        });
-
-        return () => {
-            document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
     
     const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
@@ -276,20 +264,6 @@ const Profile = ({ pEmployeeId, onEdited, onClosed }) => {
         url: `${contextValues.employeeAPI}/${hotelId}/${pEmployeeId}`
     });
 
-    useEffect(() => {
-        (async () => {
-            try {
-                pEmployeeId && await doFetch();
-            } catch (err) {
-              console.log("Error occured when fetching data");
-            }
-          })();
-    }, [showModal]);
-
-    useEffect(() => {
-        error && toast.error(error);
-    }, [data, error, loading, pEmployeeId, showModal]);
-
     // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
@@ -309,6 +283,34 @@ const Profile = ({ pEmployeeId, onEdited, onClosed }) => {
         onEdited();
     };
     // End:: Save
+
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
+
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
+
+    // Start:: fetch id wise detail from api
+    useEffect(() => {
+        (async () => {
+            try {
+                pEmployeeId && showModal && await doFetch();
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [pEmployeeId, showModal, doFetch]);
+    // End:: fetch id wise detail from api
+
+    useEffect(() => {
+        error && toast.error(error);
+    }, [data, error, loading, pEmployeeId, showModal]);
 
     // Start:: Html
     return (

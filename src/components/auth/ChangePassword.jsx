@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { Modal, NavLink } from "react-bootstrap";
 import { toast } from "react-toastify";
@@ -15,26 +15,9 @@ const Form = ({ pId, onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
     const [validateOnChange, setValidateOnChange] = useState(false);
-    const inputRef = useRef();
     const { loading, error, doUpdate } = useFetchWithAuth({
         url: `${contextValues.changePasswordAPI}/${hotelId}/${pId}`
     });
-    
-    // Strat:: close modal on key press esc    
-    useEffect(() => {
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") onClosed();
-        });
-
-        return () => {
-            document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
-    
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-    }, [loading, error]);
 
     const { values, errors, touched, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
@@ -93,8 +76,8 @@ const Form = ({ pId, onSubmited, onClosed }) => {
                             placeholder="old password"
                             className="form-control"
                             autoComplete="off"
+                            autoFocus
                             maxLength = { 100 }
-                            ref = { inputRef }
                             disabled = { loading }
                             value = { values.keyInputOldPassword }
                             onChange = { handleChange } />
@@ -244,6 +227,18 @@ const ChangePassword = ({ pEmployeeId, onEdited, onClosed }) => {
     };
     // End:: Save
 
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
+
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
+    
     // Start:: Html
     return (
         <div className="text-left">

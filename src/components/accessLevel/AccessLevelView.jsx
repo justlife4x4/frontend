@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { Modal, NavLink } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { X } from "react-feather";
@@ -9,23 +9,6 @@ import useFetchWithAuth from "../useFetchWithAuth";
 
 // Start:: form
 const Form = ({ pName, pDescription, onClosed }) => {
-    const buttonRef = useRef(null);
-
-    // Strat:: close modal on key press esc    
-    useEffect(() => {
-        buttonRef.current.focus();
-        
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") onClosed();
-        });
-
-        return () => {
-            document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
-
-    
     // Start:: Html
     return (
         <form>
@@ -70,9 +53,9 @@ const Form = ({ pName, pDescription, onClosed }) => {
 
                 {/* Start:: Close button */}
                 <button
-                    ref = { buttonRef }
                     type = "button"
                     className = "btn btn-danger"
+                    autoFocus
                     onClick = { onClosed } >
                     Close
                 </button>
@@ -103,6 +86,38 @@ const AccessLevelView = forwardRef(( props, ref ) => {
         url: `${contextValues.accessLevelAPI}/${props.pId}`
     });
 
+    // Start :: Show modal 
+    const handleShowModal = () => {
+        setShowModal(true);
+    };
+    // End :: Show modal 
+
+    // Start :: Close modal 
+    const handleCloseModal = () => {
+        setShowModal(false);
+        props.onClosed();
+    };
+    // End :: Close modal 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
+
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
 
     // Start:: fetch id wise detail from api
     useEffect(() => {
@@ -114,37 +129,12 @@ const AccessLevelView = forwardRef(( props, ref ) => {
             }
           })();
 
-    }, [props.pId, showModal]);
+    }, [props.pId, showModal, doFetch]);
     // End:: fetch id wise detail from api
 
     useEffect(() => {
         error && toast.error(error);
     }, [data, error, loading]);
-
-
-    // Start :: Show modal 
-    const handleShowModal = () => {
-        setShowModal(true);
-    };
-    // End :: Show modal 
-
-
-    // Start :: Close modal 
-    const handleCloseModal = () => {
-        setShowModal(false);
-        props.onClosed();
-    };
-    // End :: Close modal 
-
-
-    // Start:: forward reff show modal function
-    useImperativeHandle(ref, () => {
-        return {
-            handleShowModal
-        }
-    });
-    // End:: forward reff show modal function
-
 
     // Start:: Html
     return (

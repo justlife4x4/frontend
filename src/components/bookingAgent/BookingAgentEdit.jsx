@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { Modal, NavLink } from "react-bootstrap";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
@@ -12,7 +12,6 @@ import useFetchWithAuth from "../useFetchWithAuth";
 // Start:: form
 const Form = ({ pId, pName, pDescription, onSubmited, onClosed }) => {
     const contextValues = useStateContext();
-    const inputRef = useRef(null);
     const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doUpdate } = useFetchWithAuth({
         url: `${contextValues.bookingAgentAPI}/${pId}`

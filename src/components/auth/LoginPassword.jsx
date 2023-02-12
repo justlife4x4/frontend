@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef} from "react";
+import React, { useContext } from "react";
 import { useFormik } from "formik";
 import { NavLink } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
@@ -14,18 +14,10 @@ import "react-toastify/dist/ReactToastify.css";
 const LoginPassword = ({ onSuccess, onBack }) => {
 	const hotelId = useContext(HotelId);
 	const contextValues = useStateContext();
-	const inputRef = useRef();
-
 	const { data, loading, error, doLoginPassword } = useFetch({
         method: 'POST',
         url: `${contextValues.loginAPI}/${hotelId}`
     });
-    
-    useEffect(() => {
-		!loading && inputRef.current.focus()
-		data && onSuccess(data.accessToken, data.refreshToken);
-		error && toast.error(error);
-    }, [data, error, loading]);
 
     const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
         initialValues: {
@@ -33,13 +25,19 @@ const LoginPassword = ({ onSuccess, onBack }) => {
             keyInputPassword: "pixel"
         },
         validationSchema: loginPasswordSchema,
-        onSubmit: async (values, action) => {
+        onSubmit: async (values) => {
             const payload = {   
                             "userName": values.keyInputUser, 
                             "password": values.keyInputPassword
                         };
 						
             await doLoginPassword(payload);
+
+			if (error === null) {
+                onSuccess(data.accessToken, data.refreshToken);
+            } else {
+                toast.error(error);
+            }
         }
     });
    
@@ -62,8 +60,8 @@ const LoginPassword = ({ onSuccess, onBack }) => {
 								placeholder="mobile no. / email"
 								className="form-control"
 								autoComplete="off"
+								autoFocus
 								maxLength={ 100 }
-								ref = { inputRef }
 								disabled={ loading } 
 								value={ values.keyInputUser } 
 								onChange={ handleChange }

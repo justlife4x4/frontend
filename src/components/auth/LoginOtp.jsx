@@ -1,4 +1,4 @@
-import { React, useContext, useEffect, useRef } from "react";
+import { React, useContext } from "react";
 import { useFormik } from "formik";
 import { NavLink } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
@@ -14,18 +14,10 @@ import "react-toastify/dist/ReactToastify.css";
 const LoginOtp = ({ onSuccess, onBack }) => {
 	const hotelId = useContext(HotelId);
 	const contextValues = useStateContext();
-	const inputRef = useRef();
-
 	const { data, loading, error, doLoginOtp } = useFetch({
         method: "PUT",
         url: `${contextValues.loginAPI}/${hotelId}`
     });
-    
-    useEffect(() => {
-		data && onSuccess(data.accessToken, data.refreshToken);
-		!loading && inputRef.current.focus()
-		error && toast.error(error);
-    }, [data, error, loading]);
 
     const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
         initialValues: {
@@ -40,6 +32,12 @@ const LoginOtp = ({ onSuccess, onBack }) => {
                         };
 						
             await doLoginOtp(payload);
+
+			if (error === null) {
+                onSuccess(data.accessToken, data.refreshToken);
+            } else {
+                toast.error(error);
+            }
         }
     });
    
@@ -86,8 +84,8 @@ const LoginOtp = ({ onSuccess, onBack }) => {
 								placeholder="otp"
 								className="form-control"
 								autoComplete="off"
+								autoFocus
 								maxLength={ 6 }
-								ref = { inputRef }
 								disabled={ loading } 
 								value={ values.keyInputOtp } 
 								onChange={ handleChange }

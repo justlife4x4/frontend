@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext } from "react";
 import { useFormik } from "formik";
 import { NavLink } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
@@ -14,18 +14,10 @@ import "react-toastify/dist/ReactToastify.css";
 const ForgetPassword = ({ onSuccess, onBack }) => {
 	const hotelId = useContext(HotelId);
 	const contextValues = useStateContext();
-	const inputRef = useRef();
-
-	const { data, loading, error, doForgetPassword } = useFetch({
+	const { loading, error, doForgetPassword } = useFetch({
         method: "PUT",
         url: `${contextValues.forgetAPI}/${hotelId}`
     });
-    
-    useEffect(() => {
-		data && onSuccess();
-		!loading && inputRef.current.focus()
-		error && toast.error(error);
-    }, [data, error, loading]);
 
     const { values, errors, handleBlur, handleChange, touched, handleSubmit } = useFormik({
         initialValues: {
@@ -34,10 +26,16 @@ const ForgetPassword = ({ onSuccess, onBack }) => {
         validationSchema: forgetPasswordSchema,
         onSubmit: async (values, action) => {
             const payload = {   
-                            'userName': values.keyInputUser
-                        };
+                            	"userName": values.keyInputUser
+                        	};
 						
             await doForgetPassword(payload);
+
+			if (error === null) {
+                onSuccess();
+            } else {
+                toast.error(error);
+            }
         }
     });
    
@@ -60,8 +58,8 @@ const ForgetPassword = ({ onSuccess, onBack }) => {
 								placeholder="mobile no. / email"
 								className="form-control"
 								autoComplete="off"
+								autoFocus
 								maxLength={ 100 }
-								ref = { inputRef }
 								disabled={ loading } 
 								value={ values.keyInputUser } 
 								onChange={ handleChange }

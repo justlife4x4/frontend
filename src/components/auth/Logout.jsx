@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { LogOut } from "react-feather";
 
@@ -11,18 +11,24 @@ import useFetchWithAuth from "../useFetchWithAuth";
 const Logout = ({ pEmployeeId, onLogout }) => {
 	const hotelId = useContext(HotelId);
 	const contextValues = useStateContext();
-	const { data, loading, error, doLogout } = useFetchWithAuth({
+	const { loading, error, doLogout } = useFetchWithAuth({
         url: `${contextValues.logoutAPI}/${hotelId}/${pEmployeeId}`
     });
 
-	useEffect(() => {
-		pEmployeeId && !error && data === "OK" && onLogout();
-    }, [data]);
+	// useEffect(() => {
+	// 	pEmployeeId && !error && data === "OK" && onLogout();
+    // }, [data, loading, error, pEmployeeId]);
 
 	// Strat:: logout   
 	const handleLogout = async (e) => {
 		e.preventDefault();
 		await doLogout();
+
+		if (error === null) {
+			onLogout();
+		//} else {
+		//	toast.error(error);
+		}
     };
 	// End:: logout   
 
