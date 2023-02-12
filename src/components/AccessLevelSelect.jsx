@@ -16,9 +16,9 @@ const AccessLevelSelect = ({ onChange, name, value, disabled = false }) => {
 	const onSelect = (selectedList) => {
 		let list = [];
 
-		selectedList.map((item) => {
+		for (const item of selectedList) {
 			list.push({id: item.value, name: item.label});
-		});
+		}
 
 		setSelectedList(list);
 	}
@@ -28,33 +28,36 @@ const AccessLevelSelect = ({ onChange, name, value, disabled = false }) => {
             try {
                 await doFetch();
 
-				value && value.map((item) => {
-					defaultList.push({ value: item.id, label: item.name });
-				});
+				if (value !== null) {
+					for (const item of value) {
+						defaultList.push({ value: item.id, label: item.name });
+					}
+				}
             } catch (err) {
               console.log("Error occured when fetching data");
             }
           })();
-    }, [doFetch]);
+    }, [value, doFetch]);		// eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
 		let list = [];
-		data && data.map((item) => {
-			list.push({ value: item._id, label: item.name });
-		});
+
+		if (data !== null) {
+			for (const item of data) {
+				list.push({ value: item._id, label: item.name });
+			}
+		}
 
 		setAccesslevelList(list);
-		// !loading && inputRef.current.focus();
     }, [data, loading, error]);
 
 	useEffect(() => {
         onChange(selectedList);
-    }, [selectedList]);
+    }, [selectedList]);		// eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
 		<Select 
 			autoFocus
-			// ref = { inputRef }
 			name = { name }
 			options = { accesslevelList } 
 			defaultValue = { defaultList }

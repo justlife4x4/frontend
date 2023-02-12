@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { Nav, Navbar, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useNavigate, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ChevronsLeft, ChevronsRight, Paperclip, Edit3, Scissors, AtSign } from "react-feather";
 
@@ -52,7 +53,7 @@ const NavbarLogin = forwardRef(( props, ref ) => {
 
         contextValues.setMenuStatus(menuState);
         props.onShowHideSideBar(menuState);
-    }, [menuState]);
+    }, [menuState]);    // eslint-disable-line react-hooks/exhaustive-deps
 
     // Start:: on success of user options
     const handleShowHideMenu = () => {
@@ -108,7 +109,7 @@ const NavbarLogin = forwardRef(( props, ref ) => {
     // End:: on success of user options
 
 
-    {/* Start:: handle page component search/add/edit/delete */}
+    // Start:: handle page component search/add/edit/delete
     // Start:: Search
     const handleSearch = (text) => {
         props.onChangeSearch(text);
@@ -138,7 +139,7 @@ const NavbarLogin = forwardRef(( props, ref ) => {
         searchRef.current.setFocus();
     };
     // End:: on successfull operation
-    {/*  End:: handle page component search/add/edit/delete */}
+    // End:: handle page component search/add/edit/delete 
 
     // Start:: forward reff change page
     const changePage = (page) => {
@@ -170,10 +171,16 @@ const NavbarLogin = forwardRef(( props, ref ) => {
             {/* End:: app logo */}
 
             {/* Start:: open/close menu icon */}
-            <a className="sidebar-toggle d-flex mx-2" href="#" onClick = { handleShowHideMenu }
-                data-toggle="collapse" data-target="#sidebar" aria-expanded="true">
-                { menuState ? <ChevronsLeft size={20} className="mx-1"/> : <ChevronsRight size={28} className="mx-1"/> }
-            </a>
+            <Link className="sidebar-toggle d-flex mx-2" 
+                data-toggle="collapse"
+                data-target="#sidebar" 
+                aria-expanded="true"
+                href="window.location"
+                onClick = { handleShowHideMenu }>
+
+                { menuState ? <ChevronsLeft size={20} className="mx-1"/> : 
+                                <ChevronsRight size={28} className="mx-1"/> }
+            </Link>
             {/* End:: open/close menu icon */}
 
             <div className="navbar-collapse collapse">
@@ -237,15 +244,16 @@ const NavbarLogin = forwardRef(( props, ref ) => {
                 <ul className="navbar-nav ml-auto">
                     <li className="nav-item dropdown">
                         {/* Start:: user first name & menu icon */}
-                        <a className="nav-link dropdown-toggle d-none d-sm-inline-block" 
-                            href="#" 
-                            data-toggle="dropdown">
+                        <Link className="nav-link dropdown-toggle d-none d-sm-inline-block" 
+                            data-toggle="dropdown"
+                            href="window.location">
+
                             <span className="text-dark fw-bold mx-2">
                                 <AtSign size={20} className="mx-1"/>
                                 { data && getFirstName(data.name) }
                                 { !data && getFirstName(props.pEmployeeName) }
                             </span>
-                        </a>
+                        </Link>
                         {/* End:: user first name & menu icon */}
 
                         {/* Start:: dropdown menu */}

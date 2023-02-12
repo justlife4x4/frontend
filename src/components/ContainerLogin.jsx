@@ -29,7 +29,8 @@ const CloseButton = ({closeToast}) => (
 );
 // End:: hide toast close button
 
-const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
+// Start:: Component
+const ContainerLogin = ({ pEmployeeId, pEmployeeName }) => {
   const contextValues = useStateContext();
   const [menuState, setMenuState] = useState(contextValues.showMenu);
   const [menuSelected, setMenuSelected] = useState(null);
@@ -46,7 +47,7 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
     const page = getPage(contextValues.baseURL, window.location.href);
     navRef.current.changePage(page);
     setMenuSelected(page);
-  }, []);
+  }, [contextValues.baseURL]);
 
   useEffect(() => {
     navRef.current.changePage(menuSelected);
@@ -213,7 +214,6 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
     navRef.current.success();
   };
   // End:: handle header operational options
-
   
   // Start:: Html
   return ( 
@@ -223,7 +223,6 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
         <nav id="sidebar" className="sidebar mt-5">
           <div className="sidebar-content">
             <ul className="sidebar-nav mt-3">
-              {/* <li className="sidebar-header">{pEmployeeRoles}</li> */}
               <li className="sidebar-item">
                 <a href="#masters" data-toggle="collapse" className="sidebar-link collapsed">
                   <Sliders size={16}/>
@@ -353,5 +352,7 @@ const ContainerLogin = ({ pEmployeeId, pEmployeeName, pEmployeeRoles }) => {
   // End:: Html
 
 };
+// End:: Component
+
 
 export default ContainerLogin;

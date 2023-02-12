@@ -64,9 +64,11 @@ export const getPageName = (selectedCompont) => {
 export const getAccessLevel = (accessLevelArray) => {
     let names = "";
 
-    accessLevelArray && accessLevelArray.map((item) => {
-        names === "" ? names = item.name : names = names + ", " + item.name;
-    })
+    if (accessLevelArray !== null) {
+        for (const item of accessLevelArray) {
+            names === "" ? names = item.name : names = names + ", " + item.name;
+        }
+    }
 
     return names;
 };

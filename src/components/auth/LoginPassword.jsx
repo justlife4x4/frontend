@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useFormik } from "formik";
 import { NavLink } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
@@ -32,18 +32,17 @@ const LoginPassword = ({ onSuccess, onBack }) => {
                         };
 						
             await doLoginPassword(payload);
-
-			if (error === null) {
-                onSuccess(data.accessToken, data.refreshToken);
-            } else {
-                toast.error(error);
-            }
         }
     });
    
 	const handleBack = () => {
 		onBack("FORGET_PASSWORD");
     };
+
+	useEffect(() => {
+		data && onSuccess(data.accessToken, data.refreshToken);
+		error && toast.error(error);
+    }, [data, error, loading]);		// eslint-disable-line react-hooks/exhaustive-deps
 
 	return ( 
 		<>

@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { axiosPublic } from "./axiosPublic"
 
-
 const useFetch = (params) => {
     const [data, setData] = useState(undefined);
     const [loading, setLoading] = useState(false);

@@ -11,7 +11,7 @@ import useFetchWithAuth from "../useFetchWithAuth";
 const Logout = ({ pEmployeeId, onLogout }) => {
 	const hotelId = useContext(HotelId);
 	const contextValues = useStateContext();
-	const { loading, error, doLogout } = useFetchWithAuth({
+	const { error, doLogout } = useFetchWithAuth({
         url: `${contextValues.logoutAPI}/${hotelId}/${pEmployeeId}`
     });
 
@@ -20,24 +20,21 @@ const Logout = ({ pEmployeeId, onLogout }) => {
     // }, [data, loading, error, pEmployeeId]);
 
 	// Strat:: logout   
-	const handleLogout = async (e) => {
-		e.preventDefault();
+	const handleLogout = async () => {
 		await doLogout();
 
 		if (error === null) {
 			onLogout();
-		//} else {
-		//	toast.error(error);
 		}
     };
 	// End:: logout   
 
 	// Start:: Html
     return ( 
-		<Link className="dropdown-item" href="#" onClick={(e)=>{loading && e.preventDefault() 
-																!loading && handleLogout(e)}}>
-			<LogOut size={16}/>
-			&nbsp;Sign out
+		<Link className="dropdown-item" 
+			href="window.location" 
+			onClick = { handleLogout }>
+			<LogOut className="mr-2" size={16}/>Sign out
 		</Link>
     );
 	// End:: Html

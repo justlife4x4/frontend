@@ -15,7 +15,7 @@ const useFetchWithAuth = (params) => {
             const response = await axiosPrivate.request(params);
             setData(response.data);
         } catch (error) {
-            setError(error.message) ;
+            setError(error.message);
         } finally {
             setLoading(false);
         }

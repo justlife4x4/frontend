@@ -1,25 +1,34 @@
-import React from "react"
+import React from "react";
+import { Link } from "react-router-dom";
 
 const Paging = ({ itemPerPage, totalItem, selectedPage, onPaging }) => {
-    const pages = []
+    const pages = [];
 
     for (let idx = 1; idx <= Math.ceil(totalItem / itemPerPage); idx++) {
-        pages.push(idx)
-    }
+        pages.push(idx);
+    };
 
     return (
         <nav>
             <ul className='pagination'>
                 {pages.map(item => (
                     <li key={item} className={selectedPage === item ? "page-item active" : "page-item"}>
-                        <a onClick={() => onPaging(item)} href='#' className='page-link'>
+
+                        <Link className="page-link" 
+                            href="window.location"
+                            onClick = { onPaging(item) }>
+
                             {item}
-                        </a>
+                        </Link>
+
+                        {/* <a onClick={() => onPaging(item)} href='#' className='page-link'>
+                            {item}
+                        </a> */}
                     </li>
                 ))}
             </ul>
         </nav>
-  )
-}
+    );
+};
 
-export default Paging
+export default Paging;

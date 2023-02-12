@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { Modal, NavLink } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { X, Key } from "react-feather";
 
@@ -243,10 +244,11 @@ const ChangePassword = ({ pEmployeeId, onEdited, onClosed }) => {
     return (
         <div className="text-left">
             {/* Start:: Change password link */}
-			<a className="dropdown-item" href="#" onClick={handleShowModal}>
-				<Key size={16}/>
-				&nbsp;Change password
-			</a>
+            <Link className="dropdown-item" 
+                href="window.location" 
+                onClick = { handleShowModal }>
+			    <Key className="mr-2" size={16} />Change password
+            </Link>
             {/* End:: Change password link */}
 
             {/* Start:: Mod modal */}

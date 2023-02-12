@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Modal, NavLink } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
 import { X, User } from "react-feather";
@@ -317,15 +318,16 @@ const Profile = ({ pEmployeeId, onEdited, onClosed }) => {
         <div className="text-left">
 
             {/* Start:: Profile link */}
-			<a className="dropdown-item" href="#" onClick = { handleShowModal } >
-                <User size={16} />
-				&nbsp;Profile
-			</a>
+            <Link className="dropdown-item" 
+                href="window.location" 
+                onClick = { handleShowModal }>
+			    <User className="mr-2" size={16} />Profile
+            </Link>
             {/* End:: Profile link */}
 
             {/* Start:: modal */}
             <Modal 
-                show = { showModal } >
+                show = { showModal }>
 
                 {/* Start:: Modal header */}
                 <Modal.Header>
