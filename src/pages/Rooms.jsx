@@ -203,7 +203,7 @@ const Rooms = forwardRef(( props, ref ) => {
         }
     });
     // End:: forward reff change search and open add/edit/delete modal
-
+    
     // Start:: fetch data list from api
     useEffect(() => {
         (async () => {

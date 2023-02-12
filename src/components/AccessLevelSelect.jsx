@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 
 import { useStateContext } from "../contexts/ContextProvider";
 import useFetchWithAuth from "./useFetchWithAuth";
 
 const AccessLevelSelect = ({ onChange, name, value, disabled = false }) => {
-	const inputRef = useRef();
 	const contextValues = useStateContext();
 	const [accesslevelList, setAccesslevelList] = useState([]);
 	const [selectedList, setSelectedList] = useState(value);
@@ -13,29 +12,6 @@ const AccessLevelSelect = ({ onChange, name, value, disabled = false }) => {
         url: `${contextValues.accessLevelAPI}`
     });
 	let defaultList = [];
-
-	useEffect(() => {
-        doFetch();
-		
-		value && value.map((item) => {
-			defaultList.push({ value: item.id, label: item.name });
-		});
-    }, []);
-
-    useEffect(() => {
-		let list = [];
-		data && data.map((item) => {
-			list.push({ value: item._id, label: item.name });
-		});
-
-		setAccesslevelList(list);
-		!loading && inputRef.current.focus();
-    }, [data, loading, error]);
-
-	useEffect(() => {
-        onChange(selectedList);
-    }, [selectedList]);
-
 
 	const onSelect = (selectedList) => {
 		let list = [];
@@ -47,9 +23,38 @@ const AccessLevelSelect = ({ onChange, name, value, disabled = false }) => {
 		setSelectedList(list);
 	}
 
+	useEffect(() => {
+        (async () => {
+            try {
+                await doFetch();
+
+				value && value.map((item) => {
+					defaultList.push({ value: item.id, label: item.name });
+				});
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [doFetch]);
+
+    useEffect(() => {
+		let list = [];
+		data && data.map((item) => {
+			list.push({ value: item._id, label: item.name });
+		});
+
+		setAccesslevelList(list);
+		// !loading && inputRef.current.focus();
+    }, [data, loading, error]);
+
+	useEffect(() => {
+        onChange(selectedList);
+    }, [selectedList]);
+
 	return (
 		<Select 
-			ref = { inputRef }
+			autoFocus
+			// ref = { inputRef }
 			name = { name }
 			options = { accesslevelList } 
 			defaultValue = { defaultList }

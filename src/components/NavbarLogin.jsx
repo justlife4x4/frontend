@@ -36,10 +36,10 @@ const NavbarLogin = forwardRef(( props, ref ) => {
     const [sideBarHeaderTextClass, setSideBarHeaderTextClass] = useState("");
     const searchRef = useRef(null);
     const navigate = useNavigate();
-    const {data, loading, error, doFetch} = useFetchWithAuth({
+    const {data, doFetch} = useFetchWithAuth({
         url: `${contextValues.employeeAPI}/${hotelId}/${props.pEmployeeId}`
     });
-	const { dataLogout, loadingLogout, errorLogout, doLogout } = useFetchWithAuth({
+	const { doLogout } = useFetchWithAuth({
         url: `${contextValues.logoutAPI}/${hotelId}/${props.pEmployeeId}`
     });
 
@@ -139,7 +139,6 @@ const NavbarLogin = forwardRef(( props, ref ) => {
     };
     // End:: on successfull operation
     {/*  End:: handle page component search/add/edit/delete */}
-
 
     // Start:: forward reff change page
     const changePage = (page) => {

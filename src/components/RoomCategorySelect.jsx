@@ -1,29 +1,39 @@
-import React, { useContext, useEffect, useRef } from "react"
+import React, { useContext, useEffect } from "react"
 
 import { HotelId } from "../App"
+import { useStateContext } from "../contexts/ContextProvider";
 import useFetchWithAuth from "./useFetchWithAuth"
 
 const RoomCategorySelect = ({ onChange, name, value, disabled = false }) => {
 	const hotelId = useContext(HotelId)
-	const inputRef = useRef()
+	const contextValues = useStateContext();
+	// const inputRef = useRef();
+    const { data, loading, doFetch } = useFetchWithAuth({
+        url: `${contextValues.roomAPI}/${hotelId}`
+    });
 
-    const { data, loading, error, doFetch } = useFetchWithAuth({
-        url: `/roomCategories/${hotelId}`
-    })
-
-	useEffect(() => {
-        doFetch()
-    }, []);
-
+    // Start:: fetch data list from api
     useEffect(() => {
-		!loading && inputRef.current.focus()
-    }, [data, loading, error])
+        (async () => {
+            try {
+                await doFetch();
+            } catch (err) {
+                console.log("Error occured when fetching data");
+            }
+            })();
+    }, [doFetch]);
+    // End:: fetch data list from api
+
+    // useEffect(() => {
+	// 	!loading && inputRef.current.focus();
+    // }, [data, loading, error]);
 
 	return (
 		<select 
 			className="form-control"
+			autoFocus
 			name = { name }
-			ref = { inputRef }
+			// ref = { inputRef }
 			disabled = { loading && disabled } 
 			value = { value } 
 			onChange = { (e) => { onChange(e.target.value) } } >
