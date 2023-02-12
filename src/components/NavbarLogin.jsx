@@ -14,7 +14,6 @@ import ChangePassword from "./auth/ChangePassword";
 import Profile from "./auth/Profile";
 import Logout from "./auth/Logout";
 
-
 // Start:: Component
 // props parameters
 // pEmployeeId
@@ -107,7 +106,6 @@ const NavbarLogin = forwardRef(( props, ref ) => {
         navigate(0);
     };
     // End:: on success of user options
-
 
     // Start:: handle page component search/add/edit/delete
     // Start:: Search
