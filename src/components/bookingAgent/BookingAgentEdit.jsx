@@ -18,22 +18,6 @@ const Form = ({ pId, pName, pDescription, onSubmited, onClosed }) => {
         url: `${contextValues.bookingAgentAPI}/${pId}`
     })
 
-
-    // Strat:: close modal on key press esc    
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-        
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") onClosed();
-        });
-
-        return () => {
-            document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
-
-
     // Start:: Form validate and save data
     const { values, errors, touched, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
@@ -60,7 +44,6 @@ const Form = ({ pId, pName, pDescription, onSubmited, onClosed }) => {
     });
     // End:: Form validate and save data
 
-
     // Strat:: close form    
     const handleClose = () => {
         setValidateOnChange(false);
@@ -68,7 +51,6 @@ const Form = ({ pId, pName, pDescription, onSubmited, onClosed }) => {
         onClosed();
     };
     // End:: close form    
-
 
     // Start:: Html
     return (
@@ -125,10 +107,10 @@ const Form = ({ pId, pName, pDescription, onSubmited, onClosed }) => {
                             id="keyInputDescription"
                             placeholder="Description"
                             className="form-control"
+                            autoFocus
                             rows = { "5" }
                             maxLength = { "256" }
                             disabled = { loading || error !== null }
-                            ref = { inputRef }
                             value = { values.keyInputDescription } 
                             onChange = { handleChange } />
 
@@ -201,30 +183,11 @@ const BookingAgentEdit = forwardRef(( props, ref ) => {
         url: `${contextValues.bookingAgentAPI}/${props.pId}`
     })
 
-    // Start:: fetch id wise detail from api
-    useEffect(() => {
-        (async () => {
-            try {
-                showModal && await doFetch();
-            } catch (err) {
-              console.log("Error occured when fetching data");
-            }
-          })();
-    }, [showModal]);
-    // End:: fetch id wise detail from api
-
-
-    useEffect(() => {
-        error && toast.error(error);
-    }, [data, error, loading]);
-
-
     // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
     };
     // End:: Show modal
-
 
     // Start:: Close modal
     const handleCloseModal = () => {
@@ -233,14 +196,12 @@ const BookingAgentEdit = forwardRef(( props, ref ) => {
     };
     // End:: Close modal
 
-
     // Start:: Save
     const handleSave = () => { 
         setShowModal(false);
         props.onEdited();
     };
     // End:: Save
-
 
     // Start:: forward reff show modal function
     useImperativeHandle(ref, () => {
@@ -250,6 +211,33 @@ const BookingAgentEdit = forwardRef(( props, ref ) => {
     });
     // End:: forward reff show modal function
 
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
+
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
+
+    // Start:: fetch id wise detail from api
+    useEffect(() => {
+        (async () => {
+            try {
+                showModal && await doFetch();
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [showModal, doFetch]);
+    // End:: fetch id wise detail from api
+
+    useEffect(() => {
+        error && toast.error(error);
+    }, [data, error, loading]);
 
     // Start:: Html
     return (
