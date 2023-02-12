@@ -42,25 +42,6 @@ const Employees = forwardRef(( props, ref ) => {
         }
     });
 
-
-    // Start:: fetch data list from api
-    useEffect(() => {
-        (async () => {
-            try {
-              await doFetch();
-              setDataChanged(false);
-            } catch (err) {
-              console.log("Error occured when fetching data");
-            }
-          })();
-    }, [dataChanged, search]);
-    // End:: fetch data list from api
-
-    useEffect(() => {
-        error && toast.error(error);
-    }, [data, error, loading]);
-
-
     // Start:: Change search text
     const changeSearch = (text) => {
         setSearch(text);
@@ -104,13 +85,11 @@ const Employees = forwardRef(( props, ref ) => {
     };
     // End:: Open delete modal
 
-
     // Start:: Close modal
     const close = () => {
         props.onClose();
     };
     // End:: Close modal
-    
 
     // Start:: on data operation successfully
     const handleSuccess = ( operation ) => {
@@ -139,7 +118,6 @@ const Employees = forwardRef(( props, ref ) => {
     };
     // End:: on data operation successfully
 
-
     // Start:: change selection of card element    
     const handleActivated = (index) => {
             setSelectedCardIndex(index);
@@ -151,23 +129,12 @@ const Employees = forwardRef(( props, ref ) => {
     };
     // End:: change selection of card element    
 
-
     // Seart:: handle page change
     const handlePaging = (pageNumber) => {
         cardRefs.current = [itemPerRow];
         setSelectedPage(pageNumber);
     };
     // End:: handle page change
-
-
-    // Start:: forward reff change search and open add/edit/delete modal
-    useImperativeHandle(ref, () => {
-        return {
-            changeSearch, openAdd, openEdit, openDelete, close
-        }
-    });
-    // End:: forward reff change search and open add/edit/delete modal
-
 
     // Start:: show all data in card format
     const displayData = (pData = []) => {
@@ -229,6 +196,30 @@ const Employees = forwardRef(( props, ref ) => {
     };
     // End:: show all data in card format
 
+    // Start:: forward reff change search and open add/edit/delete modal
+    useImperativeHandle(ref, () => {
+        return {
+            changeSearch, openAdd, openEdit, openDelete, close
+        }
+    });
+    // End:: forward reff change search and open add/edit/delete modal
+
+    // Start:: fetch data list from api
+    useEffect(() => {
+        (async () => {
+            try {
+              await doFetch();
+              setDataChanged(false);
+            } catch (err) {
+              console.log("Error occured when fetching data");
+            }
+          })();
+    }, [dataChanged, search, doFetch]);
+    // End:: fetch data list from api
+
+    useEffect(() => {
+        error && toast.error(error);
+    }, [data, error, loading]);
 
     // Start:: Html
     return ( 
