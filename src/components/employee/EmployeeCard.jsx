@@ -30,13 +30,11 @@ const EmployeeCard = forwardRef(( props, ref ) => {
     const [focus, setFocus] = useState(false);
     const [active, setActive] = useState(false);
 
-
     // Start:: Show view modal 
     const handelOpenView = () => {
         viewRef && viewRef.current.handleShowModal();
     };
     // End:: Show view modal 
-
 
     // Start:: Show edit modal 
     const handelOpenEdit = () => {
@@ -44,13 +42,11 @@ const EmployeeCard = forwardRef(( props, ref ) => {
     };
     // End:: Show edit modal 
 
-
     // Start:: Show delete modal 
     const handelOpenDelete = () => {
         deleteRef && deleteRef.current.handleShowModal();
     };
     // End:: Show delete modal 
-
 
     // Start:: Close all modal 
     const handleClose = () => {
@@ -58,14 +54,12 @@ const EmployeeCard = forwardRef(( props, ref ) => {
     };
     // End:: Close all modal 
 
-
     // Start:: de-select card 
     const handleDeSelect = () => {
         setActive(false);
         setFocus(false);
     };
     // End:: de-select card
-
     
     // Start:: forward reff de-select, show edit/delete modal function
     useImperativeHandle(ref, () => {
@@ -74,7 +68,6 @@ const EmployeeCard = forwardRef(( props, ref ) => {
         }
     });
     // Edit:: forward reff de-select, show edit/delete modal function
-
 
     // Start:: Html
     return (

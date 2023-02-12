@@ -7,6 +7,7 @@ import { HotelId } from "../../App";
 import { useStateContext } from "../../contexts/ContextProvider";
 import useFetchWithAuth from "../useFetchWithAuth";
 
+
 // Start:: form
 const Form = ({ pId, pName, onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
@@ -15,28 +16,6 @@ const Form = ({ pId, pName, onSubmited, onClosed }) => {
     const { loading, error, doDelete } = useFetchWithAuth({
         url: `${contextValues.employeeAPI}/${hotelId}/${pId}`
     });
-    
-    // Strat:: close modal on key press esc    
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") onClosed();
-        });
-
-        return () => {
-            document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
-
-
-    // Strat:: On delete result 
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-    }, [loading, error]);
-    // End:: On delete result
-
 
     // Start:: Call delete api
     const handleSave = async () => {
@@ -44,7 +23,6 @@ const Form = ({ pId, pName, onSubmited, onClosed }) => {
         error === null ? onSubmited() : toast.error(error);
     };
     // End:: Call delete api
-
 
     // Start:: Html
     return (
@@ -63,9 +41,9 @@ const Form = ({ pId, pName, onSubmited, onClosed }) => {
                 <button 
                     type="button"   
                     className="btn btn-danger"
+                    autoFocus
                     disabled = { loading }
-                    ref = { inputRef }
-                    onClick = { onClosed } >
+                    ref = { inputRef } >
                     Close
                 </button>
                 {/* End:: Close button */}
@@ -113,7 +91,46 @@ const EmployeeDelete = forwardRef(( props, ref ) => {
         url: `${contextValues.employeeAPI}/${hotelId}/${props.pId}`
     });
 
+    // Start :: Show modal 
+    const handleShowModal = () => {
+        setShowModal(true);
+    };
+    // End :: Show modal 
 
+    // Start :: Close modal 
+    const handleCloseModal = () => {
+        setShowModal(false);
+        props.onClosed();
+    };
+    // End :: Close modal 
+
+    // Start :: Save 
+    const handleSave = () => {
+        setShowModal(false);
+        props.onDeleted(); 
+    };
+    // End :: Save 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
+
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
+    
     // Start:: fetch id wise detail from api
     useEffect(() => {
         (async () => {
@@ -123,45 +140,12 @@ const EmployeeDelete = forwardRef(( props, ref ) => {
               console.log("Error occured when fetching data");
             }
           })();
-    }, [showModal]);
+    }, [showModal, doFetch]);
     // End:: fetch id wise detail from api
-
 
     useEffect(() => {
         error && toast.error(error);
     }, [data, error, loading]);
-
-
-    // Start :: Show modal 
-    const handleShowModal = () => {
-        setShowModal(true);
-    };
-    // End :: Show modal 
-
-
-    // Start :: Close modal 
-    const handleCloseModal = () => {
-        setShowModal(false);
-        props.onClosed();
-    };
-    // End :: Close modal 
-
-
-    // Start :: Save 
-    const handleSave = () => {
-        setShowModal(false);
-        props.onDeleted(); 
-    };
-    // End :: Save 
-
-
-    // Start:: forward reff show modal function
-    useImperativeHandle(ref, () => {
-        return {
-            handleShowModal
-        }
-    });
-    // End:: forward reff show modal function
 
     // Start:: Html
     return (
