@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { Modal, NavLink } from "react-bootstrap";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
@@ -15,27 +15,10 @@ import useFetchWithAuth from "../useFetchWithAuth";
 const Form = ({ pId, pCategoryId, pNo, pTariff, pDiscount, pBed, pPerson, onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
-    const inputRef = useRef(null);
     const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doUpdate } = useFetchWithAuth({
         url: `${contextValues.roomAPI}/${hotelId}/${pId}`
     });
-
-
-    // Strat:: close modal on key press esc    
-    useEffect(() => {
-        !loading && inputRef.current.focus();
-        
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") onClosed();
-        });
-
-        return () => {
-            document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
-
 
     // Start:: Form validate and save data
     const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
@@ -71,7 +54,6 @@ const Form = ({ pId, pCategoryId, pNo, pTariff, pDiscount, pBed, pPerson, onSubm
     });
     // End:: Form validate and save data
 
-
     // Strat:: close form    
     const handleClose = () => {
         setValidateOnChange(false);
@@ -79,7 +61,6 @@ const Form = ({ pId, pCategoryId, pNo, pTariff, pDiscount, pBed, pPerson, onSubm
         onClosed();
     };
     // End:: close form    
-
 
     // Start:: Html
     return (
@@ -144,7 +125,6 @@ const Form = ({ pId, pCategoryId, pNo, pTariff, pDiscount, pBed, pPerson, onSubm
                             id="keyInputTariff"
                             placeholder="tariff"
                             className="form-control"
-                            ref={inputRef}
                             disabled={loading || error !== null}
                             value={values.keyInputTariff} 
                             onChange={handleChange} />
@@ -299,39 +279,19 @@ const RoomEdit = forwardRef(( props, ref ) => {
     const { data, loading, error, doFetch } = useFetchWithAuth({
         url: `${contextValues.roomAPI}/${hotelId}/${props.pId}`
     });
-
-    // Start:: fetch id wise detail from api
-    useEffect(() => {
-        (async () => {
-            try {
-                showModal && await doFetch();
-            } catch (err) {
-              console.log("Error occured when fetching data");
-            }
-          })();
-    }, [showModal]);
-    // End:: fetch id wise detail from api
-
-
-    useEffect(() => {
-        error && toast.error(error);
-    }, [data, error, loading]);
-
-
+    
     // Start:: Show modal
     const handleShowModal = () => {
         setShowModal(true);
     };
     // End:: Show modal
 
-
     // Start:: Close modal
     const handleCloseModal = () => {
         setShowModal(false);
         props.onClosed();
-    };
+    };    
     // End:: Close modal
-
 
     // Start:: Save
     const handleSave = () => { 
@@ -339,8 +299,7 @@ const RoomEdit = forwardRef(( props, ref ) => {
         props.onEdited();
     };
     // End:: Save
-
-
+    
     // Start:: forward reff show modal function
     useImperativeHandle(ref, () => {
         return {
@@ -349,7 +308,34 @@ const RoomEdit = forwardRef(( props, ref ) => {
     });
     // End:: forward reff show modal function
 
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
 
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
+
+    // Start:: fetch id wise detail from api
+    useEffect(() => {
+        (async () => {
+            try {
+                showModal && await doFetch();
+            } catch (err) {
+                console.log("Error occured when fetching data");
+            }
+            })();
+    }, [showModal, doFetch]);
+    // End:: fetch id wise detail from api
+        
+    useEffect(() => {
+        error && toast.error(error);
+    }, [data, error, loading]);
+    
     // Start:: Html
     return (
         <>

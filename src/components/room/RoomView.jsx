@@ -7,7 +7,6 @@ import { HotelId } from "../../App";
 import { useStateContext } from "../../contexts/ContextProvider";
 import useFetchWithAuth from "../useFetchWithAuth";
 
-
 // Start:: form
 const Form = ({ pNo, pCategoryId, pTariff, pDiscount, pBed, pPerson, onClosed }) => {
     const hotelId = useContext(HotelId);
@@ -18,23 +17,15 @@ const Form = ({ pNo, pCategoryId, pTariff, pDiscount, pBed, pPerson, onClosed })
         url: `${contextValues.roomCategoryAPI}/${hotelId}/${pCategoryId}`
     });
 
-    // Strat:: close modal on key press esc    
     useEffect(() => {
-        buttonRef.current.focus();
-                
-        document.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") onClosed();
-        })
-
-        return () => {
-          document.removeEventListener("keydown", onClosed);
-        }
-    }, []);
-    // End:: close modal on key press esc    
-
-    useEffect(() => {
-        doFetch();
-    }, [pCategoryId]);
+        (async () => {
+            try {
+                await doFetch();
+            } catch (err) {
+                console.log("Error occured when fetching data");
+            }
+            })();
+    }, [pCategoryId, doFetch]);
 
     useEffect(() => {
         data && setCategoryName(data.name);
@@ -151,6 +142,7 @@ const Form = ({ pNo, pCategoryId, pTariff, pDiscount, pBed, pPerson, onClosed })
 // pId
 // onClosed()
 
+
 // useImperativeHandle
 // handleShowModal
 const RoomView = forwardRef(( props, ref ) => {    
@@ -161,6 +153,38 @@ const RoomView = forwardRef(( props, ref ) => {
         url: `${contextValues.roomAPI}/${hotelId}/${props.pId}`
     });
 
+    // Start :: Show modal 
+    const handleShowModal = () => {
+        setShowModal(true);
+    };
+    // End :: Show modal 
+
+    // Start :: Close modal 
+    const handleCloseModal = () => {
+        setShowModal(false);
+        props.onClosed();
+    };
+    // End :: Close modal 
+
+    // Start:: forward reff show modal function
+    useImperativeHandle(ref, () => {
+        return {
+            handleShowModal
+        }
+    });
+    // End:: forward reff show modal function
+
+    // Strat:: close modal on key press esc    
+    useEffect(() => {
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") handleCloseModal();
+        });
+
+        return () => {
+            document.removeEventListener("keydown", handleCloseModal);
+        }
+    }, []);     // eslint-disable-line react-hooks/exhaustive-deps
+    // End:: close modal on key press esc    
 
     // Start:: fetch id wise detail from api
     useEffect(() => {
@@ -171,37 +195,12 @@ const RoomView = forwardRef(( props, ref ) => {
               console.log("Error occured when fetching data");
             }
           })();
-    }, [props.pId, showModal]);
+    }, [props.pId, showModal, doFetch]);
     // End:: fetch id wise detail from api
 
     useEffect(() => {
         error && toast.error(error);
     }, [data, error, loading]);
-
-
-    // Start :: Show modal 
-    const handleShowModal = () => {
-        setShowModal(true);
-    };
-    // End :: Show modal 
-
-
-    // Start :: Close modal 
-    const handleCloseModal = () => {
-        setShowModal(false);
-        props.onClosed();
-    };
-    // End :: Close modal 
-
-
-    // Start:: forward reff show modal function
-    useImperativeHandle(ref, () => {
-        return {
-            handleShowModal
-        }
-    });
-    // End:: forward reff show modal function
-
 
     // Start:: Html
     return (

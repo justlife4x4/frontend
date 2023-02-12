@@ -1,14 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
 import { memoizedRefreshToken } from "./refreshToken";
 
-axios.defaults.baseURL = 'http://localhost:8000/api';
+axios.defaults.baseURL = "http://localhost:8000/api";
 
 axios.interceptors.request.use(
   async (config) => {
-    if (localStorage.getItem('token')) {
+    if (localStorage.getItem("token")) {
         config.headers = {
             ...config.headers,
-            authorization: `Bearer ${localStorage.getItem('token')}`,
+            authorization: `Bearer ${localStorage.getItem("token")}`,
         };
     }
 

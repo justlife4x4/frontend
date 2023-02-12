@@ -10,7 +10,6 @@ import RoomView from "./RoomView";
 import RoomEdit from "./RoomEdit";
 import RoomDelete from "./RoomDelete";
 
-
 // Start:: Component
 // props parameters
 // pIndex
@@ -40,20 +39,11 @@ const RoomCard = forwardRef(( props, ref ) => {
         url: `${contextValues.roomCategoryAPI}/${hotelId}/${props.pCategoryId}`
     });
 
-    useEffect(() => {
-        doFetch();
-    }, [props.pCategoryId]);
-
-    useEffect(() => {
-        data && setCategoryName(data.name);
-    }, [data, error, loading]);
-
     // Start:: Show view modal 
     const handelOpenView = () => {
         viewRef && viewRef.current.handleShowModal();
     };
     // End:: Show view modal 
-
 
     // Start:: Show edit modal 
     const handelOpenEdit = () => {
@@ -61,13 +51,11 @@ const RoomCard = forwardRef(( props, ref ) => {
     };
     // End:: Show edit modal 
 
-
     // Start:: Show delete modal 
     const handelOpenDelete = () => {
         deleteRef && deleteRef.current.handleShowModal();
     };
     // End:: Show delete modal 
-
 
     // Start:: Close all modal 
     const handleClose = () => {
@@ -75,14 +63,12 @@ const RoomCard = forwardRef(( props, ref ) => {
     };
     // End:: Close all modal 
 
-
     // Start:: de-select card 
     const handleDeSelect = () => {
         setActive(false);
         setFocus(false);
     };
     // End:: de-select card
-
     
     // Start:: forward reff de-select, show edit/delete modal function
     useImperativeHandle(ref, () => {
@@ -92,6 +78,21 @@ const RoomCard = forwardRef(( props, ref ) => {
     });
     // Edit:: forward reff de-select, show edit/delete modal function
 
+    // Start:: fetch id wise detail from api
+    useEffect(() => {
+        (async () => {
+            try {
+                await doFetch();
+            } catch (err) {
+                console.log("Error occured when fetching data");
+            }
+            })();
+    }, [props.pCategoryId, doFetch]);
+    // Start:: fetch id wise detail from api
+
+    useEffect(() => {
+        data && setCategoryName(data.name);
+    }, [data, error, loading]);
 
     // Start:: Html
     return (
@@ -233,6 +234,7 @@ const RoomCard = forwardRef(( props, ref ) => {
     // End:: Html
 
 });
+// End:: Component
 
 
 export default RoomCard;
