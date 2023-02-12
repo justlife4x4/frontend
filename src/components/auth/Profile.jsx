@@ -22,14 +22,12 @@ const Form = ({ pId, pAccessLevels, pName, pAddress, pMobile, pEmail, onSubmited
 
     // Strat:: close modal on key press esc    
     useEffect(() => {
-        document.addEventListener('keydown', (event) => {
-            if (event.keyCode === 27) {
-                onClosed();
-            }
-        })
-    
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") onClosed();
+        });
+
         return () => {
-            document.removeEventListener('keydown', onClosed);
+            document.removeEventListener("keydown", onClosed);
         }
     }, []);
     // End:: close modal on key press esc    
@@ -43,6 +41,7 @@ const Form = ({ pId, pAccessLevels, pName, pAddress, pMobile, pEmail, onSubmited
             keyInputEmail: pEmail
         },
         validationSchema: employeeSchema,
+        validateOnChange,
         onSubmit: async (values) => {
             const payload = {   
                 "accessLevels": values.keyInputAccessLevels,

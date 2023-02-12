@@ -23,26 +23,25 @@ const Form = ({ pId, pName, pDescription, onSubmited, onClosed }) => {
     useEffect(() => {
         !loading && inputRef.current.focus();
         
-        document.addEventListener('keydown', (event) => {
-            if (event.keyCode === 27) {
-                onClosed()
-            }
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") onClosed();
         });
 
         return () => {
-            document.removeEventListener('keydown', onClosed);
-        }
+            document.removeEventListener("keydown", onClosed);
+        };
     }, []);
     // End:: close modal on key press esc    
 
 
     // Start:: Form validate and save data
-    const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
+    const { values, errors, touched, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
             keyInputName: pName,
             keyInputDescription: pDescription
         },
         validationSchema: accessLevelSchema,
+        validateOnChange,
         onSubmit: async (values) => {
             const payload = {   
                 "name": values.keyInputName.toUpperCase(), 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { Modal, NavLink } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { X } from "react-feather";
@@ -15,14 +15,12 @@ const Form = ({ pName, pDescription, onClosed }) => {
     useEffect(() => {
         buttonRef.current.focus();
         
-        document.addEventListener('keydown', (event) => {
-          if (event.keyCode === 27) {
-            onClosed();
-          }
-        })
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") onClosed();
+        });
 
         return () => {
-          document.removeEventListener('keydown', onClosed);
+            document.removeEventListener("keydown", onClosed);
         }
     }, []);
     // End:: close modal on key press esc    

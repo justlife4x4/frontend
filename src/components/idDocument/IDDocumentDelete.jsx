@@ -19,11 +19,11 @@ const Form = ({ pId, pName, onSubmited, onClosed }) => {
         !loading && inputRef.current.focus();
 
         document.addEventListener("keydown", (event) => {
-            if (event.keyCode === 27) onClosed()
+            if (event.key === "Escape") onClosed();
         });
-    
+
         return () => {
-          document.removeEventListener("keydown", onClosed);
+            document.removeEventListener("keydown", onClosed);
         }
     }, []);
     // End:: close modal on key press esc    

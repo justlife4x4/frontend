@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { Modal, NavLink } from "react-bootstrap";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
 import { X } from "react-feather";
 
-import { HotelId } from "../../App";
 import { useStateContext } from "../../contexts/ContextProvider";
 import { idDocumentSchema } from "../../schemas";
 import useFetchWithAuth from "../useFetchWithAuth";
@@ -12,7 +11,6 @@ import useFetchWithAuth from "../useFetchWithAuth";
 
 // Start:: form
 const Form = ({ onSubmited, onClosed }) => {
-    const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
     const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doInsert } = useFetchWithAuth({
@@ -22,21 +20,19 @@ const Form = ({ onSubmited, onClosed }) => {
 
     // Strat:: close modal on key press esc    
     useEffect(() => {
-        document.addEventListener('keydown', (event) => {
-          if (event.keyCode === 27) {
-            onClosed();
-          }
-        })
-    
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") onClosed();
+        });
+
         return () => {
-          document.removeEventListener('keydown', onClosed);
+            document.removeEventListener("keydown", onClosed);
         }
     }, []);
     // End:: close modal on key press esc    
 
 
     // Start:: Form validate and save data
-    const {values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm} = useFormik({
+    const {values, errors, touched, handleChange, handleSubmit, resetForm} = useFormik({
         initialValues: {
             keyInputName: "",
             keyInputDescription: "",

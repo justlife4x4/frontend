@@ -26,14 +26,12 @@ const Form = ({ pId, pCategoryId, pNo, pTariff, pDiscount, pBed, pPerson, onSubm
     useEffect(() => {
         !loading && inputRef.current.focus();
         
-        document.addEventListener('keydown', (event) => {
-            if (event.keyCode === 27) {
-                onClosed()
-            }
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") onClosed();
         });
 
         return () => {
-            document.removeEventListener('keydown', onClosed);
+            document.removeEventListener("keydown", onClosed);
         }
     }, []);
     // End:: close modal on key press esc    
@@ -50,6 +48,7 @@ const Form = ({ pId, pCategoryId, pNo, pTariff, pDiscount, pBed, pPerson, onSubm
             keyInputPerson: pPerson
         },
         validationSchema: roomSchema,
+        validateOnChange,
         onSubmit: async (values, action) => {
             const payload = {   
                                 'no': values.keyInputNo.toUpperCase(), 

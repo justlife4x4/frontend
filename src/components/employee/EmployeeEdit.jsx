@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useContext, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { Modal, NavLink } from "react-bootstrap";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
@@ -15,7 +15,6 @@ import useFetchWithAuth from "../useFetchWithAuth";
 const Form = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onSubmited, onClosed }) => {
     const hotelId = useContext(HotelId);
     const contextValues = useStateContext();
-    const inputRef = useRef(null);
     const [validateOnChange, setValidateOnChange] = useState(false);
     const { loading, error, doUpdate } = useFetchWithAuth({
         url: `${contextValues.employeeAPI}/${hotelId}/${pId}`
@@ -24,17 +23,13 @@ const Form = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onSubmited
 
     // Strat:: close modal on key press esc    
     useEffect(() => {
-        !loading && inputRef.current.focus();
-        
-        document.addEventListener('keydown', (event) => {
-            if (event.keyCode === 27) {
-                onClosed();
-            }
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") onClosed();
         });
 
         return () => {
-            document.removeEventListener('keydown', onClosed);
-        }
+            document.removeEventListener("keydown", onClosed);
+        };
     }, []);
     // End:: close modal on key press esc    
 
@@ -49,6 +44,7 @@ const Form = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onSubmited
             keyInputEmail: pEmail
         },
         validationSchema: employeeSchema,
+        validateOnChange,
         onSubmit: async (values) => {
             const payload = {   
                 "accessLevels": values.keyInputAccessLevels,
@@ -132,8 +128,8 @@ const Form = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onSubmited
                             className="form-control"
                             placeholder="Name" 
                             autoComplete="off"
+                            autoFocus
                             maxLength = { 100 }
-                            disabled = { true }
                             value = { values.keyInputName } 
                             onChange = { handleChange } />
 
@@ -166,7 +162,7 @@ const Form = ({ pAccessLevels, pId, pName, pAddress, pMobile, pEmail, onSubmited
                             rows = { "5" }
                             maxLength = { "256" }
                             disabled = { loading || error !== null }
-                            ref = { inputRef }
+                            // ref = { inputRef }
                             value = { values.keyInputAddress } 
                             onChange = { handleChange } />
 
@@ -305,7 +301,7 @@ const EmployeeEdit = forwardRef(( props, ref ) => {
             try {
                 showModal && await doFetch();
             } catch (err) {
-              console.log('Error occured when fetching data');
+              console.log("Error occured when fetching data");
             }
           })();
     }, [showModal]);

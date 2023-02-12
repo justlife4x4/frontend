@@ -25,21 +25,19 @@ const Form = ({ pId, pName, pTariff, pDiscount, pBed, pPerson, onSubmited, onClo
     useEffect(() => {
         !loading && inputRef.current.focus();
         
-        document.addEventListener('keydown', (event) => {
-            if (event.keyCode === 27) {
-                onClosed()
-            }
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") onClosed();
         });
 
         return () => {
-            document.removeEventListener('keydown', onClosed);
+            document.removeEventListener("keydown", onClosed);
         }
     }, []);
     // End:: close modal on key press esc    
 
 
     // Start:: Form validate and save data
-    const { values, errors, touched, setFieldValue, handleChange, handleSubmit, resetForm } = useFormik({
+    const { values, errors, touched, handleChange, handleSubmit, resetForm } = useFormik({
         initialValues: {
             keyInputName: pName,
             keyInputTariff: pTariff,
@@ -48,6 +46,7 @@ const Form = ({ pId, pName, pTariff, pDiscount, pBed, pPerson, onSubmited, onClo
             keyInputPerson: pPerson
         },
         validationSchema: roomCategorySchema,
+        validateOnChange,
         onSubmit: async (values, action) => {
             const payload = {   
                                 "name": values.keyInputName, 

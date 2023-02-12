@@ -21,15 +21,13 @@ const Form = ({ pNo, pCategoryId, pTariff, pDiscount, pBed, pPerson, onClosed })
     // Strat:: close modal on key press esc    
     useEffect(() => {
         buttonRef.current.focus();
-        
-        document.addEventListener('keydown', (event) => {
-          if (event.keyCode === 27) {
-            onClosed();
-          }
+                
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") onClosed();
         })
 
         return () => {
-          document.removeEventListener('keydown', onClosed);
+          document.removeEventListener("keydown", onClosed);
         }
     }, []);
     // End:: close modal on key press esc    
