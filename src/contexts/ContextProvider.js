@@ -10,9 +10,8 @@ const initialState = {
 };
 
 export const ContextProvider = ({children}) => {
-  const [baseURL, setBaseURL] = useState("http://localhost:3000/");
-  const [forgetAPI, setForgetAPI] = useState("/forgetpassword");
-  const [loginAPI, setLoginAPI] = useState("/login");
+  const forgetAPI = "/forgetpassword";
+  const loginAPI = "/login";
   const [logoutAPI, setLogoutAPI] = useState("/logout");
   const [changePasswordAPI, setChangePasswordAPI] = useState("/changePassword");
   const [accessLevelAPI, setAccessLevelAPI] = useState("/accessLevels");
@@ -51,7 +50,7 @@ export const ContextProvider = ({children}) => {
   const handleClick = (clicked) => setIsClicked({...initialState, [clicked]: true});
 
   return (
-    <StateContext.Provider value={{initialState, baseURL, forgetAPI, loginAPI, logoutAPI, changePasswordAPI,
+    <StateContext.Provider value={{initialState, forgetAPI, loginAPI, logoutAPI, changePasswordAPI,
       accessLevelAPI, employeeAPI, idDocumentAPI, planAPI, roomCategoryAPI, roomAPI, bookingAgentAPI,
       screenSize, setScreenSize, currentColor, setCurrentColor, 
       currentMode, setCurrentMode, themeSettings, setThemeSettings, 
