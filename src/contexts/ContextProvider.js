@@ -12,10 +12,10 @@ const initialState = {
 export const ContextProvider = ({children}) => {
   const forgetAPI = "/forgetpassword";
   const loginAPI = "/login";
-  const [logoutAPI, setLogoutAPI] = useState("/logout");
-  const [changePasswordAPI, setChangePasswordAPI] = useState("/changePassword");
-  const [accessLevelAPI, setAccessLevelAPI] = useState("/accessLevels");
-  const [employeeAPI, setEmployeeAPI] = useState("/employees");
+  const logoutAPI = "/logout";
+  const changePasswordAPI = "/changePassword";
+  const accessLevelAPI = "/accessLevels";
+  const employeeAPI = "/employees";
   const [idDocumentAPI, setIdDocumentAPI] = useState("/idDocuments");
   const [planAPI, setPlanAPI] = useState("/plans");
   const [roomCategoryAPI, setRoomCategoryAPI] = useState("/roomCategories");
