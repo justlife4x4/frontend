@@ -16,11 +16,11 @@ export const ContextProvider = ({children}) => {
   const changePasswordAPI = "/changePassword";
   const accessLevelAPI = "/accessLevels";
   const employeeAPI = "/employees";
-  const [idDocumentAPI, setIdDocumentAPI] = useState("/idDocuments");
-  const [planAPI, setPlanAPI] = useState("/plans");
-  const [roomCategoryAPI, setRoomCategoryAPI] = useState("/roomCategories");
-  const [roomAPI, setRoomAPI] = useState("/rooms");
-  const [bookingAgentAPI, setBookingAgentAPI] = useState("/bookingAgents");
+  const idDocumentAPI = "/idDocuments";
+  const planAPI = "/plans";
+  const roomCategoryAPI = "/roomCategories";
+  const roomAPI = "/rooms";
+  const bookingAgentAPI = "/bookingAgents";
 
   const [screenSize, setScreenSize] = useState(undefined);
   const [currentColor, setCurrentColor] = useState("#03C9D7");
