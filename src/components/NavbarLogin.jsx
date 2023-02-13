@@ -184,7 +184,7 @@ const NavbarLogin = forwardRef(( props, ref ) => {
             <div className="navbar-collapse collapse">
                 
                 {/* Start:: data operations menu search/add/edit/delete */}
-                { selectedPage &&
+                { selectedPage !== "" ?
                     <>
                         <Navbar.Brand href="#">{ getPageName(selectedPage) }</Navbar.Brand>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -235,7 +235,7 @@ const NavbarLogin = forwardRef(( props, ref ) => {
                                 </OverlayTrigger>
                             </Nav>
                         </Navbar.Collapse>
-                    </> }
+                    </> : <></>}
                 {/* End:: data operations menu search/add/edit/delete */}
 
                 {/* Start:: user menu */}

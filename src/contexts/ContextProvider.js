@@ -20,7 +20,7 @@ export const ContextProvider = ({children}) => {
   const [itemPerRow, setItemPerRow] = useState(3);
   const [itemPerPage, setItemPerPage] = useState(itemPerRow * 3);
 
-  const baseURL = "http://localhost:3000/";
+  const baseURL = process.env.REACT_APP_BASE_URI;
   const forgetAPI = "/forgetpassword";
   const loginAPI = "/login";
   const logoutAPI = "/logout";

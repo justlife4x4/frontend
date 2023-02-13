@@ -9,10 +9,10 @@ import ContainerLogin from "./components/ContainerLogin";
 const HotelId = createContext();
 
 function App() {
-  const hotelId = '1';  
+  const hotelId = "1";  
   const [pEmployeeId, setPEmployeeId] = useState(null);
   const [pEmployeeName, setPEmployeeName] = useState(null);
-
+  
   useEffect(() => {
     if (localStorage.getItem("token")) {
       const employeeInfo = jwt_decode(localStorage.getItem("token"));
