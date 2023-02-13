@@ -20,7 +20,7 @@ export const ContextProvider = ({children}) => {
   const [itemPerRow, setItemPerRow] = useState(3);
   const [itemPerPage, setItemPerPage] = useState(itemPerRow * 3);
 
-  const baseURL = "http://localhost:3000/";
+  const baseURL = "http://20.219.3.91:3000/";
   const forgetAPI = "/forgetpassword";
   const loginAPI = "/login";
   const logoutAPI = "/logout";
